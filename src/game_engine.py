@@ -1,3 +1,5 @@
+from typing import Generator, List
+
 from colony import Colony, InsufficientResources
 from player import Player, PlayerState
 
@@ -23,22 +25,34 @@ class GameEngine:
                 return False
         return True
 
-    def update(self):
+    @property
+    def in_game_players(self) -> Generator[Player, None, None]:
+        """Returns an iterators of available players in the game"""
+        for player in self.players:
+            if player.state in [PlayerState.ALIVE, PlayerState.SICK]:
+                yield player
+
+    def update(self) -> Generator:
         """This updates the game and make the actions of a complete day, from dawn to dawn"""
 
         # First step : daily actions
-        for player in self.players:
-            player.fetch_wood()
+        yield "THE DAY STARTS"
+        for player in self.in_game_players:
+            for log in player.make_random_daily_action():
+                yield log
 
         # Second step : Food and water count
         # enough_food = self.colony.food_amount >= len(self.players)
         # enough_water = self.colony.water_level >= len(self.players)
 
         # Third step : Eat and drink for the ones that can. The other dies
-        for player in self.players:
+        yield f"NIGHT FALLS, RESOURCES : {self.colony}"
+        for player in self.in_game_players:
             try:
-                player.eat()
-                player.drink()
+                for log in player.eat():
+                    yield log
+                for log in player.drink():
+                    yield log
             except InsufficientResources:
-                player.die()
-                print(f"{player} died")
+                for log in player.die():
+                    yield log

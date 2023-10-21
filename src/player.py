@@ -1,5 +1,5 @@
 import random
-from typing import List, Any, Callable
+from typing import List, Any, Callable, Generator
 from enum import IntEnum
 
 from actions import ActionRegistry
@@ -40,71 +40,88 @@ class Player:
     """
 
     @_daily_actions(id_=1)
-    def fetch_water(self):
+    def fetch_water(self) -> Generator[str, None, None]:
         amount_fetched = 1
         for o in self.inventory:
             if isinstance(o, Bucket):
                 amount_fetched += o.use()
 
+        yield f"{self} fetched {amount_fetched} water"
         self.colony.add_water(amount_fetched)
 
     @_daily_actions(id_=2)
-    def fetch_wood(self):
+    def fetch_wood(self) -> Generator[str, None, None]:
         amount_fetched = 1
         for o in self.inventory:
             if isinstance(o, Axe):
                 amount_fetched += o.use()
 
+        yield f"{self} fetched {amount_fetched} wood"
         self.colony.add_wood(amount_fetched)
 
     @_daily_actions(id_=3)
-    def fetch_food(self):
+    def fetch_food(self) -> Generator[str, None, None]:
         amount_fetched = 1
         for o in self.inventory:
             if isinstance(o, FishingRod):
                 amount_fetched += o.use()
 
+        yield f"{self} fetched {amount_fetched} fish(es)"
         self.colony.add_food(amount_fetched)
 
     @_daily_actions(id_=4)
-    def search_wreck(self):
+    def search_wreck(self) -> Generator[str, None, None]:
         """
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its inventory
         """
         if random.random() < 0.5:  # 50 % chances
             new_object_class = random.choice(object_class_list)
-            self.inventory.append(new_object_class())
+            new_object = new_object_class()
+            yield f"{self} search wreck and found {new_object}"
+            self.inventory.append(new_object)
+        else:
+            yield f"{self} search wreck and found nothing ..."
 
     """Eat & drink from colony actions
     These allows the player to get food and water from the colony in order to survive to the next day
     """
 
-    def eat(self):
+    def eat(self) -> Generator[str, None, None]:
         """Removes a unit of food from the colony"""
         self.colony.retrieve_food(1)
+        yield f"{self} eats"
 
-    def drink(self):
+    def drink(self) -> Generator[str, None, None]:
         """Removes a unit of water from the colony"""
         self.colony.retrieve_water(1)
+        yield f"{self} drinks"
 
     """States method
     Change the state of the player
     """
 
-    def die(self):
+    def die(self) -> Generator[str, None, None]:
+        yield f"{self} died"
         self._state = PlayerState.DEAD
 
-    def flee(self):
+    def flee(self) -> Generator[str, None, None]:
+        yield f"{self} escaped"
         self._state = PlayerState.GONE
 
-    def heal(self):
+    def heal(self) -> Generator[str, None, None]:
         if self.state is PlayerState.SICK:
+            yield f"{self} is now healed"
             self._state = PlayerState.ALIVE
+        else:
+            yield f"{self} was not sick"
 
-    def get_sick(self):
+    def get_sick(self) -> Generator[str, None, None]:
         if self.state is PlayerState.ALIVE:
+            yield f"{self} is now sick"
             self._state = PlayerState.SICK
+        else:
+            yield f"{self} was already sick"
 
     """Action choice
     The player should choose its actions with the following methods
@@ -113,12 +130,12 @@ class Player:
 
     def make_daily_action(self, action_id: int, *args, **kwargs) -> Any:
         """Calls the actions referring the given ID"""
-        _daily_actions.call_action(action_id, self, *args, **kwargs)
+        return _daily_actions.call_action(action_id, self, *args, **kwargs)
 
     def make_random_daily_action(self, *args, **kwargs) -> Any:
         """Calls a random daily action"""
         random_id = random.randint(1, len(_daily_actions.actions))
-        _daily_actions.call_action(random_id, self, *args, **kwargs)
+        return _daily_actions.call_action(random_id, self, *args, **kwargs)
 
     def __str__(self):
-        return f"N°{self.number} - {', '.join([str(o) for o in self.inventory])}"
+        return f"N°{self.number}"

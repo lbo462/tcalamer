@@ -1,15 +1,14 @@
-from colony import Colony
-from player import Player
+from game_engine import GameEngine
 
 
 def main():
-    colony = Colony()
-    player_6 = Player(6, colony)
-    print(colony, player_6)
+    ge = GameEngine(number_of_players=10)
 
-    player_6.make_random_daily_action()
+    while not ge.game_over:
+        for log in ge.update():
+            print(log)
 
-    print(colony, player_6)
+        print("------------ THE NEXT DAY -------------")
 
 
 if __name__ == "__main__":
