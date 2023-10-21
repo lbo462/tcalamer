@@ -1,7 +1,15 @@
 from typing import List
+from enum import IntEnum
 
 from .colony import Colony
 from .objects import Object, Bucket, Axe, FishingRod
+
+
+class PlayerState(IntEnum):
+    ALIVE = 1
+    DEAD = 2
+    GONE = 3
+    SICK = 4
 
 
 class Player:
@@ -14,6 +22,7 @@ class Player:
     def __init__(self, number: int, colony: Colony):
         self.number = number
         self.colony = colony
+        self.state = PlayerState.ALIVE
         self.inventory: List[Object] = []
 
     """Action methods
