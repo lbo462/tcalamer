@@ -1,12 +1,21 @@
 class Colony:
-    """"""
+    """
+    A colony has a certain amount of resources
+    These resources are shared by the players living in the colony
+    """
 
     def __init__(self):
+        # Define the resources held by the colony
         self._water_level = 0
         self._wood_amount = 0
         self._food_amount = 0
 
-    """"""
+    """
+    The resources are protected attributes to force the use of the deposit methods
+    To access the current amount of a resource, use the Python properties defined below :
+    
+    Each resource should be accessible though a property
+    """
 
     @property
     def water_level(self):
@@ -20,7 +29,11 @@ class Colony:
     def food_amount(self):
         return self._food_amount
 
-    """"""
+    """Deposit methods
+    These allows a player to add resources to the colony
+    
+    Each resource should define a deposit method
+    """
 
     def add_water(self, amount: int):
         self._water_level += amount
