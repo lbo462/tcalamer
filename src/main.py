@@ -4,15 +4,17 @@ from models.player import Player
 
 def main():
     colony = Colony()
-    player = Player(6, colony)
+    player_1 = Player(1, colony)
+    player_6 = Player(6, colony)
 
-    print(colony, player)
+    print(colony, player_1, player_6)
 
-    player.fetch_water()
-    player.search_wreck()
-    player.fetch_wood()
+    player_1.fetch_water()
 
-    print(colony, player)
+    player_6.search_wreck()
+    player_6.fetch_wood()
+
+    print(colony, player_1, player_6)
 
 
 if __name__ == "__main__":
