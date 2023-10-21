@@ -7,27 +7,7 @@ def main():
     player_6 = Player(6, colony)
     print(colony, player_6)
 
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.fetch_water()
-    player_6.fetch_wood()
-    player_6.fetch_food()
+    player_6.make_action(2)
 
     print(colony, player_6)
 

@@ -33,6 +33,11 @@ class Colony:
     def food_amount(self):
         return self._food_amount
 
+    @property
+    def places_on_the_raft(self):
+        """Returns the amount of places on the raft depending on the amount of wood in the colony"""
+        return int(self.wood_amount / 5)
+
     """Deposit methods
     These allows a player to add resources to the colony
     
