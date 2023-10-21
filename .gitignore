@@ -1,0 +1,17 @@
+# IDE
+.idea/
+.vscode/
+.fleet/
+
+# Python
+venv/
+env/
+VENV/
+ENV/
+.venv/
+
+# Scrapy stuff
+scrapy/
+
+# Secrets
+.env
