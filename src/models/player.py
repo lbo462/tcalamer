@@ -1,8 +1,9 @@
+import random
 from typing import List
 from enum import IntEnum
 
 from .colony import Colony
-from .objects import Object, Bucket, Axe, FishingRod
+from .objects import Object, object_class_list, Bucket, Axe, FishingRod
 
 
 class PlayerState(IntEnum):
@@ -58,8 +59,9 @@ class Player:
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its inventory
         """
-        # TODO
-        self.inventory.append(Axe())
+        if random.random() < 0.5:  # 50 % chances
+            new_object_class = random.choice(object_class_list)
+            self.inventory.append(new_object_class())
 
     def __str__(self):
         return f"N°{self.number} - {', '.join([str(o) for o in self.inventory])}"
