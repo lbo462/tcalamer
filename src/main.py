@@ -1,5 +1,5 @@
-from models.colony import Colony
-from models.player import Player
+from colony import Colony
+from player import Player
 
 
 def main():
@@ -7,7 +7,7 @@ def main():
     player_6 = Player(6, colony)
     print(colony, player_6)
 
-    player_6.make_action(2)
+    player_6.make_random_daily_action()
 
     print(colony, player_6)
 

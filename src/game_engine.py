@@ -1,7 +1,5 @@
-import random
-
-from models.colony import Colony, InsufficientResources
-from models.player import Player, PlayerState
+from colony import Colony, InsufficientResources
+from player import Player, PlayerState
 
 
 class GameEngine:

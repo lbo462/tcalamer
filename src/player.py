@@ -2,9 +2,11 @@ import random
 from typing import List, Any, Callable
 from enum import IntEnum
 
-from .actions import action_registry, UnregisteredAction
-from .colony import Colony
-from .objects import Object, object_class_list, Bucket, Axe, FishingRod
+from actions import ActionRegistry
+from colony import Colony
+from objects import Object, object_class_list, Bucket, Axe, FishingRod
+
+_daily_actions = ActionRegistry()
 
 
 class PlayerState(IntEnum):
@@ -32,12 +34,12 @@ class Player:
     def state(self) -> PlayerState:
         return self._state
 
-    """Action methods
-    These are the actions that a player can do for the colony.
+    """Daily action methods
+    These are the actions that a player can do for the colony during the daylight.
     Each action has a defined ID. This identifier will used by by the neural network to output actions 
     """
 
-    @action_registry(id_=1)
+    @_daily_actions(id_=1)
     def fetch_water(self):
         amount_fetched = 1
         for o in self.inventory:
@@ -46,7 +48,7 @@ class Player:
 
         self.colony.add_water(amount_fetched)
 
-    @action_registry(id_=2)
+    @_daily_actions(id_=2)
     def fetch_wood(self):
         amount_fetched = 1
         for o in self.inventory:
@@ -55,7 +57,7 @@ class Player:
 
         self.colony.add_wood(amount_fetched)
 
-    @action_registry(id_=3)
+    @_daily_actions(id_=3)
     def fetch_food(self):
         amount_fetched = 1
         for o in self.inventory:
@@ -64,7 +66,7 @@ class Player:
 
         self.colony.add_food(amount_fetched)
 
-    @action_registry(id_=4)
+    @_daily_actions(id_=4)
     def search_wreck(self):
         """
         The player can go to the wreck and search for objects.
@@ -109,13 +111,14 @@ class Player:
     This will later be handled by neural networks
     """
 
-    def make_action(self, action_id: int, *args, **kwargs) -> Any:
+    def make_daily_action(self, action_id: int, *args, **kwargs) -> Any:
         """Calls the actions referring the given ID"""
-        for action in action_registry.actions:
-            if action.id_ == action_id:
-                return action.function(self, *args, **kwargs)
+        _daily_actions.call_action(action_id, self, *args, **kwargs)
 
-        raise UnregisteredAction(f"Action #{action_id} wasn't registered")
+    def make_random_daily_action(self, *args, **kwargs) -> Any:
+        """Calls a random daily action"""
+        random_id = random.randint(1, len(_daily_actions.actions))
+        _daily_actions.call_action(random_id, self, *args, **kwargs)
 
     def __str__(self):
         return f"N°{self.number} - {', '.join([str(o) for o in self.inventory])}"
