@@ -9,6 +9,7 @@ env/
 VENV/
 ENV/
 .venv/
+__pycache__/
 
 # Scrapy stuff
 scrapy/
