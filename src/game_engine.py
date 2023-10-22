@@ -1,4 +1,5 @@
-from typing import Generator
+import random
+from typing import Generator, List
 
 from world import World
 from colony import Colony, InsufficientResources
@@ -34,6 +35,22 @@ class GameEngine:
             if player.state in [PlayerState.ALIVE, PlayerState.SICK]:
                 yield player
 
+    @property
+    def in_game_order_at_random(self) -> List[Player]:
+        """Returns the shuffled list of available players in the game"""
+        players = []
+        for player in self.in_game_players:
+            players.append(player)
+        random.shuffle(players)
+        return players
+
+    @property
+    def summary(self) -> str:
+        return (
+            f"World : {self.world}, Colony : {self.colony}, "
+            f"Number of players alive : {len(self.in_game_order_at_random)}"
+        )
+
     def update(self) -> Generator:
         """This updates the game and make the actions of a complete day, from dawn to dawn"""
 
@@ -46,7 +63,7 @@ class GameEngine:
 
         # First step : daily actions
         yield "EVERY ONE WORK"
-        for player in self.in_game_players:
+        for player in self.in_game_order_at_random:
             for log in player.make_random_daily_action():
                 yield log
 
@@ -56,7 +73,8 @@ class GameEngine:
 
         # Third step : Eat and drink for the ones that can. The other dies
         yield f"NIGHT FALLS, COLONY RESOURCES : {self.colony}"
-        for player in self.in_game_players:
+
+        for player in self.in_game_order_at_random:
             try:
                 for log in player.eat():
                     yield log
@@ -65,3 +83,6 @@ class GameEngine:
             except InsufficientResources:
                 for log in player.die():
                     yield log
+
+        # Day summary
+        yield self.summary
