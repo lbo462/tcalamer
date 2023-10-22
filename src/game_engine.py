@@ -68,12 +68,12 @@ class GameEngine:
                 yield log
 
         # Second step : Food and water count
-        # enough_food = self.colony.food_amount >= len(self.players)
-        # enough_water = self.colony.water_level >= len(self.players)
+        enough_food = self.colony.food_amount >= len(self.players)
+        enough_water = self.colony.water_level >= len(self.players)
+        yield f"Enough food : {enough_food}, Enough water : {enough_water}"
 
         # Third step : Eat and drink for the ones that can. The other dies
         yield f"NIGHT FALLS, COLONY RESOURCES : {self.colony}"
-
         for player in self.in_game_order_at_random:
             try:
                 for log in player.eat():
