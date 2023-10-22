@@ -3,6 +3,7 @@ from typing import List, Any, Callable, Generator
 from enum import IntEnum
 
 from actions import ActionRegistry
+from world import ResourceEmpty
 from colony import Colony
 from objects import Object, object_class_list, Bucket, Axe, FishingRod
 
@@ -46,8 +47,12 @@ class Player:
             if isinstance(o, Bucket):
                 amount_fetched += o.use()
 
-        yield f"{self} fetched {amount_fetched} water"
-        self.colony.add_water(amount_fetched)
+        try:
+            amount_fetched = self.colony.world.fetch_water(amount_fetched)
+            yield f"{self} fetched {amount_fetched} water"
+            self.colony.add_water(amount_fetched)
+        except ResourceEmpty as e:
+            yield f"{self} : {e}"
 
     @_daily_actions(id_=2)
     def fetch_wood(self) -> Generator[str, None, None]:
@@ -56,8 +61,12 @@ class Player:
             if isinstance(o, Axe):
                 amount_fetched += o.use()
 
-        yield f"{self} fetched {amount_fetched} wood"
-        self.colony.add_wood(amount_fetched)
+        try:
+            amount_fetched = self.colony.world.fetch_wood(amount_fetched)
+            yield f"{self} fetched {amount_fetched} wood"
+            self.colony.add_wood(amount_fetched)
+        except ResourceEmpty as e:
+            yield f"{self} : {e}"
 
     @_daily_actions(id_=3)
     def fetch_food(self) -> Generator[str, None, None]:
@@ -66,8 +75,12 @@ class Player:
             if isinstance(o, FishingRod):
                 amount_fetched += o.use()
 
-        yield f"{self} fetched {amount_fetched} fish(es)"
-        self.colony.add_food(amount_fetched)
+        try:
+            amount_fetched = self.colony.world.fetch_food(amount_fetched)
+            yield f"{self} fetched {amount_fetched} fish(es)"
+            self.colony.add_food(amount_fetched)
+        except ResourceEmpty as e:
+            yield f"{self} : {e}"
 
     @_daily_actions(id_=4)
     def search_wreck(self) -> Generator[str, None, None]:

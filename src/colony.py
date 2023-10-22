@@ -1,3 +1,6 @@
+from world import World
+
+
 class InsufficientResources(Exception):
     """Raised when fetching too much of a resource compared to the amount stored in the colony"""
 
@@ -8,7 +11,9 @@ class Colony:
     These resources are shared by the players living in the colony
     """
 
-    def __init__(self):
+    def __init__(self, world: World):
+        self.world = world
+
         # Define the resources held by the colony
         self._water_level = 0
         self._wood_amount = 0
