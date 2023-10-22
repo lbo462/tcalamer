@@ -1,4 +1,4 @@
-from typing import Generator, List
+from typing import Generator
 
 from colony import Colony, InsufficientResources
 from player import Player, PlayerState
