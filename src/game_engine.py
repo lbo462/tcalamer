@@ -1,5 +1,6 @@
 from typing import Generator
 
+from world import World
 from colony import Colony, InsufficientResources
 from player import Player, PlayerState
 
@@ -12,7 +13,8 @@ class GameEngine:
     """
 
     def __init__(self, number_of_players: int):
-        self.colony = Colony()
+        self.world = World()
+        self.colony = Colony(self.world)
         self.players = []
         for i in range(0, number_of_players):
             self.players.append(Player(i, self.colony))
@@ -35,8 +37,15 @@ class GameEngine:
     def update(self) -> Generator:
         """This updates the game and make the actions of a complete day, from dawn to dawn"""
 
-        # First step : daily actions
         yield "THE DAY STARTS"
+
+        # Step zero
+        self.world.update()
+        yield f"Weather of the day : {self.world.weather.name}"
+        yield f"World resources : {self.world}"
+
+        # First step : daily actions
+        yield "EVERY ONE WORK"
         for player in self.in_game_players:
             for log in player.make_random_daily_action():
                 yield log
@@ -46,7 +55,7 @@ class GameEngine:
         # enough_water = self.colony.water_level >= len(self.players)
 
         # Third step : Eat and drink for the ones that can. The other dies
-        yield f"NIGHT FALLS, RESOURCES : {self.colony}"
+        yield f"NIGHT FALLS, COLONY RESOURCES : {self.colony}"
         for player in self.in_game_players:
             try:
                 for log in player.eat():

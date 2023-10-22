@@ -2,7 +2,7 @@ from game_engine import GameEngine
 
 
 def main():
-    ge = GameEngine(number_of_players=10)
+    ge = GameEngine(number_of_players=50)
 
     while not ge.game_over:
         for log in ge.update():
