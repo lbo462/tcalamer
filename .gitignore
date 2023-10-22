@@ -12,7 +12,7 @@ ENV/
 __pycache__/
 
 # Scrapy stuff
-scrapy/
+.scrapy/
 
 # Secrets
 .env

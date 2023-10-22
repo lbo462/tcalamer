@@ -1,35 +1,14 @@
-from models.colony import Colony
-from models.player import Player
+from game_engine import GameEngine
 
 
 def main():
-    colony = Colony()
-    player_6 = Player(6, colony)
-    print(colony, player_6)
+    ge = GameEngine(number_of_players=10)
 
-    player_6.search_wreck()
-    print(colony, player_6)
+    while not ge.game_over:
+        for log in ge.update():
+            print(log)
 
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.search_wreck()
-    print(colony, player_6)
-
-    player_6.fetch_water()
-    player_6.fetch_wood()
-    player_6.fetch_food()
-
-    print(colony, player_6)
+        print("------------ THE NEXT DAY -------------")
 
 
 if __name__ == "__main__":
