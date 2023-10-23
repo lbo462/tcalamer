@@ -2,7 +2,8 @@ import random
 from enum import IntEnum
 from typing import Union
 
-from wreck import Wreck, T
+from wreck import Wreck
+from objects import T
 
 
 class ResourceEmpty(Exception):

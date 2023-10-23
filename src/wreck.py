@@ -1,9 +1,7 @@
 import random
-from typing import TypeVar, Type, List, Union
+from typing import Type, List, Union
 
-from objects import Object
-
-T = TypeVar("T", bound=Object)
+from objects import T
 
 
 class ItemSetEmpty(Exception):

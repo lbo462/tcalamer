@@ -5,7 +5,7 @@ from enum import IntEnum
 from actions import ActionRegistry
 from world import ResourceEmpty
 from colony import Colony
-from objects import Object, object_class_list, Bucket, Axe, FishingRod
+from objects import Object, Bucket, Axe, FishingRod
 
 _daily_actions = ActionRegistry()
 
@@ -13,7 +13,7 @@ _daily_actions = ActionRegistry()
 class PlayerState(IntEnum):
     ALIVE = 1
     DEAD = 2
-    GONE = 3
+    ESCAPED = 3
     SICK = 4
 
 
@@ -120,7 +120,7 @@ class Player:
 
     def flee(self) -> Generator[str, None, None]:
         yield f"{self} escaped"
-        self._state = PlayerState.GONE
+        self._state = PlayerState.ESCAPED
 
     def heal(self) -> Generator[str, None, None]:
         if self.state is PlayerState.SICK:
