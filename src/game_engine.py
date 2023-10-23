@@ -23,10 +23,10 @@ class GameEngine:
         wreck.add_item(FishingRod, 1)
 
         # Create _world
-        self.world = World(wreck)
+        self._world = World(wreck)
 
         # Create _colony
-        self.colony = Colony(self.world, [])
+        self.colony = Colony(self._world, [])
 
         # Add players
         for i in range(0, number_of_players):
@@ -40,7 +40,7 @@ class GameEngine:
     @property
     def summary(self) -> str:
         return (
-            f"World : {self.world}, Colony : {self.colony}, "
+            f"World : {self._world}, Colony : {self.colony}, "
             f"Number of players alive on the isle : {len(self.colony.alive_players)}"
         )
 
@@ -50,9 +50,9 @@ class GameEngine:
         yield "--- THE DAY STARTS"
 
         # Step zero
-        self.world.update()
-        yield f"- Weather report : {self.world.weather.name}"
-        yield f"- World resources : {self.world}"
+        self._world.update()
+        yield f"- Weather report : {self._world.weather.name}"
+        yield f"- World resources : {self._world}"
 
         # First step : daily _actions
         yield "--- EVERY ONE WORK"
