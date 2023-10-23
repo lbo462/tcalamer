@@ -80,22 +80,29 @@ class GameEngine:
             for log in player.make_random_daily_action():
                 yield log
 
+        yield f"--- NIGHT FALLS, COLONY RESOURCES : {self.colony}"
+
         # Second step : Food and water count
         enough_food = self.colony.food_amount >= len(self.players)
         enough_water = self.colony.water_level >= len(self.players)
         yield f"Enough food : {enough_food}, Enough water : {enough_water}"
 
-        # Third step : Eat and drink for the ones that can. The other dies
-        yield f"NIGHT FALLS, COLONY RESOURCES : {self.colony}"
-        for player in self.in_game_order_at_random:
-            try:
-                for log in player.eat():
-                    yield log
-                for log in player.drink():
-                    yield log
-            except InsufficientResources:
-                for log in player.die():
-                    yield log
+        # Second - bis step : Vote for the players to die
+        if not enough_water or not enough_food:
+            limiting_factor = min(self.colony.water_level, self.colony.food_amount)
+            amount_of_players_to_die = (
+                len(self.in_game_order_at_random) - limiting_factor
+            )
+            yield f"{amount_of_players_to_die} players must die."
+            # TODO vote system
+            for i in range(0, amount_of_players_to_die):
+                player_to_die: Player = random.choice(self.in_game_order_at_random)
+                yield f"{player_to_die} was chosen to die"
+                player_to_die.die()
+
+        # Third step : Eat and drink
+        for player in self.in_game_players:
+            player.eat_and_drink()
 
         # Day summary
         yield self.summary
