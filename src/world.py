@@ -15,6 +15,7 @@ class Weather(IntEnum):
     CLOUDY = 1
     RAINING = 2
     STORM = 3
+    DOOM = 4
 
 
 class World:
@@ -59,18 +60,24 @@ class World:
 
     @property
     def _water_fetch_factor(self) -> List[int]:
+        if self.weather is Weather.DOOM:
+            return [0]
         if self.weather is Weather.RAINING:
             return [2 * i for i in self._basic_water_fetch_factor]
         return self._basic_water_fetch_factor
 
     @property
     def _wood_fetch_factor(self) -> List[int]:
+        if self.weather is Weather.DOOM:
+            return [0]
         if self.weather is Weather.STORM:
             return [2 * i for i in self._basic_wood_fetch_factor]
         return self._basic_wood_fetch_factor
 
     @property
     def _food_fetch_factor(self) -> List[int]:
+        if self.weather is Weather.DOOM:
+            return [0]
         if self.weather is Weather.STORM:
             return [2 * i for i in self._basic_food_fetch_factor]
         return self._basic_food_fetch_factor
@@ -123,8 +130,11 @@ class World:
         return self._wreck.search()
 
     def update(self):
-        # Randomly change the weather
-        self._weather = random.choice(list(Weather))
+        # Update the weather
+        if self.weather is Weather.CLOUDY:
+            self._weather = Weather.RAINING
+        else:
+            self._weather = random.choice(list(Weather))
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"
