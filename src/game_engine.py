@@ -32,6 +32,10 @@ class GameEngine:
         self.players = []
         for i in range(0, number_of_players):
             self.players.append(Player(i, self.colony))
+            # Add a basic resource for each player
+            self.colony.add_water(2)
+            self.colony.add_wood(2)
+            self.colony.add_food(2)
 
     @property
     def game_over(self) -> bool:
@@ -58,10 +62,23 @@ class GameEngine:
         return players
 
     @property
+    def alive_players(self) -> int:
+        return len(self.in_game_order_at_random)
+
+    @property
     def summary(self) -> str:
         return (
             f"World : {self.world}, Colony : {self.colony}, "
-            f"Number of players alive : {len(self.in_game_order_at_random)}"
+            f"Number of players alive on the isle : {len(self.in_game_order_at_random)}"
+        )
+
+    @property
+    def able_to_leave(self) -> bool:
+        """Returns the possibility for the colony to leave"""
+        return (
+            self.colony.wood_amount >= self.alive_players * 5
+            and self.colony.food_amount >= self.alive_players
+            and self.colony.water_level >= self.alive_players
         )
 
     def update(self) -> Generator:
@@ -83,16 +100,14 @@ class GameEngine:
         yield f"--- NIGHT FALLS, COLONY RESOURCES : {self.colony}"
 
         # Second step : Food and water count
-        enough_food = self.colony.food_amount >= len(self.players)
-        enough_water = self.colony.water_level >= len(self.players)
+        enough_food = self.colony.food_amount >= self.alive_players
+        enough_water = self.colony.water_level >= self.alive_players
         yield f"Enough food : {enough_food}, Enough water : {enough_water}"
 
         # Second - bis step : Vote for the players to die
         if not enough_water or not enough_food:
             limiting_factor = min(self.colony.water_level, self.colony.food_amount)
-            amount_of_players_to_die = (
-                len(self.in_game_order_at_random) - limiting_factor
-            )
+            amount_of_players_to_die = self.alive_players - limiting_factor
             yield f"{amount_of_players_to_die} players must die."
             # TODO vote system
             for i in range(0, amount_of_players_to_die):
@@ -103,6 +118,13 @@ class GameEngine:
         # Third step : Eat and drink
         for player in self.in_game_players:
             player.eat_and_drink()
+
+        # Fourth step : Verify if there's enough resources to leave
+        if self.able_to_leave:
+            for player in self.in_game_players:
+                yield f"{player} took the raft and left"
+                player.flee()
+            yield "EVERY LEFT THE ISLE"
 
         # Day summary
         yield self.summary
