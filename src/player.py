@@ -5,7 +5,7 @@ from enum import IntEnum
 from actions import ActionRegistry
 from world import ResourceEmpty
 from colony import Colony
-from objects import Object, object_class_list, Bucket, Axe, FishingRod
+from objects import Object, Bucket, Axe, FishingRod
 
 _daily_actions = ActionRegistry()
 
@@ -13,7 +13,7 @@ _daily_actions = ActionRegistry()
 class PlayerState(IntEnum):
     ALIVE = 1
     DEAD = 2
-    GONE = 3
+    ESCAPED = 3
     SICK = 4
 
 
@@ -27,6 +27,7 @@ class Player:
     def __init__(self, number: int, colony: Colony):
         self.number = number
         self.colony = colony
+        self.world = colony.world
         self._state = PlayerState.ALIVE
         self.inventory: List[Object] = []
         self.actions: List[Callable] = []
@@ -48,7 +49,7 @@ class Player:
                 amount_fetched += o.use()
 
         try:
-            amount_fetched = self.colony.world.fetch_water(amount_fetched)
+            amount_fetched = self.world.fetch_water(amount_fetched)
             yield f"{self} fetched {amount_fetched} water"
             self.colony.add_water(amount_fetched)
         except ResourceEmpty as e:
@@ -62,7 +63,7 @@ class Player:
                 amount_fetched += o.use()
 
         try:
-            amount_fetched = self.colony.world.fetch_wood(amount_fetched)
+            amount_fetched = self.world.fetch_wood(amount_fetched)
             yield f"{self} fetched {amount_fetched} wood"
             self.colony.add_wood(amount_fetched)
         except ResourceEmpty as e:
@@ -76,7 +77,7 @@ class Player:
                 amount_fetched += o.use()
 
         try:
-            amount_fetched = self.colony.world.fetch_food(amount_fetched)
+            amount_fetched = self.world.fetch_food(amount_fetched)
             yield f"{self} fetched {amount_fetched} fish(es)"
             self.colony.add_food(amount_fetched)
         except ResourceEmpty as e:
@@ -88,9 +89,8 @@ class Player:
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its inventory
         """
-        if random.random() < 0.5:  # 50 % chances
-            new_object_class = random.choice(object_class_list)
-            new_object = new_object_class()
+        new_object = self.world.search_wreck()
+        if new_object:
             yield f"{self} search wreck and found {new_object}"
             self.inventory.append(new_object)
         else:
@@ -120,7 +120,7 @@ class Player:
 
     def flee(self) -> Generator[str, None, None]:
         yield f"{self} escaped"
-        self._state = PlayerState.GONE
+        self._state = PlayerState.ESCAPED
 
     def heal(self) -> Generator[str, None, None]:
         if self.state is PlayerState.SICK:

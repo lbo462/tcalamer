@@ -1,8 +1,4 @@
-"""
-This file defines every objects the game contains
-To add a new object, create a subclass of Object and add it to the object_class_list
-"""
-from typing import Any
+from typing import Any, TypeVar
 
 
 class Object:
@@ -39,9 +35,4 @@ class FishingRod(Object):
         return 1
 
 
-# Add every existing objects in the following list :
-object_class_list = [
-    Bucket,
-    Axe,
-    FishingRod,
-]
+T = TypeVar("T", bound=Object)
