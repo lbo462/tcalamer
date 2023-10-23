@@ -20,9 +20,9 @@ class Weather(IntEnum):
 
 class World:
     """
-    The world has certain amount of resources
-    The colony lives in the world and take its resources
-    The world also defines the weather
+    The _world has certain amount of resources
+    The _colony lives in the _world and take its resources
+    The _world also defines the weather
     """
 
     def __init__(self, wreck: Wreck):
@@ -38,15 +38,15 @@ class World:
         self._basic_food_fetch_factor = [1, 2, 3]
 
     @property
-    def water_level(self):
+    def water_level(self) -> int:
         return self._water_level
 
     @property
-    def wood_amount(self):
+    def wood_amount(self) -> int:
         return self._wood_amount
 
     @property
-    def food_amount(self):
+    def food_amount(self) -> int:
         return self._food_amount
 
     @property
@@ -83,8 +83,8 @@ class World:
         return self._basic_food_fetch_factor
 
     """Fetch methods
-    Get the resources out of the world
-    It is not possible to put resources back to the world
+    Get the resources out of the _world
+    It is not possible to put resources back to the _world
     """
 
     def fetch_water(self, requested_amount: int) -> int:
