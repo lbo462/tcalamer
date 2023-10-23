@@ -11,8 +11,6 @@ def main():
         for log in ge.update():
             print(log)
 
-        print("------------ THE NEXT DAY -------------")
-
 
 if __name__ == "__main__":
     main()
