@@ -1,5 +1,8 @@
 import random
 from enum import IntEnum
+from typing import Union
+
+from wreck import Wreck, T
 
 
 class ResourceEmpty(Exception):
@@ -21,12 +24,13 @@ class World:
     The world also defines the weather
     """
 
-    def __init__(self):
-        self._water_level = 10
-        self._wood_amount = 10
-        self._food_amount = 10
+    def __init__(self, wreck: Wreck):
+        self._water_level = 100
+        self._wood_amount = 100
+        self._food_amount = 100
 
-        self.weather = Weather.BLUE_SKY
+        self._wreck = wreck
+        self._weather = Weather.BLUE_SKY
 
     @property
     def water_level(self):
@@ -40,9 +44,13 @@ class World:
     def food_amount(self):
         return self._food_amount
 
+    @property
+    def weather(self) -> Weather:
+        return self._weather
+
     def update(self):
         # Randomly change the weather
-        self.weather = random.choice(list(Weather))
+        self._weather = random.choice(list(Weather))
 
         # Add water to the world on rainy days
         if self.weather is Weather.RAINING:
@@ -88,6 +96,9 @@ class World:
 
         self._food_amount -= amount
         return amount
+
+    def search_wreck(self) -> Union[None, T]:
+        return self._wreck.search()
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

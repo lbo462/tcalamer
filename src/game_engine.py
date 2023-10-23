@@ -1,9 +1,11 @@
 import random
 from typing import Generator, List
 
+from wreck import Wreck
 from world import World
 from colony import Colony, InsufficientResources
 from player import Player, PlayerState
+from objects import Bucket, Axe, FishingRod
 
 
 class GameEngine:
@@ -13,9 +15,20 @@ class GameEngine:
     It defines the different steps of the game
     """
 
-    def __init__(self, number_of_players: int):
-        self.world = World()
+    def __init__(self, number_of_players: int, wreck_probability: float):
+        # Create wreck
+        wreck = Wreck(wreck_probability)
+        wreck.add_item(Bucket, 1)
+        wreck.add_item(Axe, 1)
+        wreck.add_item(FishingRod, 1)
+
+        # Create world
+        self.world = World(wreck)
+
+        # Create colony
         self.colony = Colony(self.world)
+
+        # Add players
         self.players = []
         for i in range(0, number_of_players):
             self.players.append(Player(i, self.colony))
