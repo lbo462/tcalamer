@@ -25,9 +25,9 @@ class World:
     """
 
     def __init__(self, wreck: Wreck):
-        self._water_level = 100
-        self._wood_amount = 100
-        self._food_amount = 100
+        self._water_level = 500
+        self._wood_amount = 500
+        self._food_amount = 500
 
         self._wreck = wreck
         self._weather = Weather.BLUE_SKY
