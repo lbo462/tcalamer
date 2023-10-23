@@ -100,41 +100,33 @@ class Player:
     These allows the player to get food and water from the colony in order to survive to the next day
     """
 
-    def eat(self) -> Generator[str, None, None]:
+    def eat(self):
         """Removes a unit of food from the colony"""
         self.colony.retrieve_food(1)
-        yield f"{self} eats"
 
-    def drink(self) -> Generator[str, None, None]:
+    def drink(self):
         """Removes a unit of water from the colony"""
         self.colony.retrieve_water(1)
-        yield f"{self} drinks"
+
+    def eat_and_drink(self):
+        self.eat()
+        self.drink()
 
     """States method
     Change the state of the player
     """
 
-    def die(self) -> Generator[str, None, None]:
-        yield f"{self} died"
+    def die(self):
         self._state = PlayerState.DEAD
 
-    def flee(self) -> Generator[str, None, None]:
-        yield f"{self} escaped"
+    def flee(self):
         self._state = PlayerState.ESCAPED
 
-    def heal(self) -> Generator[str, None, None]:
-        if self.state is PlayerState.SICK:
-            yield f"{self} is now healed"
-            self._state = PlayerState.ALIVE
-        else:
-            yield f"{self} was not sick"
+    def heal(self):
+        self._state = PlayerState.ALIVE
 
-    def get_sick(self) -> Generator[str, None, None]:
-        if self.state is PlayerState.ALIVE:
-            yield f"{self} is now sick"
-            self._state = PlayerState.SICK
-        else:
-            yield f"{self} was already sick"
+    def get_sick(self):
+        self._state = PlayerState.SICK
 
     """Action choice
     The player should choose its actions with the following methods

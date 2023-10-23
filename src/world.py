@@ -15,7 +15,6 @@ class Weather(IntEnum):
     CLOUDY = 1
     RAINING = 2
     STORM = 3
-    VOLCANO_ERUPTION = 4
 
 
 class World:
