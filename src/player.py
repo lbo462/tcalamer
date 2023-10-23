@@ -29,7 +29,7 @@ class Player:
         self.colony = colony
         self.world = colony.world
         self._state = PlayerState.ALIVE
-        self.inventory: List[Object] = [Bucket(), FishingRod()]
+        self.inventory: List[Object] = []
         self.actions: List[Callable] = []
 
     @property

@@ -121,10 +121,13 @@ class GameEngine:
 
         # Fourth step : Verify if there's enough resources to leave
         if self.able_to_leave and not self.game_over:
+            number_of_winners = self.alive_players
             for player in self.in_game_players:
                 yield f"{player} took the raft and left"
                 player.flee()
-            yield "EVERY LEFT THE ISLE"
+            yield f"{number_of_winners} PLAYERS ESCAPED"
+        else:
+            # Day summary
+            yield self.summary
 
-        # Day summary
-        yield self.summary
+            yield "--------- THE NEXT DAY ------------"
