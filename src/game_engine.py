@@ -120,7 +120,7 @@ class GameEngine:
             player.eat_and_drink()
 
         # Fourth step : Verify if there's enough resources to leave
-        if self.able_to_leave:
+        if self.able_to_leave and not self.game_over:
             for player in self.in_game_players:
                 yield f"{player} took the raft and left"
                 player.flee()
