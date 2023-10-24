@@ -8,13 +8,13 @@ In order to register an action, create an instance of ActionRegistry and call it
 >>>   ...
 
 The registered functions are accessible though the created instance as such:
->>> print(ar.actions)
+>>> print(ar._actions)
 
 To call a registered method, use
 >>> ar.call_action(1, ...)
 """
 
-from typing import List, Callable
+from typing import List, Callable, Any
 
 
 class UnregisteredAction(Exception):
@@ -30,7 +30,7 @@ class Action:
 
 
 class ActionRegistry:
-    """Keep track of every possible actions though its decorator"""
+    """Keep track of every possible _actions though its decorator"""
 
     def __init__(self):
         self.actions: List[Action] = []
@@ -46,7 +46,7 @@ class ActionRegistry:
 
         return register_function
 
-    def call_action(self, id_: int, *args, **kwargs):
+    def call_action(self, id_: int, *args, **kwargs) -> Any:
         """
         Calls the action registered under the given ID
         :raises UnregisteredAction:

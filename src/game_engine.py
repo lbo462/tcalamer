@@ -11,7 +11,7 @@ from objects import Bucket, Axe, FishingRod
 class GameEngine:
     """
     The GameEngine drives the whole game.
-    It creates a colony and players in it.
+    It creates a _colony and players in it.
     It defines the different steps of the game
     """
 
@@ -22,112 +22,86 @@ class GameEngine:
         wreck.add_item(Axe, 1)
         wreck.add_item(FishingRod, 1)
 
-        # Create world
-        self.world = World(wreck)
+        # Create _world
+        self._world = World(wreck)
 
-        # Create colony
-        self.colony = Colony(self.world)
+        # Create _colony
+        self.colony = Colony(self._world, [])
 
         # Add players
-        self.players = []
         for i in range(0, number_of_players):
-            self.players.append(Player(i, self.colony))
-            # Add a basic resource for each player
-            self.colony.add_water(2)
-            self.colony.add_wood(2)
-            self.colony.add_food(2)
+            self.colony.add_player(Player(i, self.colony))
+
+        # Initiate day counter
+        self._day = 0
 
     @property
     def game_over(self) -> bool:
         """The game is over iff every player is dead or gone"""
-        for player in self.players:
-            if player.state in [PlayerState.ALIVE, PlayerState.SICK]:
-                return False
-        return True
+        return len(self.colony.alive_players) <= 0
 
     @property
-    def in_game_players(self) -> Generator[Player, None, None]:
-        """Returns an iterators of available players in the game"""
-        for player in self.players:
-            if player.state in [PlayerState.ALIVE, PlayerState.SICK]:
-                yield player
+    def current_day(self) -> int:
+        return self._day
 
-    @property
-    def in_game_order_at_random(self) -> List[Player]:
-        """Returns the shuffled list of available players in the game"""
-        players = []
-        for player in self.in_game_players:
-            players.append(player)
-        random.shuffle(players)
-        return players
+    def update(self) -> Generator[str, None, None]:
+        """This updates the game and make the _actions of a complete day, from dawn to dawn"""
 
-    @property
-    def alive_players(self) -> int:
-        return len(self.in_game_order_at_random)
+        # Step zero, world update
+        self._day += 1
+        self._world.update()
 
-    @property
-    def summary(self) -> str:
-        return (
-            f"World : {self.world}, Colony : {self.colony}, "
-            f"Number of players alive on the isle : {len(self.in_game_order_at_random)}"
-        )
+        yield f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})"
+        yield f"/ ---"
+        yield f"| World : {self._world}"
+        yield f"| Colony : {self.colony}"
+        yield f"| {len(self.colony.alive_players)} players lefts"
+        yield f"\\ ---"
 
-    @property
-    def able_to_leave(self) -> bool:
-        """Returns the possibility for the colony to leave"""
-        return (
-            self.colony.wood_amount >= self.alive_players * 5
-            and self.colony.food_amount >= self.alive_players
-            and self.colony.water_level >= self.alive_players
-        )
-
-    def update(self) -> Generator:
-        """This updates the game and make the actions of a complete day, from dawn to dawn"""
-
-        yield "THE DAY STARTS"
-
-        # Step zero
-        self.world.update()
-        yield f"Weather of the day : {self.world.weather.name}"
-        yield f"World resources : {self.world}"
-
-        # First step : daily actions
-        yield "EVERY ONE WORK"
-        for player in self.in_game_order_at_random:
+        # First step : daily _actions
+        for player in self.colony.alive_players:
             for log in player.make_random_daily_action():
-                yield log
+                yield f"  > {log}"
 
-        yield f"--- NIGHT FALLS, COLONY RESOURCES : {self.colony}"
+        yield ""
+        yield f"--- SUN GETS DOWN - {self.colony}"
 
-        # Second step : Food and water count
-        enough_food = self.colony.food_amount >= self.alive_players
-        enough_water = self.colony.water_level >= self.alive_players
-        yield f"Enough food : {enough_food}, Enough water : {enough_water}"
+        # Second step : Some must die
+        if not self.colony.enough_resources:
+            limiting_factor = self.colony.limiting_factor
+            amount_of_players_to_die = len(self.colony.alive_players) - limiting_factor
+            yield f"NOT ENOUGH RESOURCES : {amount_of_players_to_die} players must die."
 
-        # Second - bis step : Vote for the players to die
-        if not enough_water or not enough_food:
-            limiting_factor = min(self.colony.water_level, self.colony.food_amount)
-            amount_of_players_to_die = self.alive_players - limiting_factor
-            yield f"{amount_of_players_to_die} players must die."
-            # TODO vote system
             for i in range(0, amount_of_players_to_die):
-                player_to_die: Player = random.choice(self.in_game_order_at_random)
-                yield f"{player_to_die} was chosen to die"
-                player_to_die.die()
+                player_to_die = self.colony.get_random_alive_player()
+                player_to_die.die(self.current_day)
+                yield f"  X {player_to_die} died on day #{player_to_die.day_of_death}."
 
-        # Third step : Eat and drink
-        for player in self.in_game_players:
-            player.eat_and_drink()
+        if not self.game_over:
+            # Third step : Diner
+            yield f"EVERY ONE DINE"
+            for player in self.colony.dine():
+                yield f"  - {player} dine"
 
-        # Fourth step : Verify if there's enough resources to leave
-        if self.able_to_leave and not self.game_over:
-            number_of_winners = self.alive_players
-            for player in self.in_game_players:
-                yield f"{player} took the raft and left"
-                player.flee()
-            yield f"{number_of_winners} PLAYERS ESCAPED"
+            # Fourth step : Verify if there's enough resources to leave
+            if self.colony.able_to_leave:
+                yield f"SOME LEAVE THE ISLE !"
+                count = 0
+                for player in self.colony.leave_isle():
+                    yield f"  >> {player} took the raft"
+                    count += 1
+                yield f"--------- {count} PLAYERS ESCAPED ---------"
+
+            # Fifth step : Close your eyes and sleep my darling
+            else:
+                yield "--------- NIGHT FALLS ------------"
+
         else:
-            # Day summary
-            yield self.summary
+            yield "--------- GAME OVER ------------"
 
-            yield "--------- THE NEXT DAY ------------"
+        # Day summary
+        yield f"/ ---"
+        yield f"| World : {self._world}"
+        yield f"| Colony : {self.colony}"
+        yield f"| {len(self.colony.alive_players)} players lefts"
+        yield f"\\ ---"

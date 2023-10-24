@@ -9,7 +9,8 @@ def main():
 
     while not ge.game_over:
         for log in ge.update():
-            print(log)
+            print(f". {log}")
+        print("\n")
 
 
 if __name__ == "__main__":
