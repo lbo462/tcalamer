@@ -32,10 +32,17 @@ class GameEngine:
         for i in range(0, number_of_players):
             self.colony.add_player(Player(i, self.colony))
 
+        # Initiate day counter
+        self._day = 0
+
     @property
     def game_over(self) -> bool:
         """The game is over iff every player is dead or gone"""
         return len(self.colony.alive_players) <= 0
+
+    @property
+    def current_day(self) -> int:
+        return self._day
 
     @property
     def summary(self) -> str:
@@ -46,8 +53,9 @@ class GameEngine:
 
     def update(self) -> Generator[str, None, None]:
         """This updates the game and make the _actions of a complete day, from dawn to dawn"""
+        self._day += 1
 
-        yield "--- THE DAY STARTS"
+        yield f"--- THE DAY #{self._day} STARTS"
 
         # Step zero
         self._world.update()
@@ -72,13 +80,13 @@ class GameEngine:
 
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
-                player_to_die.die()
-                yield f"{player_to_die} was chosen to die"
+                player_to_die.die(self.current_day)
+                yield f"{player_to_die} died on day #{player_to_die.day_of_death}."
 
         if not self.game_over:
             # Third step : Diner
             yield f"--- EVERY ONE EATS DINER"
-            for _ in self.colony.make_diner():
+            for _ in self.colony.dine():
                 ...
 
             # Fourth step : Verify if there's enough resources to leave

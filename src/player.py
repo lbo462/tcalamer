@@ -27,10 +27,12 @@ class Player:
     def __init__(self, number: int, colony):
         self._number = number
         self._colony = colony
-        self._world = colony._world
+        self._world = colony._world  # noqa
         self._state = PlayerState.ALIVE
         self._inventory: List[Object] = []
         self._actions: List[Callable] = []
+
+        self._day_of_death = -1  # initialize purposefully with a wrong value
 
     @property
     def name(self) -> str:
@@ -39,6 +41,12 @@ class Player:
     @property
     def state(self) -> PlayerState:
         return self._state
+
+    @property
+    def day_of_death(self) -> int:
+        if self._day_of_death == -1 or self.state is not PlayerState.DEAD:
+            raise ValueError(f"{self} not dead yet")
+        return self._day_of_death
 
     """Daily action methods
     These are the _actions that a player can do for the _colony during the daylight.
@@ -116,8 +124,9 @@ class Player:
     Change the state of the player
     """
 
-    def die(self):
+    def die(self, day_of_death: int):
         self._state = PlayerState.DEAD
+        self._day_of_death = day_of_death
 
     def flee(self):
         self._state = PlayerState.ESCAPED

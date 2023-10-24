@@ -129,7 +129,7 @@ class Colony:
     def get_random_alive_player(self) -> Player:
         return random.choice(self.alive_players)
 
-    def make_diner(self) -> Generator[Player, None, None]:
+    def dine(self) -> Generator[Player, None, None]:
         """Make every player eat and drink and returns an iterator of the players that eat and drink"""
         for player in self.alive_players:
             player.eat()
