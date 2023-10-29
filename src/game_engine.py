@@ -1,10 +1,9 @@
-import random
-from typing import Generator, List
+from typing import Generator
 
 from wreck import Wreck
 from world import World
-from colony import Colony, InsufficientResources
-from player import Player, PlayerState
+from colony import Colony
+from player import Player
 from objects import Bucket, Axe, FishingRod
 
 
@@ -15,18 +14,30 @@ class GameEngine:
     It defines the different steps of the game
     """
 
-    def __init__(self, number_of_players: int, wreck_probability: float):
+    def __init__(
+        self,
+        number_of_players: int,
+        wreck_probability: float,
+        amount_of_wood_per_player_to_leave=20,
+        amount_of_water_per_player_to_leave=2,
+        amount_of_food_per_player_to_leave=2,
+    ):
         # Create wreck
         wreck = Wreck(wreck_probability)
         wreck.add_item(Bucket, 1)
         wreck.add_item(Axe, 1)
         wreck.add_item(FishingRod, 1)
 
-        # Create _world
+        # Create world
         self._world = World(wreck)
 
-        # Create _colony
-        self.colony = Colony(self._world, [])
+        # Create colony
+        self.colony = Colony(
+            self._world,
+            amount_of_wood_per_player_to_leave=amount_of_wood_per_player_to_leave,
+            amount_of_water_per_player_to_leave=amount_of_water_per_player_to_leave,
+            amount_of_food_per_player_to_leave=amount_of_food_per_player_to_leave,
+        )
 
         # Add players
         for i in range(0, number_of_players):
@@ -60,7 +71,7 @@ class GameEngine:
 
         # First step : daily _actions
         for player in self.colony.alive_players:
-            for log in player.make_random_daily_action():
+            for log in player.make_best_daily_action():
                 yield f"  > {log}"
 
         yield ""

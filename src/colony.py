@@ -15,17 +15,28 @@ class Colony:
     These resources are shared by the players living in the _colony
     """
 
-    def __init__(self, world: World, players: List[Player]):
+    def __init__(
+        self,
+        world: World,
+        amount_of_wood_per_player_to_leave: int,
+        amount_of_water_per_player_to_leave: int,
+        amount_of_food_per_player_to_leave: int,
+    ):
         self._world = world
-        self._players = players
+        self._players: List[Player] = []
+
+        # Defines initial colony resources
+        self._water_level = 0
+        self._wood_amount = 0
+        self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = 1
+        self._initial_surviving_factor = 3
 
-        # Define the resources held by the colony depending on the players
-        self._wood_amount = 0
-        self._water_level = self._initial_surviving_factor * len(players)
-        self._food_amount = self._initial_surviving_factor * len(players)
+        # Define the amount of resources to leave
+        self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
+        self._amount_of_water_to_leave = amount_of_water_per_player_to_leave
+        self._amount_of_food_to_leave = amount_of_food_per_player_to_leave
 
     @property
     def alive_players(self) -> List[Player]:
@@ -40,9 +51,11 @@ class Colony:
     def able_to_leave(self) -> bool:
         """Returns the possibility for the colony to leave"""
         return (
-            self.wood_amount >= len(self.alive_players) * 5
-            and self.food_amount >= len(self.alive_players)
-            and self.water_level >= len(self.alive_players)
+            self.wood_amount >= len(self.alive_players) * self._amount_of_wood_to_leave
+            and self.food_amount
+            >= len(self.alive_players) * self._amount_of_food_to_leave
+            and self.water_level
+            >= len(self.alive_players) * self._amount_of_water_to_leave
         )
 
     @property
@@ -53,6 +66,28 @@ class Colony:
     @property
     def enough_resources(self) -> bool:
         return self.limiting_factor >= len(self.alive_players)
+
+    @property
+    def daily_fitness(self) -> float:
+        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
+        food_objective = self._amount_of_food_to_leave * len(
+            self.alive_players
+        ) + 2 * len(self.alive_players)
+        water_objective = self._amount_of_water_to_leave * len(
+            self.alive_players
+        ) + 2 * len(self.alive_players)
+
+        # Compute distance
+        wood_distance = (wood_objective - self.wood_amount) / wood_objective
+        food_distance = (food_objective - self.food_amount) / food_objective
+        water_distance = (water_objective - self.water_level) / water_objective
+
+        # Adapt distance to care about sign
+        wood_distance = wood_distance if wood_distance > 0 else 1
+        food_distance = food_distance if food_distance > 0 else 1
+        water_distance = water_distance if water_distance > 0 else 1
+
+        return 1 / wood_distance + 1 / food_distance + 1 / water_distance
 
     """
     The resources are protected attributes to force the use of the deposit methods

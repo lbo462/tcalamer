@@ -8,12 +8,13 @@ In order to register an action, create an instance of ActionRegistry and call it
 >>>   ...
 
 The registered functions are accessible though the created instance as such:
->>> print(ar._actions)
+>>> print(ar.actions)
 
 To call a registered method, use
 >>> ar.call_action(1, ...)
 """
 
+from dataclasses import dataclass
 from typing import List, Callable, Any
 
 
@@ -21,12 +22,12 @@ class UnregisteredAction(Exception):
     """Raised when the action required is not the registry"""
 
 
+@dataclass
 class Action:
     """Defines an action together with its ID to be registered"""
 
-    def __init__(self, function: Callable, id_: int):
-        self.function = function
-        self.id_ = id_
+    function: Callable
+    id_: int
 
 
 class ActionRegistry:

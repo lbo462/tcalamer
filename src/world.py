@@ -15,27 +15,26 @@ class Weather(IntEnum):
     CLOUDY = 1
     RAINING = 2
     STORM = 3
-    DOOM = 4
 
 
 class World:
     """
-    The _world has certain amount of resources
-    The _colony lives in the _world and take its resources
-    The _world also defines the weather
+    The world has certain amount of resources
+    The colony lives in the _world and take its resources
+    The world also defines the weather
     """
 
     def __init__(self, wreck: Wreck):
         self._wreck = wreck
         self._weather = Weather.BLUE_SKY
 
-        self._water_level = 500
-        self._wood_amount = 500
-        self._food_amount = 500
+        self._water_level = 5000
+        self._wood_amount = 5000
+        self._food_amount = 5000
 
-        self._basic_water_fetch_factor = [1, 2, 3]
-        self._basic_wood_fetch_factor = [1, 2, 3]
-        self._basic_food_fetch_factor = [1, 2, 3]
+        self._basic_water_fetch_factor = [3, 4, 5]
+        self._basic_wood_fetch_factor = [3, 4, 5]
+        self._basic_food_fetch_factor = [3, 4, 5]
 
     @property
     def water_level(self) -> int:
@@ -60,26 +59,20 @@ class World:
 
     @property
     def _water_fetch_factor(self) -> List[int]:
-        if self.weather is Weather.DOOM:
-            return [0]
         if self.weather is Weather.RAINING:
             return [2 * i for i in self._basic_water_fetch_factor]
         return self._basic_water_fetch_factor
 
     @property
     def _wood_fetch_factor(self) -> List[int]:
-        if self.weather is Weather.DOOM:
-            return [0]
         if self.weather is Weather.STORM:
             return [2 * i for i in self._basic_wood_fetch_factor]
         return self._basic_wood_fetch_factor
 
     @property
     def _food_fetch_factor(self) -> List[int]:
-        if self.weather is Weather.DOOM:
-            return [0]
-        if self.weather is Weather.STORM:
-            return [2 * i for i in self._basic_food_fetch_factor]
+        if self.weather is Weather.CLOUDY:
+            return [2 * i for i in self._basic_wood_fetch_factor]
         return self._basic_food_fetch_factor
 
     """Fetch methods
