@@ -1,10 +1,11 @@
+from settings import number_of_player, wreck_probability
 from game_engine import GameEngine
 
 
 def main():
     ge = GameEngine(
-        number_of_players=50,
-        wreck_probability=0.5,
+        number_of_players=number_of_player,
+        wreck_probability=wreck_probability,
     )
 
     while not ge.game_over:
