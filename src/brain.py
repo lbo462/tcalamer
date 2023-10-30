@@ -1,4 +1,5 @@
 import os
+from math import exp
 from typing import List
 import torch
 from torch import nn
@@ -17,55 +18,27 @@ amount_of_outputs = 4
 class NNInputs:
     """Modelization of the inputs for the neural network"""
 
-    def __init__(
-        self,
-        amount_of_buckets_of_the_player: int,
-        amount_of_axes_of_the_player: int,
-        amount_of_fishing_rods_of_the_player: int,
-        amount_of_water_held_by_the_colony: int,
-        amount_of_wood_held_by_the_colony: int,
-        amount_of_food_held_by_the_colony: int,
-        current_weather: Weather,
-        number_times_wreck_searched: int,
-    ):
-        self._amount_of_buckets_of_the_player = amount_of_buckets_of_the_player
-        self._amount_of_axes_of_the_player = amount_of_axes_of_the_player
-        self._amount_of_fishing_rods_of_the_player = (
-            amount_of_fishing_rods_of_the_player
-        )
+    def __init__(self, player: "Player"):
+        self._player = player
+        self._colony = player._colony  # noqa
+        self._world = player._colony._world  # noqa
+        self._wreck = self._world._wreck  # noqa
 
-        self._amount_of_water_held_by_the_colony = amount_of_water_held_by_the_colony
-        self._amount_of_wood_held_by_the_colony = amount_of_wood_held_by_the_colony
-        self._amount_of_food_held_by_the_colony = amount_of_food_held_by_the_colony
-
-        self._current_weather = current_weather
-
-        self._number_times_wreck_searched = number_times_wreck_searched
-
-    def to_list(self) -> List[int]:
+    def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            self._amount_of_buckets_of_the_player,
-            self._amount_of_axes_of_the_player,
-            self._amount_of_fishing_rods_of_the_player,
-            self._amount_of_water_held_by_the_colony,
-            self._amount_of_wood_held_by_the_colony,
-            self._amount_of_food_held_by_the_colony,
-            self._current_weather.value,
-            self._number_times_wreck_searched,
+            self._player.bucket_amount / self._wreck.amount_of_items_set,
+            self._player.axe_amount / self._wreck.amount_of_items_set,
+            self._player.fishing_rod_amount / self._wreck.amount_of_items_set,
+            self._colony.water_level / self._world.initial_water_level,
+            self._colony.wood_amount / self._world.initial_wood_amount,
+            self._colony.wood_amount / self._world.initial_food_amount,
+            self._world.weather.value / (len(Weather) - 1),
+            1 - exp(-1 * self._wreck.number_of_times_fetched),
         ]
 
     def __str__(self):
-        return (
-            f"{self._current_weather.name}, "
-            f"{self._amount_of_buckets_of_the_player}b, "
-            f"{self._amount_of_axes_of_the_player}a, "
-            f"{self._amount_of_fishing_rods_of_the_player}f, "
-            f"{self._amount_of_water_held_by_the_colony}wa, "
-            f"{self._amount_of_wood_held_by_the_colony}wo, "
-            f"{self._amount_of_food_held_by_the_colony}fo, "
-            f"{self._number_times_wreck_searched}we"
-        )
+        return f"{', '.join([str(i) for i in self.to_list()])}"
 
 
 class _QNetwork(nn.Module):

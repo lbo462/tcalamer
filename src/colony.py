@@ -67,8 +67,36 @@ class Colony:
     def enough_resources(self) -> bool:
         return self.limiting_factor >= len(self.alive_players)
 
+    """
+    The following properties gives information about 
+    how many player already choosed the corresponding action
+    or how many are still ready to make an action
+    """
+
+    @property
+    def amount_of_player_to_the_water(self) -> int:
+        ...
+
+    @property
+    def amount_of_player_to_the_wood(self) -> int:
+        ...
+
+    @property
+    def amount_of_player_to_the_food(self) -> int:
+        ...
+
+    @property
+    def amount_of_player_to_the_wreck(self) -> int:
+        ...
+
+    @property
+    def amount_of_free_players(self) -> int:
+        ...
+
     @property
     def daily_fitness(self) -> float:
+        """Evaluate the fitness of the colony for the neural network"""
+
         wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
         food_objective = self._amount_of_food_to_leave * len(
             self.alive_players

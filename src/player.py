@@ -181,16 +181,7 @@ class Player:
 
     @property
     def current_vision(self) -> NNInputs:
-        return NNInputs(
-            amount_of_buckets_of_the_player=self.bucket_amount,
-            amount_of_axes_of_the_player=self.axe_amount,
-            amount_of_fishing_rods_of_the_player=self.fishing_rod_amount,
-            amount_of_water_held_by_the_colony=self._colony.water_level,
-            amount_of_wood_held_by_the_colony=self._colony.wood_amount,
-            amount_of_food_held_by_the_colony=self._colony.food_amount,
-            current_weather=self._world.weather,
-            number_times_wreck_searched=self._world._wreck.number_of_times_fetched,  # noqa
-        )
+        return NNInputs(self)
 
     """Action choice
     The player should choose its _actions with the following methods
