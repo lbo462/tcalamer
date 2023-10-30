@@ -1,4 +1,5 @@
 import random
+import math
 from typing import List, Generator
 
 from player import Player, PlayerState
@@ -38,6 +39,12 @@ class Colony:
         self._amount_of_water_to_leave = amount_of_water_per_player_to_leave
         self._amount_of_food_to_leave = amount_of_food_per_player_to_leave
 
+        # Count the actions made by the player each day
+        self._amount_of_player_to_the_water = 0
+        self._amount_of_player_to_the_wood = 0
+        self._amount_of_player_to_the_food = 0
+        self._amount_of_player_to_the_wreck = 0
+
     @property
     def alive_players(self) -> List[Player]:
         """Returns the alive and sick players in the colony"""
@@ -46,6 +53,13 @@ class Colony:
             for player in self._players
             if player.state in [PlayerState.ALIVE, PlayerState.SICK]
         ]
+
+    @property
+    def at_least_one_left_the_isle(self) -> bool:
+        for player in self._players:
+            if player.state is PlayerState.ESCAPED:
+                return True
+        return False
 
     @property
     def able_to_leave(self) -> bool:
@@ -69,53 +83,66 @@ class Colony:
 
     """
     The following properties gives information about 
-    how many player already choosed the corresponding action
+    how many player already choose the corresponding action
     or how many are still ready to make an action
     """
 
     @property
     def amount_of_player_to_the_water(self) -> int:
-        ...
+        return self._amount_of_player_to_the_water
 
     @property
     def amount_of_player_to_the_wood(self) -> int:
-        ...
+        return self._amount_of_player_to_the_wood
 
     @property
     def amount_of_player_to_the_food(self) -> int:
-        ...
+        return self._amount_of_player_to_the_food
 
     @property
     def amount_of_player_to_the_wreck(self) -> int:
-        ...
-
-    @property
-    def amount_of_free_players(self) -> int:
-        ...
+        return self._amount_of_player_to_the_wreck
 
     @property
     def daily_fitness(self) -> float:
         """Evaluate the fitness of the colony for the neural network"""
 
-        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
-        food_objective = self._amount_of_food_to_leave * len(
-            self.alive_players
-        ) + 2 * len(self.alive_players)
-        water_objective = self._amount_of_water_to_leave * len(
-            self.alive_players
-        ) + 2 * len(self.alive_players)
+        # Compute the needs
+        wood_needs = (
+            self._amount_of_wood_to_leave * len(self.alive_players) - self.wood_amount
+        )
+        water_needs = (
+            self._amount_of_water_to_leave * len(self.alive_players)
+            + len(self.alive_players)
+        ) - self.water_level
+        food_needs = (
+            self._amount_of_food_to_leave * len(self.alive_players)
+            + len(self.alive_players)
+        ) - self.food_amount
 
-        # Compute distance
-        wood_distance = (wood_objective - self.wood_amount) / wood_objective
-        food_distance = (food_objective - self.food_amount) / food_objective
-        water_distance = (water_objective - self.water_level) / water_objective
+        # Compute the fitness of each resource
+        if wood_needs > 0:
+            wood_fit = 1 / wood_needs
+        elif wood_needs < 0:
+            wood_fit = -1 / wood_needs
+        else:
+            wood_fit = 2
 
-        # Adapt distance to care about sign
-        wood_distance = wood_distance if wood_distance > 0 else 1
-        food_distance = food_distance if food_distance > 0 else 1
-        water_distance = water_distance if water_distance > 0 else 1
+        if water_needs > 0:
+            water_fit = 1 / water_needs
+        elif water_needs < 0:
+            water_fit = -1 / water_needs
+        else:
+            water_fit = 2
 
-        return 1 / wood_distance + 1 / food_distance + 1 / water_distance
+        if food_needs > 0:
+            food_fit = 1 / food_needs
+        elif food_needs < 0:
+            food_fit = -1 / food_needs
+        else:
+            food_fit = 2
+
+        return -math.log(wood_fit) - math.log(water_fit) - math.log(food_fit)
 
     """
     The resources are protected attributes to force the use of the deposit methods
@@ -180,6 +207,13 @@ class Colony:
     """Other methods
     Some stuff I couldn't store
     """
+
+    def update(self) -> Generator[str, None, None]:
+        # Reset action counters
+        self._amount_of_player_to_the_water = 0
+        self._amount_of_player_to_the_wood = 0
+        self._amount_of_player_to_the_food = 0
+        self._amount_of_player_to_the_wreck = 0
 
     def add_player(self, player: Player):
         """Adds a new player in the colony"""

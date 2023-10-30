@@ -25,7 +25,12 @@ class Player:
     He also has objects in its _inventory to enhance his _actions
     """
 
-    def __init__(self, number: int, colony):
+    def __init__(
+        self, number: int, colony, training=False, trainer: "BrainTrainer" = None
+    ):
+        if training and not trainer:
+            raise ValueError("Please, give a trainer to enable training")
+
         self._number = number
         self._colony = colony
         self._world = colony._world  # noqa
@@ -36,9 +41,9 @@ class Player:
         self._day_of_death = -1  # initialize purposefully with a wrong value
 
         # Brain and NN stuffs blah blah blah
-        self._brain = Brain(brain_location)
-        self._training_enable = False
-        self._trainer: "BrainTrainer" = None  # noqa
+        self._brain = Brain(brain_location) if not training else None
+        self._training_enable = training
+        self._trainer = trainer
         self.nn_vision_before_action: NNInputs = None  # noqa
         self.nn_vision_after_action: NNInputs = None  # noqa
         self.nn_action_taken: int = None  # noqa
@@ -82,6 +87,10 @@ class Player:
             if isinstance(o, FishingRod):
                 counter += 1
         return counter
+
+    @property
+    def current_vision(self) -> NNInputs:
+        return NNInputs(self)
 
     """Daily action methods
     These are the _actions that a player can do for the _colony during the daylight.
@@ -162,26 +171,6 @@ class Player:
 
     def get_sick(self):
         self._state = PlayerState.SICK
-
-    """Brain functions
-    These function are necessary for the brain and decision making
-    """
-
-    def i_want_to_enable_training_and_i_am_fully_responsible_of_my_acts(
-        self, trainer: "BrainTrainer"
-    ):
-        """Enable training. DON'T USE THIS FUNCTION
-        You better be 100 % sure of what this is doing beforehand !
-        I'm not responsible the damages caused by enabling training, YOU ARE !
-        """
-        self._training_enable = True
-        self._trainer = trainer
-        # Modify the content of the brain for the training
-        self._brain._q_network = trainer._q_network  # noqa, *evil laughs*
-
-    @property
-    def current_vision(self) -> NNInputs:
-        return NNInputs(self)
 
     """Action choice
     The player should choose its _actions with the following methods

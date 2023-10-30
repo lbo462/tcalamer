@@ -10,7 +10,7 @@ from world import Weather
 When modifying the amount of inputs or outputs, 
 remember to update this variable :
 """
-amount_of_inputs = 8
+amount_of_inputs = 12
 # len(_daily_actions.actions) can't be imported due to circular imports ...
 amount_of_outputs = 4
 
@@ -21,20 +21,26 @@ class NNInputs:
     def __init__(self, player: "Player"):
         self._player = player
         self._colony = player._colony  # noqa
-        self._world = player._colony._world  # noqa
+        self._world = self._colony._world  # noqa
         self._wreck = self._world._wreck  # noqa
 
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
+        players_amount = len(self._colony.alive_players)
+
         return [
             self._player.bucket_amount / self._wreck.amount_of_items_set,
             self._player.axe_amount / self._wreck.amount_of_items_set,
             self._player.fishing_rod_amount / self._wreck.amount_of_items_set,
             self._colony.water_level / self._world.initial_water_level,
             self._colony.wood_amount / self._world.initial_wood_amount,
-            self._colony.wood_amount / self._world.initial_food_amount,
+            self._colony.food_amount / self._world.initial_food_amount,
             self._world.weather.value / (len(Weather) - 1),
-            1 - exp(-1 * self._wreck.number_of_times_fetched),
+            1 - exp(-10 * self._wreck.number_of_times_fetched),
+            self._colony.amount_of_player_to_the_water / players_amount,
+            self._colony.amount_of_player_to_the_wood / players_amount,
+            self._colony.amount_of_player_to_the_food / players_amount,
+            self._colony.amount_of_player_to_the_wreck / players_amount,
         ]
 
     def __str__(self):
@@ -47,13 +53,11 @@ class _QNetwork(nn.Module):
     def __init__(self, input_size: int, output_size: int):
         super(_QNetwork, self).__init__()
 
-        # Adds two fully-connected layers
-        self.fc1 = nn.Linear(input_size, 16)
-        self.fc2 = nn.Linear(16, output_size)
+        # Add a fully-connected layer
+        self.fc = nn.Linear(input_size, output_size)
 
     def forward(self, x):
-        x = self.fc1(x)
-        return self.fc2(x)
+        return self.fc(torch.relu(x))
 
 
 class Brain:

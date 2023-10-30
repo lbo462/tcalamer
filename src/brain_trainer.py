@@ -23,7 +23,8 @@ class BrainTrainer:
         self._learning_rate = 0.001
         self._discount_factor = 0.99
         self._greedy_epsilon = 0.1
-        self._num_iterations = 3001
+        self._num_iterations = 10000
+        self._num_testing_iterations = 1000
 
         # Choose parameters for the game engine
         self._number_of_player = number_of_player
@@ -51,16 +52,13 @@ class BrainTrainer:
 
     def train(self) -> Generator[str, None, None]:
         for iteration in range(self._num_iterations):
-            # Creates a new game engine
+            # Creates a new game engine for training purposes
             ge = GameEngine(
                 number_of_players=self._number_of_player,
                 wreck_probability=self._wreck_probability,
+                training=True,
+                brain_trainer=self,
             )
-
-            for player in ge.colony.alive_players:
-                player.i_want_to_enable_training_and_i_am_fully_responsible_of_my_acts(
-                    self
-                )
 
             total_reward = 0
 
@@ -109,7 +107,21 @@ class BrainTrainer:
                     loss.backward()
                     self._optimizer.step()
 
-            yield f"Iteration {iteration} : {total_reward / ge.current_day}"
+            yield f"{iteration} : {total_reward / ge.current_day}"
+
+        yield f"Testing on {self._num_testing_iterations} games ..."
+        wins = 0
+        for iteration in range(self._num_testing_iterations):
+            ge = GameEngine(
+                number_of_players=self._number_of_player,
+                wreck_probability=self._wreck_probability,
+            )
+            while not ge.game_over:
+                for _ in ge.update():
+                    ...
+            if ge.colony.at_least_one_left_the_isle:
+                wins += 1
+        yield f"Win ratio : {100 * wins / self._num_iterations} %"
 
 
 if __name__ == "__main__":
