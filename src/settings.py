@@ -1,6 +1,6 @@
 # Game settings
 
-number_of_player = 50
+number_of_player = 5
 wreck_probability = 0.5
 
 # Brain location

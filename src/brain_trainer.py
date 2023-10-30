@@ -57,57 +57,59 @@ class BrainTrainer:
                 wreck_probability=self._wreck_probability,
             )
 
-            # Pick a random player
-            player = ge.colony.get_random_alive_player()
-            # Enable training on the player
-            player.i_want_to_enable_training_and_i_am_fully_responsible_of_my_acts(self)
+            for player in ge.colony.alive_players:
+                player.i_want_to_enable_training_and_i_am_fully_responsible_of_my_acts(
+                    self
+                )
 
-            # Keep track of the reward
             total_reward = 0
 
-            while player.state in [PlayerState.ALIVE, PlayerState.SICK]:
+            while not ge.game_over:
                 """
                 Update the game for the current day,
-                where the player chooses a training action
+                where the players chooses a training action
                 """
                 for _ in ge.update():
                     ...
 
-                # Take a look of the vision before and after the action
-                morning_inputs = player.nn_vision_before_action
-                night_inputs = player.nn_vision_after_action
-                # And the action chosen by the player
-                action_taken = player.nn_action_taken
+                for player in ge.colony.alive_players:
+                    # Take a look of the vision before and after the action
+                    morning_inputs = player.nn_vision_before_action
+                    night_inputs = player.nn_vision_after_action
+                    # And the action chosen by the player
+                    action_taken = player.nn_action_taken
 
-                # Compute its reward
-                reward = player.nn_fitness_after_action
-                if player.state is PlayerState.DEAD:
-                    reward = -100
-                elif player.state is PlayerState.ESCAPED:
-                    reward = 1000 / ge.current_day
-                total_reward += reward
+                    # Compute its reward
+                    reward = player.nn_fitness_after_action
+                    if player.state is PlayerState.DEAD:
+                        reward = -100
+                    elif player.state is PlayerState.ESCAPED:
+                        reward = 1000 / ge.current_day
+                    total_reward += reward
 
-                # Now, observe the result of the chosen action regarding the inputs
-                q_values = self._q_network(torch.Tensor(morning_inputs.to_list()))
-                next_q_values = self._q_network(torch.Tensor(night_inputs.to_list()))
+                    # Now, observe the result of the chosen action regarding the inputs
+                    q_values = self._q_network(torch.Tensor(morning_inputs.to_list()))
+                    next_q_values = self._q_network(
+                        torch.Tensor(night_inputs.to_list())
+                    )
 
-                # Update the value Q of the action using the Q-learning rule
-                q_values[action_taken] += self._learning_rate * (
-                    reward
-                    + self._discount_factor * next_q_values.max()
-                    - q_values[action_taken]
-                )
+                    # Update the value Q of the action using the Q-learning rule
+                    q_values[action_taken] += self._learning_rate * (
+                        reward
+                        + self._discount_factor * next_q_values.max()
+                        - q_values[action_taken]
+                    )
 
-                # Update the Q-Network
-                self._optimizer.zero_grad()
-                loss = nn.MSELoss()(
-                    q_values, self._q_network(torch.Tensor(morning_inputs.to_list()))
-                )
-                loss.backward()
-                self._optimizer.step()
+                    # Update the Q-Network
+                    self._optimizer.zero_grad()
+                    loss = nn.MSELoss()(
+                        q_values,
+                        self._q_network(torch.Tensor(morning_inputs.to_list())),
+                    )
+                    loss.backward()
+                    self._optimizer.step()
 
-            # yield f"TRAINED {player} IS OUT OF THE GAME"
-            yield f"Iteration {iteration} : {total_reward}"
+            yield f"Iteration {iteration} : {total_reward / ge.current_day}"
 
 
 if __name__ == "__main__":
