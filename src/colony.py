@@ -105,44 +105,21 @@ class Colony:
 
     @property
     def daily_fitness(self) -> float:
-        """Evaluate the fitness of the colony for the neural network"""
+        player_c = len(self.alive_players)  # number of alive players
 
-        # Compute the needs
-        wood_needs = (
-            self._amount_of_wood_to_leave * len(self.alive_players) - self.wood_amount
-        )
-        water_needs = (
-            self._amount_of_water_to_leave * len(self.alive_players)
-            + len(self.alive_players)
-        ) - self.water_level
-        food_needs = (
-            self._amount_of_food_to_leave * len(self.alive_players)
-            + len(self.alive_players)
-        ) - self.food_amount
+        wood_weight = self._amount_of_wood_to_leave
+        food_weight = self._amount_of_food_to_leave + player_c
+        water_weight = self._amount_of_water_to_leave + player_c
 
-        # Compute the fitness of each resource
-        if wood_needs > 0:
-            wood_fit = 1 / wood_needs
-        elif wood_needs < 0:
-            wood_fit = -1 / wood_needs
-        else:
-            wood_fit = 2
+        wood_need = self._amount_of_wood_to_leave * player_c - self.wood_amount
+        food_need = (self._amount_of_food_to_leave + 1) * player_c - self.food_amount
+        water_need = (self._amount_of_water_to_leave + 1) * player_c - self.water_level
 
-        if water_needs > 0:
-            water_fit = 1 / water_needs
-        elif water_needs < 0:
-            water_fit = -1 / water_needs
-        else:
-            water_fit = 2
+        wood_score = math.exp(0.01 * wood_weight * wood_need)
+        food_score = math.exp(0.01 * food_weight * food_need)
+        water_score = math.exp(0.01 * water_weight * water_need)
 
-        if food_needs > 0:
-            food_fit = 1 / food_needs
-        elif food_needs < 0:
-            food_fit = -1 / food_needs
-        else:
-            food_fit = 2
-
-        return -math.log(wood_fit) - math.log(water_fit) - math.log(food_fit)
+        return 1 / (wood_score + food_score + water_score)
 
     """
     The resources are protected attributes to force the use of the deposit methods
