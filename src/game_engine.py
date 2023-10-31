@@ -19,8 +19,8 @@ class GameEngine:
         number_of_players: int,
         wreck_probability: float,
         amount_of_wood_per_player_to_leave=5,
-        amount_of_water_per_player_to_leave=1,
-        amount_of_food_per_player_to_leave=1,
+        amount_of_water_per_player_to_leave=10,
+        amount_of_food_per_player_to_leave=10,
         training=False,
         brain_trainer: "BrainTrainer" = None,
     ):

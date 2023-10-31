@@ -23,7 +23,7 @@ class BrainTrainer:
         self._learning_rate = 0.001
         self._discount_factor = 0.99
         self._greedy_epsilon = 0.1
-        self._num_iterations = 10000
+        self._num_iterations = 3000
         self._num_testing_iterations = 1000
 
         # Choose parameters for the game engine
@@ -81,8 +81,6 @@ class BrainTrainer:
                     reward = player.nn_fitness_after_action
                     if player.state is PlayerState.DEAD:
                         reward = -100
-                    elif player.state is PlayerState.ESCAPED:
-                        reward = 1000 / ge.current_day
                     total_reward += reward
 
                     # Now, observe the result of the chosen action regarding the inputs
@@ -108,20 +106,6 @@ class BrainTrainer:
                     self._optimizer.step()
 
             yield f"{iteration} : {total_reward / ge.current_day}"
-
-        yield f"Testing on {self._num_testing_iterations} games ..."
-        wins = 0
-        for iteration in range(self._num_testing_iterations):
-            ge = GameEngine(
-                number_of_players=self._number_of_player,
-                wreck_probability=self._wreck_probability,
-            )
-            while not ge.game_over:
-                for _ in ge.update():
-                    ...
-            if ge.colony.at_least_one_left_the_isle:
-                wins += 1
-        yield f"Win ratio : {100 * wins / self._num_iterations} %"
 
 
 if __name__ == "__main__":

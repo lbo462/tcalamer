@@ -32,7 +32,7 @@ class Colony:
         self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = 3
+        self._initial_surviving_factor = 1
 
         # Define the amount of resources to leave
         self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
@@ -108,18 +108,31 @@ class Colony:
         player_c = len(self.alive_players)  # number of alive players
 
         wood_weight = self._amount_of_wood_to_leave
-        food_weight = self._amount_of_food_to_leave + player_c
-        water_weight = self._amount_of_water_to_leave + player_c
+        food_weight = self._amount_of_food_to_leave + 1 * player_c
+        water_weight = self._amount_of_water_to_leave + 1 * player_c
 
         wood_need = self._amount_of_wood_to_leave * player_c - self.wood_amount
         food_need = (self._amount_of_food_to_leave + 1) * player_c - self.food_amount
         water_need = (self._amount_of_water_to_leave + 1) * player_c - self.water_level
 
-        wood_score = math.exp(0.01 * wood_weight * wood_need)
-        food_score = math.exp(0.01 * food_weight * food_need)
-        water_score = math.exp(0.01 * water_weight * water_need)
+        wood_coef = wood_weight * wood_need
+        food_coef = food_weight * food_need
+        water_coef = water_weight * water_need
 
-        return 1 / (wood_score + food_score + water_score)
+        if wood_coef < 0:
+            wood_coef = 0
+        if food_coef < 0:
+            food_coef = 0
+        if water_coef < 0:
+            water_coef = 0
+
+        wood_score = math.exp(-0.1 * wood_coef)
+        food_score = math.exp(-0.1 * food_coef)
+        water_score = math.exp(-0.1 * water_coef)
+
+        # print(f"{self.wood_amount} wood, weight {wood_weight}, need {wood_need} -> {wood_coef} -> {wood_score}")
+
+        return math.sqrt(wood_score**2 + food_score**2 + water_score**2)
 
     """
     The resources are protected attributes to force the use of the deposit methods
