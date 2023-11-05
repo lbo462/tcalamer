@@ -10,7 +10,7 @@ from world import Weather
 When modifying the amount of inputs or outputs, 
 remember to update this variable :
 """
-amount_of_inputs = 12
+amount_of_inputs = 8
 # len(_daily_actions.actions) can't be imported due to circular imports ...
 amount_of_outputs = 4
 
@@ -37,10 +37,10 @@ class NNInputs:
             self._colony.food_amount / self._world.initial_food_amount,
             self._world.weather.value / (len(Weather) - 1),
             1 - exp(-10 * self._wreck.number_of_times_fetched),
-            self._colony.amount_of_player_to_the_water / players_amount,
-            self._colony.amount_of_player_to_the_wood / players_amount,
-            self._colony.amount_of_player_to_the_food / players_amount,
-            self._colony.amount_of_player_to_the_wreck / players_amount,
+            # self._colony.amount_of_player_to_the_water / players_amount,
+            # self._colony.amount_of_player_to_the_wood / players_amount,
+            # self._colony.amount_of_player_to_the_food / players_amount,
+            # self._colony.amount_of_player_to_the_wreck / players_amount,
         ]
 
     def __str__(self):

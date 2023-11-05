@@ -105,34 +105,25 @@ class Colony:
 
     @property
     def daily_fitness(self) -> float:
-        player_c = len(self.alive_players)  # number of alive players
+        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
+        food_objective = self._amount_of_food_to_leave * len(
+            self.alive_players
+        ) + 2 * len(self.alive_players)
+        water_objective = self._amount_of_water_to_leave * len(
+            self.alive_players
+        ) + 2 * len(self.alive_players)
 
-        wood_weight = self._amount_of_wood_to_leave
-        food_weight = self._amount_of_food_to_leave + 1 * player_c
-        water_weight = self._amount_of_water_to_leave + 1 * player_c
+        # Compute distance
+        wood_distance = (wood_objective - self.wood_amount) / wood_objective
+        food_distance = (food_objective - self.food_amount) / food_objective
+        water_distance = (water_objective - self.water_level) / water_objective
 
-        wood_need = self._amount_of_wood_to_leave * player_c - self.wood_amount
-        food_need = (self._amount_of_food_to_leave + 1) * player_c - self.food_amount
-        water_need = (self._amount_of_water_to_leave + 1) * player_c - self.water_level
+        # Adapt distance to care about sign
+        wood_distance = wood_distance if wood_distance > 0 else 1
+        food_distance = food_distance if food_distance > 0 else 1
+        water_distance = water_distance if water_distance > 0 else 1
 
-        wood_coef = wood_weight * wood_need
-        food_coef = food_weight * food_need
-        water_coef = water_weight * water_need
-
-        if wood_coef < 0:
-            wood_coef = 0
-        if food_coef < 0:
-            food_coef = 0
-        if water_coef < 0:
-            water_coef = 0
-
-        wood_score = math.exp(-0.1 * wood_coef)
-        food_score = math.exp(-0.1 * food_coef)
-        water_score = math.exp(-0.1 * water_coef)
-
-        # print(f"{self.wood_amount} wood, weight {wood_weight}, need {wood_need} -> {wood_coef} -> {wood_score}")
-
-        return math.sqrt(wood_score**2 + food_score**2 + water_score**2)
+        return 1 / wood_distance + 1 / food_distance + 1 / water_distance
 
     """
     The resources are protected attributes to force the use of the deposit methods
