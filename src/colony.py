@@ -32,7 +32,7 @@ class Colony:
         self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = 1
+        self._initial_surviving_factor = 3
 
         # Define the amount of resources to leave
         self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
