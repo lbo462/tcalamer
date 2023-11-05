@@ -1,10 +1,7 @@
 import os
-from math import exp
 from typing import List
 import torch
 from torch import nn
-
-from world import Weather
 
 """
 When modifying the amount of inputs or outputs, 
@@ -26,17 +23,17 @@ class NNInputs:
 
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
-        players_amount = len(self._colony.alive_players)
+        # players_amount = len(self._colony.alive_players)
 
         return [
-            self._player.bucket_amount / self._wreck.amount_of_items_set,
-            self._player.axe_amount / self._wreck.amount_of_items_set,
-            self._player.fishing_rod_amount / self._wreck.amount_of_items_set,
-            self._colony.water_level / self._world.initial_water_level,
-            self._colony.wood_amount / self._world.initial_wood_amount,
-            self._colony.food_amount / self._world.initial_food_amount,
-            self._world.weather.value / (len(Weather) - 1),
-            1 - exp(-10 * self._wreck.number_of_times_fetched),
+            self._player.bucket_amount,
+            self._player.axe_amount,
+            self._player.fishing_rod_amount,
+            self._colony.water_level,
+            self._colony.wood_amount,
+            self._colony.food_amount,
+            self._world.weather.value,
+            self._wreck.number_of_times_fetched,
             # self._colony.amount_of_player_to_the_water / players_amount,
             # self._colony.amount_of_player_to_the_wood / players_amount,
             # self._colony.amount_of_player_to_the_food / players_amount,
@@ -53,11 +50,12 @@ class _QNetwork(nn.Module):
     def __init__(self, input_size: int, output_size: int):
         super(_QNetwork, self).__init__()
 
-        # Add a fully-connected layer
-        self.fc = nn.Linear(input_size, output_size)
+        self.fc1 = nn.Linear(input_size, 16)
+        self.fc2 = nn.Linear(16, output_size)
 
     def forward(self, x):
-        return self.fc(torch.relu(x))
+        x = self.fc1(x)
+        return self.fc2(x)
 
 
 class Brain:
