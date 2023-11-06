@@ -87,48 +87,49 @@ class Colony:
     """
 
     @property
-    def amount_of_player_to_the_water(self) -> int:
+    def amount_of_players_to_the_water(self) -> int:
         return self._amount_of_player_to_the_water
 
     @property
-    def amount_of_player_to_the_wood(self) -> int:
+    def amount_of_players_to_the_wood(self) -> int:
         return self._amount_of_player_to_the_wood
 
     @property
-    def amount_of_player_to_the_food(self) -> int:
+    def amount_of_players_to_the_food(self) -> int:
         return self._amount_of_player_to_the_food
 
     @property
-    def amount_of_player_to_the_wreck(self) -> int:
+    def amount_of_players_to_the_wreck(self) -> int:
         return self._amount_of_player_to_the_wreck
 
     @property
     def amount_of_free_players(self) -> int:
         return (
             len(self.alive_players)
-            - self.amount_of_player_to_the_water
-            - self.amount_of_player_to_the_wood
-            - self.amount_of_player_to_the_food
-            - self.amount_of_player_to_the_wreck
+            - self.amount_of_players_to_the_water
+            - self.amount_of_players_to_the_wood
+            - self.amount_of_players_to_the_food
+            - self.amount_of_players_to_the_wreck
         )
 
     @property
     def daily_fitness(self) -> float:
-        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
+        # wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
         food_objective = (self._amount_of_food_to_leave + 2) * len(self.alive_players)
         water_objective = (self._amount_of_water_to_leave + 2) * len(self.alive_players)
 
         # Compute distance
-        wood_distance = (wood_objective - self.wood_amount) / wood_objective
+        # wood_distance = (wood_objective - self.wood_amount) / wood_objective
         food_distance = (food_objective - self.food_amount) / food_objective
         water_distance = (water_objective - self.water_level) / water_objective
 
         # Adapt distance to care about sign
-        wood_distance = wood_distance if wood_distance > 0 else 1
+        # wood_distance = wood_distance if wood_distance > 0 else 1
         food_distance = food_distance if food_distance > 0 else 1
         water_distance = water_distance if water_distance > 0 else 1
 
-        return 1 / wood_distance + 1 / food_distance + 1 / water_distance
+        # return 1 / wood_distance + 1 / food_distance + 1 / water_distance
+        return 1 / food_distance + 1 / water_distance
 
     """
     The resources are protected attributes to force the use of the deposit methods

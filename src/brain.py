@@ -1,7 +1,9 @@
 import os
+from dataclasses import dataclass
 from typing import List
 import torch
 from torch import nn
+
 
 """
 When modifying the amount of inputs or outputs, 
@@ -12,31 +14,59 @@ amount_of_inputs = 8
 amount_of_outputs = 4
 
 
+@dataclass
 class NNInputs:
     """Modelization of the inputs for the neural network"""
 
-    def __init__(self, player: "Player"):
-        self._player = player
-        self._colony = player._colony  # noqa
-        self._world = self._colony._world  # noqa
-        self._wreck = self._world._wreck  # noqa
+    bucket_amount: int
+    axe_amount: int
+    fishing_rod_amount: int
+    water_level: int
+    wood_amount: int
+    food_amount: int
+    weather: "Weather"
+    wreck_visits_amount: int
+    # players_to_the_wood: int
+    # players_to_the_water: int
+    # players_to_the_food: int
+    # players_waiting: int
+
+    @classmethod
+    def from_player(cls, player: "Player"):
+        colony = player._colony  # noqa
+        world = player._world  # noqa
+        wreck = world._wreck  # noqa
+
+        return cls(
+            player.bucket_amount,
+            player.axe_amount,
+            player.fishing_rod_amount,
+            colony.water_level,
+            colony.wood_amount,
+            colony.food_amount,
+            world.weather,
+            wreck.number_of_times_fetched,
+            # colony.amount_of_players_to_the_wood,
+            # colony.amount_of_players_to_the_water,
+            # colony.amount_of_players_to_the_food,
+            # colony.amount_of_free_players,
+        )
 
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            self._player.bucket_amount,
-            self._player.axe_amount,
-            self._player.fishing_rod_amount,
-            self._colony.water_level,
-            self._colony.wood_amount,
-            self._colony.food_amount,
-            self._world.weather.value,
-            self._wreck.number_of_times_fetched,
-            # self._colony.amount_of_player_to_the_wood,
-            # self._colony.amount_of_player_to_the_water,
-            # self._colony.amount_of_player_to_the_food,
-            # self._colony.amount_of_player_to_the_wreck,
-            # self._colony.amount_of_free_players,
+            self.bucket_amount,
+            self.axe_amount,
+            self.fishing_rod_amount,
+            self.water_level,
+            self.wood_amount,
+            self.food_amount,
+            self.weather.value,
+            self.wreck_visits_amount,
+            # self.players_to_the_wood,
+            # self.players_to_the_water,
+            # self.players_to_the_food,
+            # self.players_waiting,
         ]
 
     def __str__(self):

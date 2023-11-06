@@ -106,7 +106,7 @@ class BrainTrainer:
                     loss.backward()
                     self._optimizer.step()
 
-            yield f"{iteration} : {total_reward / ge.current_day}"
+            yield f"{iteration} : {total_reward}"
 
 
 if __name__ == "__main__":

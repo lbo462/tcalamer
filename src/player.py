@@ -48,8 +48,8 @@ class Player:
         self.nn_vision_before_action: NNInputs = None  # noqa
         self.nn_vision_after_action: NNInputs = None  # noqa
         self.nn_action_taken: int = None  # noqa
-        self.nn_fitness_before_action: int = None  # noqa
-        self.nn_fitness_after_action: int = None  # noqa
+        self.nn_fitness_before_action: float = None  # noqa
+        self.nn_fitness_after_action: float = None  # noqa
 
     @property
     def name(self) -> str:
@@ -89,9 +89,8 @@ class Player:
                 counter += 1
         return counter
 
-    @property
-    def current_vision(self) -> NNInputs:
-        return NNInputs(self)
+    def get_current_vision(self) -> NNInputs:
+        return NNInputs.from_player(self)
 
     """Daily action methods
     These are the _actions that a player can do for the _colony during the daylight.
@@ -99,50 +98,49 @@ class Player:
     """
 
     @_daily_actions(id_=0)
-    def fetch_water(self) -> Generator[str, None, None]:
+    def fetch_water(self) -> str:
         amount_fetched = 1 + self.bucket_amount
 
         try:
             amount_fetched = self._world.fetch_water(amount_fetched)
-            yield f"{self} fetched {amount_fetched} water"
             self._colony.add_water(amount_fetched)
+            return f"{self} fetched {amount_fetched} water"
         except ResourceEmpty as e:
-            yield f"{self} : {e}"
+            return f"{self} : {e}"
 
     @_daily_actions(id_=1)
-    def fetch_wood(self) -> Generator[str, None, None]:
+    def fetch_wood(self) -> str:
         amount_fetched = 1 + self.axe_amount
 
         try:
             amount_fetched = self._world.fetch_wood(amount_fetched)
-            yield f"{self} fetched {amount_fetched} wood"
             self._colony.add_wood(amount_fetched)
+            return f"{self} fetched {amount_fetched} wood"
         except ResourceEmpty as e:
-            yield f"{self} : {e}"
+            return f"{self} : {e}"
 
     @_daily_actions(id_=2)
-    def fetch_food(self) -> Generator[str, None, None]:
+    def fetch_food(self) -> str:
         amount_fetched = 1 + self.fishing_rod_amount
 
         try:
             amount_fetched = self._world.fetch_food(amount_fetched)
-            yield f"{self} fetched {amount_fetched} fish(es)"
             self._colony.add_food(amount_fetched)
+            return f"{self} fetched {amount_fetched} fish(es)"
         except ResourceEmpty as e:
-            yield f"{self} : {e}"
+            return f"{self} : {e}"
 
     @_daily_actions(id_=3)
-    def search_wreck(self) -> Generator[str, None, None]:
+    def search_wreck(self) -> str:
         """
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its _inventory
         """
         new_object = self._world.search_wreck()
         if new_object:
-            yield f"{self} search wreck and found {new_object}"
             self._inventory.append(new_object)
-        else:
-            yield f"{self} search wreck and found nothing ..."
+            return f"{self} search wreck and found {new_object}"
+        return f"{self} search wreck and found nothing ..."
 
     """Eat & drink from _colony _actions
     These allows the player to get food and water from the _colony in order to survive to the next day
@@ -178,21 +176,21 @@ class Player:
     This will later be handled by neural networks
     """
 
-    def _make_daily_action(self, action_id: int) -> Generator[str, None, None]:
+    def _make_daily_action(self, action_id: int) -> str:
         """Calls the _actions referring the given ID"""
         return _daily_actions.call_action(action_id, self)
 
-    def make_random_daily_action(self) -> Generator[str, None, None]:
+    def make_random_daily_action(self) -> str:
         """Calls a random daily action"""
         return random.choice(_daily_actions.actions).function()
 
-    def make_best_daily_action(self):
+    def make_best_daily_action(self) -> str:
         """
         Uses a brain to choose the best daily action and calls it
         If training was enabled, the player uses its brain trainer to make the decision
         This updates the vision before and after the action
         """
-        inputs = self.current_vision
+        inputs = self.get_current_vision()
         self.nn_vision_before_action = inputs
         self.nn_fitness_before_action = self._colony.daily_fitness
 
@@ -202,11 +200,10 @@ class Player:
             action_id = self._brain.chose_action(inputs)
 
         self.nn_action_taken = action_id
-        output = self._make_daily_action(action_id)
+        output: str = self._make_daily_action(action_id)
 
-        self.nn_vision_after_action = self.current_vision
+        self.nn_vision_after_action = self.get_current_vision()
         self.nn_fitness_after_action = self._colony.daily_fitness
-
         return output
 
     def __str__(self):

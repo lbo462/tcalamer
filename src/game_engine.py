@@ -74,8 +74,7 @@ class GameEngine:
 
         # First step : daily _actions
         for player in self.colony.alive_players:
-            for log in player.make_best_daily_action():
-                yield f"  > {log}"
+            yield f"  > {player.make_best_daily_action()}"
 
         yield ""
         yield f"--- SUN GETS DOWN - {self.colony}"
