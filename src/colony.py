@@ -120,9 +120,9 @@ class Colony:
         water_objective = (self._amount_of_water_to_leave + 2) * len(self.alive_players)
 
         # Compute distance
-        wood_distance = (wood_objective - self.wood_amount) / wood_objective
-        food_distance = (food_objective - self.food_amount) / food_objective
-        water_distance = (water_objective - self.water_level) / water_objective
+        wood_distance = wood_objective - self.wood_amount
+        food_distance = food_objective - self.food_amount
+        water_distance = water_objective - self.water_level
 
         # Adapt distance to care about sign
         wood_distance = wood_distance if wood_distance > 0 else 0.1
