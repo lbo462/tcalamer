@@ -129,7 +129,7 @@ class Colony:
         food_distance = food_distance if food_distance > 0 else 0.1
         water_distance = water_distance if water_distance > 0 else 0.1
 
-        return 1000 * (
+        return 100 * (
             1 / math.exp(wood_distance)
             + 1 / math.exp(food_distance)
             + 1 / math.exp(water_distance)
