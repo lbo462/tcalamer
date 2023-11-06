@@ -104,6 +104,16 @@ class Colony:
         return self._amount_of_player_to_the_wreck
 
     @property
+    def amount_of_free_players(self) -> int:
+        return (
+            len(self.alive_players)
+            - self.amount_of_player_to_the_water
+            - self.amount_of_player_to_the_wood
+            - self.amount_of_player_to_the_food
+            - self.amount_of_player_to_the_wreck
+        )
+
+    @property
     def daily_fitness(self) -> float:
         wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
         food_objective = self._amount_of_food_to_leave * len(
@@ -151,12 +161,15 @@ class Colony:
     """
 
     def add_water(self, amount: int):
+        self._amount_of_player_to_the_water += 1
         self._water_level += amount
 
     def add_wood(self, amount: int):
+        self._amount_of_player_to_the_wood += 1
         self._wood_amount += amount
 
     def add_food(self, amount: int):
+        self._amount_of_player_to_the_food += 1
         self._food_amount += amount
 
     """Fetch methods
@@ -189,7 +202,7 @@ class Colony:
     Some stuff I couldn't store
     """
 
-    def update(self) -> Generator[str, None, None]:
+    def update(self):
         # Reset action counters
         self._amount_of_player_to_the_water = 0
         self._amount_of_player_to_the_wood = 0

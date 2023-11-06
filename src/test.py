@@ -3,6 +3,7 @@ from game_engine import GameEngine
 
 number_of_games = 1000
 
+
 def main():
     wins = 0
     for _ in range(number_of_games):
@@ -16,7 +17,7 @@ def main():
                 ...
 
         if ge.colony.at_least_one_left_the_isle:
-                wins += 1
+            wins += 1
     print(f"Win ratio : {100 * wins / number_of_games} %")
 
 

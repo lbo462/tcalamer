@@ -1,8 +1,8 @@
 import random
-from typing import List, Any, Callable, Generator
+from typing import List, Callable, Generator
 from enum import IntEnum
 
-from settings import brain_location
+from settings import playable_brain_location
 from actions import ActionRegistry
 from world import ResourceEmpty
 from objects import Object, Bucket, Axe, FishingRod
@@ -41,7 +41,7 @@ class Player:
         self._day_of_death = -1  # initialize purposefully with a wrong value
 
         # Brain and NN stuffs blah blah blah
-        self._brain = Brain(brain_location) if not training else None
+        self._brain = Brain(playable_brain_location) if not training else None
         self._training_enable = training
         self._trainer = trainer
         self.nn_vision_before_action: NNInputs = None  # noqa

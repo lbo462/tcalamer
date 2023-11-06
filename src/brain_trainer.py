@@ -11,7 +11,7 @@ from typing import Generator
 import torch
 from torch import nn, optim
 
-from settings import number_of_player, wreck_probability, brain_location
+from settings import number_of_player, wreck_probability, trained_brain_location
 from game_engine import GameEngine
 from player import PlayerState
 from brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
@@ -112,8 +112,8 @@ if __name__ == "__main__":
     for log in brain_trainer.train():
         print(log)
 
-    torch.save(brain_trainer._q_network.state_dict(), brain_location)  # noqa
-    print(f"Saved brain at {brain_location}")
+    torch.save(brain_trainer._q_network.state_dict(), trained_brain_location)  # noqa
+    print(f"Saved brain at {trained_brain_location}")
 
     print("Testing on 1000 games ...")
     wins = 0
