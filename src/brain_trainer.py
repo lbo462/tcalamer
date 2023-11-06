@@ -80,6 +80,8 @@ class BrainTrainer:
                     reward = player.nn_fitness_after_action
                     if player.state is PlayerState.DEAD:
                         reward = -100
+                    elif player.state is PlayerState.ESCAPED:
+                        reward = 1000 / ge.current_day
                     total_reward += reward
 
                     # Now, observe the result of the chosen action regarding the inputs

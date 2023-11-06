@@ -1,5 +1,4 @@
 import random
-import math
 from typing import List, Generator
 
 from player import Player, PlayerState
@@ -116,12 +115,8 @@ class Colony:
     @property
     def daily_fitness(self) -> float:
         wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
-        food_objective = self._amount_of_food_to_leave * len(
-            self.alive_players
-        ) + 2 * len(self.alive_players)
-        water_objective = self._amount_of_water_to_leave * len(
-            self.alive_players
-        ) + 2 * len(self.alive_players)
+        food_objective = (self._amount_of_food_to_leave + 2) * len(self.alive_players)
+        water_objective = (self._amount_of_water_to_leave + 2) * len(self.alive_players)
 
         # Compute distance
         wood_distance = (wood_objective - self.wood_amount) / wood_objective

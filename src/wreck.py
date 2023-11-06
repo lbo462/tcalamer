@@ -38,20 +38,13 @@ class Wreck:
         self._probability = probability
         self._item_sets: List[_ItemSet] = []
         self._number_of_times_fetched = 0
-        self._amount_of_items_set = 0
 
     @property
     def number_of_times_fetched(self) -> int:
         return self._number_of_times_fetched
 
-    @property
-    def amount_of_items_set(self) -> int:
-        """Returns the amount of items sets initially present, agnostic to how many times this wreck was fetched"""
-        return self._amount_of_items_set
-
     def add_item(self, item_class: Type[T], quantity: int):
         self._item_sets.append(_ItemSet(item_class, quantity))
-        self._amount_of_items_set += quantity
 
     def search(self) -> Union[None, T]:
         """Search the wreck
