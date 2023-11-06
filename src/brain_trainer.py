@@ -23,7 +23,7 @@ class BrainTrainer:
         self._learning_rate = 0.001
         self._discount_factor = 0.99
         self._greedy_epsilon = 0.1
-        self._num_iterations = 3000
+        self._num_iterations = 1000
 
         # Choose parameters for the game engine
         self._number_of_player = number_of_player
