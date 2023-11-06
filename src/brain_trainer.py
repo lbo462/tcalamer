@@ -116,17 +116,3 @@ if __name__ == "__main__":
 
     torch.save(brain_trainer._q_network.state_dict(), trained_brain_location)  # noqa
     print(f"Saved brain at {trained_brain_location}")
-
-    print("Testing on 1000 games ...")
-    wins = 0
-    for iteration in range(1000):
-        ge = GameEngine(
-            number_of_players=50,
-            wreck_probability=0.5,
-        )
-        while not ge.game_over:
-            for _ in ge.update():
-                ...
-        if ge.colony.at_least_one_left_the_isle:
-            wins += 1
-    print(f"Win ratio : {100 * wins / 1000} %")

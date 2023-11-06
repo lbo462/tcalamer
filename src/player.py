@@ -41,6 +41,7 @@ class Player:
         self._day_of_death = -1  # initialize purposefully with a wrong value
 
         # Brain and NN stuffs blah blah blah
+        # don't set brain when training enabled, the trainer do the job
         self._brain = Brain(playable_brain_location) if not training else None
         self._training_enable = training
         self._trainer = trainer

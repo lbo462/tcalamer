@@ -7,7 +7,7 @@ from torch import nn
 When modifying the amount of inputs or outputs, 
 remember to update this variable :
 """
-amount_of_inputs = 10
+amount_of_inputs = 8
 # len(_daily_actions.actions) can't be imported due to circular imports ...
 amount_of_outputs = 4
 
@@ -24,19 +24,19 @@ class NNInputs:
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            # self._player.bucket_amount,
-            # self._player.axe_amount,
-            # self._player.fishing_rod_amount,
+            self._player.bucket_amount,
+            self._player.axe_amount,
+            self._player.fishing_rod_amount,
             self._colony.water_level,
             self._colony.wood_amount,
             self._colony.food_amount,
             self._world.weather.value,
             self._wreck.number_of_times_fetched,
-            self._colony.amount_of_player_to_the_water,
-            self._colony.amount_of_player_to_the_wood,
-            self._colony.amount_of_player_to_the_food,
-            self._colony.amount_of_player_to_the_wreck,
-            self._colony.amount_of_free_players,
+            # self._colony.amount_of_player_to_the_wood,
+            # self._colony.amount_of_player_to_the_water,
+            # self._colony.amount_of_player_to_the_food,
+            # self._colony.amount_of_player_to_the_wreck,
+            # self._colony.amount_of_free_players,
         ]
 
     def __str__(self):
@@ -49,6 +49,7 @@ class _QNetwork(nn.Module):
     def __init__(self, input_size: int, output_size: int):
         super(_QNetwork, self).__init__()
 
+        # Adds two fully-connected layers
         self.fc1 = nn.Linear(input_size, 16)
         self.fc2 = nn.Linear(16, output_size)
 

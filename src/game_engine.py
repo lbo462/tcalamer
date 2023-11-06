@@ -43,8 +43,7 @@ class GameEngine:
 
         # Add players
         for i in range(0, number_of_players):
-            player = Player(i, self.colony, training, brain_trainer)
-            self.colony.add_player(player)
+            self.colony.add_player(Player(i, self.colony, training, brain_trainer))
 
         # Initiate day counter
         self._day = 0
