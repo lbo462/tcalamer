@@ -24,17 +24,39 @@ class World:
     The world also defines the weather
     """
 
-    def __init__(self, wreck: Wreck):
+    def __init__(
+        self,
+        wreck: Wreck,
+        initial_water_level=5000,
+        initial_wood_amount=5000,
+        initial_food_amount=5000,
+    ):
         self._wreck = wreck
         self._weather = Weather.BLUE_SKY
 
-        self._water_level = 5000
-        self._wood_amount = 5000
-        self._food_amount = 5000
+        self._initial_water_level = initial_water_level
+        self._initial_wood_amount = initial_wood_amount
+        self._initial_food_amount = initial_food_amount
+
+        self._water_level = initial_water_level
+        self._wood_amount = initial_wood_amount
+        self._food_amount = initial_food_amount
 
         self._basic_water_fetch_factor = [3, 4, 5]
         self._basic_wood_fetch_factor = [3, 4, 5]
         self._basic_food_fetch_factor = [3, 4, 5]
+
+    @property
+    def initial_water_level(self) -> int:
+        return self._initial_water_level
+
+    @property
+    def initial_wood_amount(self) -> int:
+        return self._initial_wood_amount
+
+    @property
+    def initial_food_amount(self) -> int:
+        return self._initial_food_amount
 
     @property
     def water_level(self) -> int:

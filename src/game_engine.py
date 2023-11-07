@@ -21,6 +21,8 @@ class GameEngine:
         amount_of_wood_per_player_to_leave=20,
         amount_of_water_per_player_to_leave=2,
         amount_of_food_per_player_to_leave=2,
+        training=False,
+        brain_trainer: "BrainTrainer" = None,
     ):
         # Create wreck
         wreck = Wreck(wreck_probability)
@@ -41,7 +43,7 @@ class GameEngine:
 
         # Add players
         for i in range(0, number_of_players):
-            self.colony.add_player(Player(i, self.colony))
+            self.colony.add_player(Player(i, self.colony, training, brain_trainer))
 
         # Initiate day counter
         self._day = 0
@@ -61,6 +63,7 @@ class GameEngine:
         # Step zero, world update
         self._day += 1
         self._world.update()
+        self.colony.update()
 
         yield f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})"
         yield f"/ ---"
@@ -71,8 +74,7 @@ class GameEngine:
 
         # First step : daily _actions
         for player in self.colony.alive_players:
-            for log in player.make_best_daily_action():
-                yield f"  > {log}"
+            yield f"  > {player.make_best_daily_action()}"
 
         yield ""
         yield f"--- SUN GETS DOWN - {self.colony}"

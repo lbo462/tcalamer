@@ -1,9 +1,9 @@
 import os
+from dataclasses import dataclass
 from typing import List
 import torch
 from torch import nn
 
-from world import Weather
 
 """
 When modifying the amount of inputs or outputs, 
@@ -14,58 +14,63 @@ amount_of_inputs = 8
 amount_of_outputs = 4
 
 
+@dataclass
 class NNInputs:
     """Modelization of the inputs for the neural network"""
 
-    def __init__(
-        self,
-        amount_of_buckets_of_the_player: int,
-        amount_of_axes_of_the_player: int,
-        amount_of_fishing_rods_of_the_player: int,
-        amount_of_water_held_by_the_colony: int,
-        amount_of_wood_held_by_the_colony: int,
-        amount_of_food_held_by_the_colony: int,
-        current_weather: Weather,
-        number_times_wreck_searched: int,
-    ):
-        self._amount_of_buckets_of_the_player = amount_of_buckets_of_the_player
-        self._amount_of_axes_of_the_player = amount_of_axes_of_the_player
-        self._amount_of_fishing_rods_of_the_player = (
-            amount_of_fishing_rods_of_the_player
+    bucket_amount: int
+    axe_amount: int
+    fishing_rod_amount: int
+    water_level: int
+    wood_amount: int
+    food_amount: int
+    weather: "Weather"
+    wreck_visits_amount: int
+    # players_to_the_wood: int
+    # players_to_the_water: int
+    # players_to_the_food: int
+    # players_waiting: int
+
+    @classmethod
+    def from_player(cls, player: "Player"):
+        colony = player._colony  # noqa
+        world = player._world  # noqa
+        wreck = world._wreck  # noqa
+
+        return cls(
+            player.bucket_amount,
+            player.axe_amount,
+            player.fishing_rod_amount,
+            colony.water_level,
+            colony.wood_amount,
+            colony.food_amount,
+            world.weather,
+            wreck.number_of_times_fetched,
+            # colony.amount_of_players_to_the_wood,
+            # colony.amount_of_players_to_the_water,
+            # colony.amount_of_players_to_the_food,
+            # colony.amount_of_free_players,
         )
 
-        self._amount_of_water_held_by_the_colony = amount_of_water_held_by_the_colony
-        self._amount_of_wood_held_by_the_colony = amount_of_wood_held_by_the_colony
-        self._amount_of_food_held_by_the_colony = amount_of_food_held_by_the_colony
-
-        self._current_weather = current_weather
-
-        self._number_times_wreck_searched = number_times_wreck_searched
-
-    def to_list(self) -> List[int]:
+    def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            self._amount_of_buckets_of_the_player,
-            self._amount_of_axes_of_the_player,
-            self._amount_of_fishing_rods_of_the_player,
-            self._amount_of_water_held_by_the_colony,
-            self._amount_of_wood_held_by_the_colony,
-            self._amount_of_food_held_by_the_colony,
-            self._current_weather.value,
-            self._number_times_wreck_searched,
+            self.bucket_amount,
+            self.axe_amount,
+            self.fishing_rod_amount,
+            self.water_level,
+            self.wood_amount,
+            self.food_amount,
+            self.weather.value,
+            self.wreck_visits_amount,
+            # self.players_to_the_wood,
+            # self.players_to_the_water,
+            # self.players_to_the_food,
+            # self.players_waiting,
         ]
 
     def __str__(self):
-        return (
-            f"{self._current_weather.name}, "
-            f"{self._amount_of_buckets_of_the_player}b, "
-            f"{self._amount_of_axes_of_the_player}a, "
-            f"{self._amount_of_fishing_rods_of_the_player}f, "
-            f"{self._amount_of_water_held_by_the_colony}wa, "
-            f"{self._amount_of_wood_held_by_the_colony}wo, "
-            f"{self._amount_of_food_held_by_the_colony}fo, "
-            f"{self._number_times_wreck_searched}we"
-        )
+        return f"{', '.join([str(i) for i in self.to_list()])}"
 
 
 class _QNetwork(nn.Module):
