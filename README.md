@@ -56,7 +56,7 @@ The JSON follows the following scheme :
       ]
     }
   },
-  "turns": [
+  "days": [
     {
       "day": 1,
       "actions": [

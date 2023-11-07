@@ -12,6 +12,9 @@ class ColonySum(PBaseModel):
     water: int
     food: int
     wood: int
+    water_needs: int
+    food_needs: int
+    wood_needs: int
     players: List[PlayerSum]
 
 
@@ -90,16 +93,39 @@ class Colony(BaseModel):
     def enough_resources(self) -> bool:
         return self.limiting_factor >= len(self.alive_players)
 
+    """Objectives"""
+
+    @property
+    def water_objective(self) -> int:
+        return (self._amount_of_water_to_leave + 2) * len(self.alive_players)
+
+    @property
+    def food_objective(self) -> int:
+        return (self._amount_of_food_to_leave + 2) * len(self.alive_players)
+
+    @property
+    def wood_objective(self) -> int:
+        return self._amount_of_wood_to_leave * len(self.alive_players)
+
+    """Needs"""
+
+    @property
+    def water_needs(self) -> int:
+        return self.water_objective - self.water_level
+
+    @property
+    def food_needs(self) -> int:
+        return self.food_objective - self.food_amount
+
+    @property
+    def wood_needs(self) -> int:
+        return self.wood_objective - self.water_level
+
     @property
     def daily_fitness(self) -> float:
-        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
-        food_objective = (self._amount_of_food_to_leave + 2) * len(self.alive_players)
-        water_objective = (self._amount_of_water_to_leave + 2) * len(self.alive_players)
-
-        # Compute distance
-        wood_distance = wood_objective - self.wood_amount
-        food_distance = food_objective - self.food_amount
-        water_distance = water_objective - self.water_level
+        wood_distance = self.wood_needs
+        food_distance = self.food_needs
+        water_distance = self.water_needs
 
         # Adapt distance to care about sign
         wood_distance = wood_distance if wood_distance > 0 else 0.1
@@ -215,6 +241,9 @@ class Colony(BaseModel):
             water=self.water_level,
             food=self.food_amount,
             wood=self.wood_amount,
+            water_needs=self.water_needs,
+            food_needs=self.food_needs,
+            wood_needs=self.wood_needs,
             players=[p.summarize() for p in self._players],
         )
 

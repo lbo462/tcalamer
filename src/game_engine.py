@@ -19,7 +19,7 @@ class GameStateSum(PBaseModel):
     colony: ColonySum
 
 
-class Turn(PBaseModel):
+class Day(PBaseModel):
     day: int
     actions: List[PlayerAction]
     night_state: GameStateSum
@@ -27,7 +27,7 @@ class Turn(PBaseModel):
 
 class GameSum(PBaseModel):
     initial_state: GameStateSum
-    turns: List[Turn]
+    days: List[Day]
 
 
 class GameEngine:
@@ -45,7 +45,7 @@ class GameEngine:
         amount_of_water_per_player_to_leave=2,
         amount_of_food_per_player_to_leave=2,
         training=False,
-        brain_trainer: "BrainTrainer" = None,
+        brain_trainer=None,
     ):
         # Create wreck
         wreck = Wreck(wreck_probability)
@@ -81,7 +81,7 @@ class GameEngine:
     def _current_day(self) -> int:
         return self._day
 
-    def _update(self) -> Turn:
+    def _update(self) -> Day:
         """This updates the game and make the _actions of a complete day, from dawn to dawn"""
 
         # Step zero, world update
@@ -119,7 +119,7 @@ class GameEngine:
                 for _ in self.colony.leave_isle():
                     ...
 
-        return Turn(
+        return Day(
             day=self._day,
             actions=actions,
             night_state=GameStateSum(
@@ -131,7 +131,7 @@ class GameEngine:
 
     def run(self) -> GameSum:
         initial_state: GameStateSum
-        turns: List[Turn] = []
+        days: List[Day] = []
 
         # Compute initial state
         initial_state = GameStateSum(
@@ -140,12 +140,12 @@ class GameEngine:
             colony=self.colony.summarize(),
         )
 
-        # Compute turns
+        # Compute days
         while not self._game_over:
-            turn = self._update()
-            turns.append(turn)
+            day = self._update()
+            days.append(day)
 
         return GameSum(
             initial_state=initial_state,
-            turns=turns,
+            days=days,
         )
