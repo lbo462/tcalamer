@@ -1,0 +1,138 @@
+[gd_scene load_steps=16 format=3 uid="uid://b4f4xsvtubtdu"]
+
+[ext_resource type="Texture2D" uid="uid://dp3af0en5i62v" path="res://images/Animations/Man/Men_Walk_Down_1.png" id="1_j7284"]
+[ext_resource type="Texture2D" uid="uid://tkvielkkginh" path="res://images/Animations/Man/Men_Walk_Down_2.png" id="2_vga4o"]
+[ext_resource type="Texture2D" uid="uid://ck6ukc13ssyjo" path="res://images/Animations/Man/Men_Walk_Down_3.png" id="3_36hxp"]
+[ext_resource type="Texture2D" uid="uid://xiveliemwfkf" path="res://images/Animations/Man/Men_Walk_Left_1.png" id="4_5lwf4"]
+[ext_resource type="Texture2D" uid="uid://iaqivimi5o03" path="res://images/Animations/Man/Men_Walk_Left_2.png" id="5_kwwah"]
+[ext_resource type="Texture2D" uid="uid://bm2f8qqw1aph0" path="res://images/Animations/Man/Men_Walk_Left_3.png" id="6_0kbxh"]
+[ext_resource type="Texture2D" uid="uid://c7rxj8stbw1vx" path="res://images/Animations/Man/Men_Walk_Right_1.png" id="7_77ck5"]
+[ext_resource type="Texture2D" uid="uid://cjkm20f11guac" path="res://images/Animations/Man/Men_Walk_Right_2.png" id="8_n5sm8"]
+[ext_resource type="Texture2D" uid="uid://cok13p8u4twln" path="res://images/Animations/Man/Men_Walk_Right_3.png" id="9_ma6ao"]
+[ext_resource type="Texture2D" uid="uid://cs8hq6mk2dcq2" path="res://images/Animations/Man/Men_Walk_Up_1.png" id="10_klmb5"]
+[ext_resource type="Texture2D" uid="uid://cyvhlrl6jogm2" path="res://images/Animations/Man/Men_Walk_Up_2.png" id="11_7vbkv"]
+[ext_resource type="Texture2D" uid="uid://jm1e2omkvgqh" path="res://images/Animations/Man/Men_Walk_Up_3.png" id="12_77j4r"]
+[ext_resource type="Script" path="res://scripts/playerSimulation.gd" id="13_0l3y0"]
+[ext_resource type="FontFile" uid="uid://tvtnoij3bbif" path="res://font/Pixeled.ttf" id="14_y4p2k"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5pkjy"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"dead",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_j7284")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vga4o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_36hxp")
+}],
+"loop": true,
+"name": &"down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_vga4o")
+}],
+"loop": true,
+"name": &"idle_down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_kwwah")
+}],
+"loop": true,
+"name": &"idle_left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_n5sm8")
+}],
+"loop": true,
+"name": &"idle_right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_7vbkv")
+}],
+"loop": true,
+"name": &"idle_up",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_5lwf4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_kwwah")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_0kbxh")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_77ck5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_n5sm8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ma6ao")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_klmb5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_7vbkv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_77j4r")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}]
+
+[node name="Player" type="AnimatedSprite2D"]
+z_index = 20
+texture_filter = 1
+position = Vector2(8, 8)
+sprite_frames = SubResource("SpriteFrames_5pkjy")
+animation = &"down"
+script = ExtResource("13_0l3y0")
+
+[node name="ID" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -13.0
+offset_top = -21.0
+offset_right = -3.0
+offset_bottom = -4.0
+grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_fonts/font = ExtResource("14_y4p2k")
+theme_override_font_sizes/font_size = 5
+text = "01"
+horizontal_alignment = 1
+vertical_alignment = 1
+justification_flags = 128

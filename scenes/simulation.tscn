@@ -1,0 +1,21 @@
+[gd_scene load_steps=7 format=3 uid="uid://c4qifkwmg5ald"]
+
+[ext_resource type="Script" path="res://scripts/simulation.gd" id="1_lm63p"]
+[ext_resource type="PackedScene" uid="uid://b4f4xsvtubtdu" path="res://scenes/player.tscn" id="2_cdr1c"]
+[ext_resource type="PackedScene" uid="uid://d2e0eopjysnod" path="res://scenes/player_infos.tscn" id="3_0q2us"]
+[ext_resource type="PackedScene" uid="uid://dyel7u1nk3b88" path="res://scenes/in_game_players_infos.tscn" id="4_kfigw"]
+[ext_resource type="PackedScene" uid="uid://clei3idjfq7p7" path="res://scenes/world_ui.tscn" id="5_vw3bp"]
+[ext_resource type="PackedScene" uid="uid://drqhvecp44h5f" path="res://scenes/world.tscn" id="6_oo6ox"]
+
+[node name="Simulation" type="Node"]
+script = ExtResource("1_lm63p")
+playerInstance = ExtResource("2_cdr1c")
+playerInfos = ExtResource("3_0q2us")
+
+[node name="PlayersInfos" parent="." instance=ExtResource("4_kfigw")]
+
+[node name="WorldUI" parent="." instance=ExtResource("5_vw3bp")]
+
+[node name="World" parent="." instance=ExtResource("6_oo6ox")]
+
+[connection signal="start_simulation" from="WorldUI" to="." method="new_simulation"]
