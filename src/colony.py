@@ -4,7 +4,7 @@ from typing import List, Generator
 from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
-from player import Player, PlayerState
+from player import Player, PlayerState, PlayerSum
 from world import World
 
 
@@ -12,6 +12,7 @@ class ColonySum(PBaseModel):
     water: int
     food: int
     wood: int
+    players: List[PlayerSum]
 
 
 class InsufficientResources(Exception):
@@ -214,6 +215,7 @@ class Colony(BaseModel):
             water=self.water_level,
             food=self.food_amount,
             wood=self.wood_amount,
+            players=[p.summarize() for p in self._players],
         )
 
     def __str__(self):

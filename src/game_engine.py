@@ -1,11 +1,10 @@
-from typing import Generator, Dict, List
+from typing import List
 from pydantic import BaseModel as PBaseModel
 
-from base_model import BaseModel
-from wreck import Wreck
-from world import World
-from colony import Colony
-from player import Player, PlayerSum
+from wreck import Wreck, WreckSum
+from world import World, WorldSum
+from colony import Colony, ColonySum
+from player import Player
 from objects import Bucket, Axe, FishingRod
 
 
@@ -14,12 +13,24 @@ class PlayerAction(PBaseModel):
     action_id: int
 
 
+class GameStateSum(PBaseModel):
+    world: WorldSum
+    wreck: WreckSum
+    colony: ColonySum
+
+
 class Turn(PBaseModel):
+    day: int
     actions: List[PlayerAction]
-    night_state: Dict
+    night_state: GameStateSum
 
 
-class GameEngine(BaseModel):
+class GameSum(PBaseModel):
+    initial_state: GameStateSum
+    turns: List[Turn]
+
+
+class GameEngine:
     """
     The GameEngine drives the whole game.
     It creates a _colony and players in it.
@@ -41,6 +52,7 @@ class GameEngine(BaseModel):
         wreck.add_item(Bucket, 1)
         wreck.add_item(Axe, 1)
         wreck.add_item(FishingRod, 1)
+        self._wreck = wreck
 
         # Create world
         self._world = World(wreck)
@@ -61,15 +73,15 @@ class GameEngine(BaseModel):
         self._day = 0
 
     @property
-    def game_over(self) -> bool:
+    def _game_over(self) -> bool:
         """The game is over iff every player is dead or gone"""
         return len(self.colony.alive_players) <= 0
 
     @property
-    def current_day(self) -> int:
+    def _current_day(self) -> int:
         return self._day
 
-    def update(self) -> Generator[str, None, None]:
+    def _update(self) -> Turn:
         """This updates the game and make the _actions of a complete day, from dawn to dawn"""
 
         # Step zero, world update
@@ -77,59 +89,63 @@ class GameEngine(BaseModel):
         self._world.update()
         self.colony.update()
 
-        yield f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})"
-        yield f"/ ---"
-        yield f"| World : {self._world}"
-        yield f"| Colony : {self.colony}"
-        yield f"| {len(self.colony.alive_players)} players lefts"
-        yield f"\\ ---"
-
-        # First step : daily _actions
+        # First step : daily actions
+        actions: List[PlayerAction] = []
         for player in self.colony.alive_players:
-            yield f"  > {player.make_best_daily_action()}"
-
-        yield ""
-        yield f"--- SUN GETS DOWN - {self.colony}"
+            action_id = player.make_best_daily_action()
+            actions.append(
+                PlayerAction(
+                    player_id=player.number,
+                    action_id=action_id,
+                )
+            )
 
         # Second step : Some must die
         if not self.colony.enough_resources:
             limiting_factor = self.colony.limiting_factor
             amount_of_players_to_die = len(self.colony.alive_players) - limiting_factor
-            yield f"NOT ENOUGH RESOURCES : {amount_of_players_to_die} players must die."
 
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
-                player_to_die.die(self.current_day)
-                yield f"  X {player_to_die} died on day #{player_to_die.day_of_death}."
+                player_to_die.die(self._current_day)
 
-        if not self.game_over:
+        if not self._game_over:
             # Third step : Diner
-            yield f"EVERY ONE DINE"
-            for player in self.colony.dine():
-                yield f"  - {player} dine"
+            for _ in self.colony.dine():
+                ...
 
             # Fourth step : Verify if there's enough resources to leave
             if self.colony.able_to_leave:
-                yield f"SOME LEAVE THE ISLE !"
-                count = 0
-                for player in self.colony.leave_isle():
-                    yield f"  >> {player} took the raft"
-                    count += 1
-                yield f"--------- {count} PLAYERS ESCAPED ---------"
+                for _ in self.colony.leave_isle():
+                    ...
 
-            # Fifth step : Close your eyes and sleep my darling
-            else:
-                yield "--------- NIGHT FALLS ------------"
+        return Turn(
+            day=self._day,
+            actions=actions,
+            night_state=GameStateSum(
+                world=self._world.summarize(),
+                wreck=self._wreck.summarize(),
+                colony=self.colony.summarize(),
+            ),
+        )
 
-        else:
-            yield "--------- GAME OVER ------------"
+    def run(self) -> GameSum:
+        initial_state: GameStateSum
+        turns: List[Turn] = []
 
-        # Day summary
-        yield f"/ ---"
-        yield f"| World : {self._world}"
-        yield f"| Colony : {self.colony}"
-        yield f"| {len(self.colony.alive_players)} players lefts"
-        yield f"\\ ---"
+        # Compute initial state
+        initial_state = GameStateSum(
+            world=self._world.summarize(),
+            wreck=self._wreck.summarize(),
+            colony=self.colony.summarize(),
+        )
 
-    def summarize(self) -> Dict:
-        return {}
+        # Compute turns
+        while not self._game_over:
+            turn = self._update()
+            turns.append(turn)
+
+        return GameSum(
+            initial_state=initial_state,
+            turns=turns,
+        )

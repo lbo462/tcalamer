@@ -66,6 +66,10 @@ class Player(BaseModel):
         return f"N°{self._number}"
 
     @property
+    def number(self) -> int:
+        return self._number
+
+    @property
     def state(self) -> PlayerState:
         return self._state
 
@@ -142,7 +146,7 @@ class Player(BaseModel):
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its _inventory
         """
-        new_object = self._world.search_wreck()
+        new_object = self._world.search_wreck(self)
         if new_object:
             self._inventory.append(new_object)
             return f"{self} search wreck and found {new_object}"
@@ -190,11 +194,12 @@ class Player(BaseModel):
         """Calls a random daily action"""
         return random.choice(_daily_actions.actions).function()
 
-    def make_best_daily_action(self) -> str:
+    def make_best_daily_action(self) -> int:
         """
         Uses a brain to choose the best daily action and calls it
         If training was enabled, the player uses its brain trainer to make the decision
         This updates the vision before and after the action
+        :return: ID of the action chosen
         """
         inputs = self.get_current_vision()
         self.nn_vision_before_action = inputs
@@ -206,11 +211,11 @@ class Player(BaseModel):
             action_id = self._brain.chose_action(inputs)
 
         self.nn_action_taken = action_id
-        output: str = self._make_daily_action(action_id)
+        self._make_daily_action(action_id)
 
         self.nn_vision_after_action = self.get_current_vision()
         self.nn_fitness_after_action = self._colony.daily_fitness
-        return output
+        return action_id
 
     def summarize(self) -> PlayerSum:
         return PlayerSum(

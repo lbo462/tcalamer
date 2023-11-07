@@ -8,10 +8,8 @@ def main():
         wreck_probability=wreck_probability,
     )
 
-    while not ge.game_over:
-        for log in ge.update():
-            print(f". {log}")
-        print("\n")
+    summary = ge.run()
+    print(summary.model_dump_json())
 
 
 if __name__ == "__main__":

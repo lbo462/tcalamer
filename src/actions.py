@@ -23,7 +23,7 @@ class UnregisteredAction(Exception):
 
 
 @dataclass
-class ActionSummary:
+class Action:
     """Defines an action together with its ID to be registered"""
 
     function: Callable

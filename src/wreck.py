@@ -57,7 +57,7 @@ class Wreck(BaseModel):
 
     def _amount(self, item_class: Type[T]) -> bool:
         for item_set in self._item_sets:
-            if isinstance(item_set.item_class, item_class):
+            if item_set.item_class is item_class:
                 return True
         return False
 

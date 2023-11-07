@@ -1,10 +1,9 @@
 import random
 from enum import IntEnum
-from typing import Union, List, Dict
+from typing import Union, List
 from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
-from wreck import Wreck
 from objects import T
 
 
@@ -34,7 +33,7 @@ class World(BaseModel):
 
     def __init__(
         self,
-        wreck: Wreck,
+        wreck,
         initial_water_level=5000,
         initial_wood_amount=5000,
         initial_food_amount=5000,
@@ -149,8 +148,8 @@ class World(BaseModel):
         self._food_amount -= amount
         return amount
 
-    def search_wreck(self) -> Union[None, T]:
-        return self._wreck.search()
+    def search_wreck(self, player) -> Union[None, T]:
+        return self._wreck.search(player)
 
     def update(self):
         # Update the weather
