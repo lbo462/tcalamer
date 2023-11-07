@@ -1,9 +1,16 @@
 import random
-from typing import Type, List, Union, Dict
+from typing import Type, List, Union
+from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
 from objects import T, Axe, Bucket, FishingRod
 from player import Player
+
+
+class WreckSum(PBaseModel):
+    buckets: int
+    axes: int
+    fishing_rods: int
 
 
 class _ItemSetEmpty(Exception):
@@ -79,9 +86,9 @@ class Wreck(BaseModel):
 
         return None
 
-    def summarize(self) -> Dict:
-        return {
-            "buckets": self._amount(Bucket),
-            "axes": self._amount(Axe),
-            "fishing_rod": self._amount(FishingRod),
-        }
+    def summarize(self) -> WreckSum:
+        return WreckSum(
+            buckets=self._amount(Bucket),
+            axes=self._amount(Axe),
+            fishing_rods=self._amount(FishingRod),
+        )

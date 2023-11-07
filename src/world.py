@@ -1,10 +1,17 @@
 import random
 from enum import IntEnum
 from typing import Union, List, Dict
+from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
 from wreck import Wreck
 from objects import T
+
+
+class WorldSum(PBaseModel):
+    water: int
+    food: int
+    wood: int
 
 
 class ResourceEmpty(Exception):
@@ -152,12 +159,12 @@ class World(BaseModel):
         else:
             self._weather = random.choice(list(Weather))
 
-    def summarize(self) -> Dict:
-        return {
-            "water": self.water_level,
-            "food": self.food_amount,
-            "wood": self.wood_amount,
-        }
+    def summarize(self) -> WorldSum:
+        return WorldSum(
+            water=self.water_level,
+            food=self.food_amount,
+            wood=self.wood_amount,
+        )
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

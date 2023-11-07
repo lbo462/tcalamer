@@ -1,6 +1,7 @@
 import random
 from typing import List, Callable, Dict, Type, Optional
 from enum import IntEnum
+from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
 from settings import playable_brain_location
@@ -17,6 +18,14 @@ class PlayerState(IntEnum):
     DEAD = 2
     ESCAPED = 3
     SICK = 4
+
+
+class PlayerSum(PBaseModel):
+    number: int
+    state: PlayerState
+    has_bucket: bool
+    has_axe: bool
+    has_fishing_rod: bool
 
 
 class Player(BaseModel):
@@ -203,14 +212,14 @@ class Player(BaseModel):
         self.nn_fitness_after_action = self._colony.daily_fitness
         return output
 
-    def summarize(self) -> Dict:
-        return {
-            "number": self._number,
-            "state": self._state.value,
-            "has_bucket": self.has_bucket,
-            "has_axe": self.has_axe,
-            "has_fishing_rod": self.has_fishing_rod,
-        }
+    def summarize(self) -> PlayerSum:
+        return PlayerSum(
+            number=self._number,
+            state=self._state,
+            has_bucket=self.has_bucket,
+            has_axe=self.has_axe,
+            has_fishing_rod=self.has_fishing_rod,
+        )
 
     def __str__(self):
         return f"{self.name} ({len(self._inventory)} items)"

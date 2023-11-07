@@ -1,10 +1,17 @@
 import random
 import math
-from typing import List, Generator, Dict
+from typing import List, Generator
+from pydantic import BaseModel as PBaseModel
 
 from base_model import BaseModel
 from player import Player, PlayerState
 from world import World
+
+
+class ColonySum(PBaseModel):
+    water: int
+    food: int
+    wood: int
 
 
 class InsufficientResources(Exception):
@@ -202,13 +209,12 @@ class Colony(BaseModel):
             player.flee()
             yield player
 
-    def summarize(self) -> Dict:
-        return {
-            "water": self.water_level,
-            "food": self.food_amount,
-            "wood": self.wood_amount,
-            "players": [p.summarize for p in self._players],
-        }
+    def summarize(self) -> ColonySum:
+        return ColonySum(
+            water=self.water_level,
+            food=self.food_amount,
+            wood=self.wood_amount,
+        )
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

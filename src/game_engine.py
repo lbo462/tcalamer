@@ -1,13 +1,25 @@
-from typing import Generator
+from typing import Generator, Dict, List
+from pydantic import BaseModel as PBaseModel
 
-from src.wreck import Wreck
-from src.world import World
-from src.colony import Colony
-from src.player import Player
-from src.objects import Bucket, Axe, FishingRod
+from base_model import BaseModel
+from wreck import Wreck
+from world import World
+from colony import Colony
+from player import Player, PlayerSum
+from objects import Bucket, Axe, FishingRod
 
 
-class GameEngine:
+class PlayerAction(PBaseModel):
+    player_id: int
+    action_id: int
+
+
+class Turn(PBaseModel):
+    actions: List[PlayerAction]
+    night_state: Dict
+
+
+class GameEngine(BaseModel):
     """
     The GameEngine drives the whole game.
     It creates a _colony and players in it.
@@ -118,3 +130,6 @@ class GameEngine:
         yield f"| Colony : {self.colony}"
         yield f"| {len(self.colony.alive_players)} players lefts"
         yield f"\\ ---"
+
+    def summarize(self) -> Dict:
+        return {}
