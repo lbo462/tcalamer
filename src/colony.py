@@ -1,7 +1,8 @@
 import random
 import math
-from typing import List, Generator
+from typing import List, Generator, Dict
 
+from base_model import BaseModel
 from player import Player, PlayerState
 from world import World
 
@@ -10,7 +11,7 @@ class InsufficientResources(Exception):
     """Raised when fetching too much of a resource compared to the amount stored in the colony"""
 
 
-class Colony:
+class Colony(BaseModel):
     """
     A colony has a certain amount of resources
     These resources are shared by the players living in the _colony
@@ -80,38 +81,6 @@ class Colony:
     @property
     def enough_resources(self) -> bool:
         return self.limiting_factor >= len(self.alive_players)
-
-    """
-    The following properties gives information about 
-    how many player already choose the corresponding action
-    or how many are still ready to make an action
-    """
-
-    @property
-    def amount_of_players_to_the_water(self) -> int:
-        return self._amount_of_player_to_the_water
-
-    @property
-    def amount_of_players_to_the_wood(self) -> int:
-        return self._amount_of_player_to_the_wood
-
-    @property
-    def amount_of_players_to_the_food(self) -> int:
-        return self._amount_of_player_to_the_food
-
-    @property
-    def amount_of_players_to_the_wreck(self) -> int:
-        return self._amount_of_player_to_the_wreck
-
-    @property
-    def amount_of_free_players(self) -> int:
-        return (
-            len(self.alive_players)
-            - self.amount_of_players_to_the_water
-            - self.amount_of_players_to_the_wood
-            - self.amount_of_players_to_the_food
-            - self.amount_of_players_to_the_wreck
-        )
 
     @property
     def daily_fitness(self) -> float:
@@ -232,6 +201,14 @@ class Colony:
         for player in self.alive_players:
             player.flee()
             yield player
+
+    def summarize(self) -> Dict:
+        return {
+            "water": self.water_level,
+            "food": self.food_amount,
+            "wood": self.wood_amount,
+            "players": [p.summarize for p in self._players],
+        }
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

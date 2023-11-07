@@ -1,10 +1,10 @@
 from typing import Generator
 
-from ..wreck import Wreck
-from ..world import World
-from ..colony import Colony
-from ..player import Player
-from ..objects import Bucket, Axe, FishingRod
+from src.wreck import Wreck
+from src.world import World
+from src.colony import Colony
+from src.player import Player
+from src.objects import Bucket, Axe, FishingRod
 
 
 class GameEngine:

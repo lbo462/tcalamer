@@ -65,7 +65,7 @@ class Wreck(BaseModel):
         if random.random() < self._probability and len(self._item_sets) > 0:
             item_set_found: _ItemSet = random.choice(self._item_sets)
             if player.has_item(item_set_found.item_class):
-                return None
+                return self.search(player)
             try:
                 item = item_set_found.take_item()
             except _ItemSetEmpty:
