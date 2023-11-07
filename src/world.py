@@ -1,7 +1,8 @@
 import random
 from enum import IntEnum
-from typing import Union, List
+from typing import Union, List, Dict
 
+from base_model import BaseModel
 from wreck import Wreck
 from objects import T
 
@@ -17,7 +18,7 @@ class Weather(IntEnum):
     STORM = 3
 
 
-class World:
+class World(BaseModel):
     """
     The world has certain amount of resources
     The colony lives in the _world and take its resources
@@ -150,6 +151,13 @@ class World:
             self._weather = Weather.RAINING
         else:
             self._weather = random.choice(list(Weather))
+
+    def summarize(self) -> Dict:
+        return {
+            "water": self.water_level,
+            "food": self.food_amount,
+            "wood": self.wood_amount,
+        }
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"
