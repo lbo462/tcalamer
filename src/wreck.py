@@ -2,6 +2,7 @@ import random
 from typing import Type, List, Union
 
 from objects import T
+from player import Player
 
 
 class _ItemSetEmpty(Exception):
@@ -46,7 +47,7 @@ class Wreck:
     def add_item(self, item_class: Type[T], quantity: int):
         self._item_sets.append(_ItemSet(item_class, quantity))
 
-    def search(self) -> Union[None, T]:
+    def search(self, player: Player) -> Union[None, T]:
         """Search the wreck
         Returns None if no objects was found,
         Returns an item if an item is found
@@ -56,6 +57,8 @@ class Wreck:
 
         if random.random() < self._probability and len(self._item_sets) > 0:
             item_set_found: _ItemSet = random.choice(self._item_sets)
+            if player.has_item(item_set_found.item_class):
+                return None
             try:
                 item = item_set_found.take_item()
             except _ItemSetEmpty:

@@ -1,11 +1,12 @@
 import random
-from typing import List, Callable, Generator
+from typing import List, Callable, Dict, Type, Optional
 from enum import IntEnum
 
+from base_model import BaseModel
 from settings import playable_brain_location
 from actions import ActionRegistry
 from world import ResourceEmpty
-from objects import Object, Bucket, Axe, FishingRod
+from objects import Object, Bucket, Axe, FishingRod, T
 from brain import Brain, NNInputs
 
 _daily_actions = ActionRegistry()
@@ -18,7 +19,7 @@ class PlayerState(IntEnum):
     SICK = 4
 
 
-class Player:
+class Player(BaseModel):
     """
     A player is defined by a _number (names ar for humans)
     He lives in a _colony and can add some resources to it.
@@ -45,11 +46,11 @@ class Player:
         self._brain = Brain(playable_brain_location) if not training else None
         self._training_enable = training
         self._trainer = trainer
-        self.nn_vision_before_action: NNInputs = None  # noqa
-        self.nn_vision_after_action: NNInputs = None  # noqa
-        self.nn_action_taken: int = None  # noqa
-        self.nn_fitness_before_action: float = None  # noqa
-        self.nn_fitness_after_action: float = None  # noqa
+        self.nn_vision_before_action: Optional[NNInputs] = None
+        self.nn_vision_after_action: Optional[NNInputs] = None
+        self.nn_action_taken: Optional[int] = None
+        self.nn_fitness_before_action: Optional[float] = None
+        self.nn_fitness_after_action: Optional[float] = None
 
     @property
     def name(self) -> str:
@@ -65,32 +66,28 @@ class Player:
             raise ValueError(f"{self} not dead yet")
         return self._day_of_death
 
-    @property
-    def bucket_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, Bucket):
-                counter += 1
-        return counter
-
-    @property
-    def axe_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, Axe):
-                counter += 1
-        return counter
-
-    @property
-    def fishing_rod_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, FishingRod):
-                counter += 1
-        return counter
-
     def get_current_vision(self) -> NNInputs:
         return NNInputs.from_player(self)
+
+    """Items checkup"""
+
+    def has_item(self, item_class: Type[Object]) -> bool:
+        for o in self._inventory:
+            if isinstance(o, item_class):
+                return True
+        return False
+
+    @property
+    def has_bucket(self) -> bool:
+        return self.has_item(Bucket)
+
+    @property
+    def has_axe(self) -> bool:
+        return self.has_item(Axe)
+
+    @property
+    def has_fishing_rod(self) -> bool:
+        return self.has_item(FishingRod)
 
     """Daily action methods
     These are the _actions that a player can do for the _colony during the daylight.
@@ -99,7 +96,7 @@ class Player:
 
     @_daily_actions(id_=0)
     def fetch_water(self) -> str:
-        amount_fetched = 1 + self.bucket_amount
+        amount_fetched = 2 if self.has_bucket else 1
 
         try:
             amount_fetched = self._world.fetch_water(amount_fetched)
@@ -110,7 +107,7 @@ class Player:
 
     @_daily_actions(id_=1)
     def fetch_wood(self) -> str:
-        amount_fetched = 1 + self.axe_amount
+        amount_fetched = 2 if self.has_axe else 1
 
         try:
             amount_fetched = self._world.fetch_wood(amount_fetched)
@@ -121,7 +118,7 @@ class Player:
 
     @_daily_actions(id_=2)
     def fetch_food(self) -> str:
-        amount_fetched = 1 + self.fishing_rod_amount
+        amount_fetched = 2 if self.has_fishing_rod else 1
 
         try:
             amount_fetched = self._world.fetch_food(amount_fetched)
@@ -205,6 +202,15 @@ class Player:
         self.nn_vision_after_action = self.get_current_vision()
         self.nn_fitness_after_action = self._colony.daily_fitness
         return output
+
+    def summarize(self) -> Dict:
+        return {
+            "number": self._number,
+            "state": self._state.value,
+            "has_bucket": self.has_bucket,
+            "has_axe": self.has_axe,
+            "has_fishing_rod": self.has_fishing_rod,
+        }
 
     def __str__(self):
         return f"{self.name} ({len(self._inventory)} items)"
