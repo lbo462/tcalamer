@@ -171,7 +171,7 @@ class Player:
     def get_sick(self):
         self._state = PlayerState.SICK
 
-    """Action choice
+    """ActionSummary choice
     The player should choose its _actions with the following methods
     This will later be handled by neural networks
     """

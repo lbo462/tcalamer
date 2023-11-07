@@ -23,7 +23,7 @@ class UnregisteredAction(Exception):
 
 
 @dataclass
-class Action:
+class ActionSummary:
     """Defines an action together with its ID to be registered"""
 
     function: Callable
@@ -56,4 +56,4 @@ class ActionRegistry:
             if action.id_ == id_:
                 return action.function(*args, **kwargs)
 
-        raise UnregisteredAction(f"Action #{id_} wasn't registered")
+        raise UnregisteredAction(f"ActionSummary #{id_} wasn't registered")
