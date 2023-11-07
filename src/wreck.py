@@ -1,7 +1,8 @@
 import random
-from typing import Type, List, Union
+from typing import Type, List, Union, Dict
 
-from objects import T
+from base_model import BaseModel
+from objects import T, Axe, Bucket, FishingRod
 from player import Player
 
 
@@ -27,7 +28,7 @@ class _ItemSet:
         return self.item_class()
 
 
-class Wreck:
+class Wreck(BaseModel):
     """The wreck contains multiple _item_sets of objects"""
 
     def __init__(self, probability: float):
@@ -46,6 +47,12 @@ class Wreck:
 
     def add_item(self, item_class: Type[T], quantity: int):
         self._item_sets.append(_ItemSet(item_class, quantity))
+
+    def _amount(self, item_class: Type[T]) -> bool:
+        for item_set in self._item_sets:
+            if isinstance(item_set.item_class, item_class):
+                return True
+        return False
 
     def search(self, player: Player) -> Union[None, T]:
         """Search the wreck
@@ -71,3 +78,10 @@ class Wreck:
             return item
 
         return None
+
+    def summarize(self) -> Dict:
+        return {
+            "buckets": self._amount(Bucket),
+            "axes": self._amount(Axe),
+            "fishing_rod": self._amount(FishingRod),
+        }

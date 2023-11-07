@@ -71,7 +71,7 @@ class Player(BaseModel):
 
     """Items checkup"""
 
-    def has_item(self, item_class: Type[Object]) -> bool:
+    def has_item(self, item_class: Type[T]) -> bool:
         for o in self._inventory:
             if isinstance(o, item_class):
                 return True
