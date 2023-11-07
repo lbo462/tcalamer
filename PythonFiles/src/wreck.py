@@ -47,10 +47,13 @@ class Wreck(BaseModel):
         self._probability = probability
         self._item_sets: List[_ItemSet] = []
         self._number_of_times_fetched = 0
+        self._number_of_failed_fetch = 0
 
     @property
     def number_of_times_fetched(self) -> int:
         return self._number_of_times_fetched
+    def number_of_failed_fetch(self) -> int:
+        return self._number_of_failed_fetch
 
     def add_item(self, item_class: Type[T], quantity: int):
         self._item_sets.append(_ItemSet(item_class, quantity))
@@ -81,6 +84,7 @@ class Wreck(BaseModel):
                 return None
 
             if item_set_found.is_empty:
+                self._number_of_failed_fetch+=1
                 self._item_sets.remove(item_set_found)
             return item
 
