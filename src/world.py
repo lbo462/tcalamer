@@ -7,12 +7,6 @@ from base_model import BaseModel
 from objects import T
 
 
-class WorldSum(PBaseModel):
-    water: int
-    food: int
-    wood: int
-
-
 class ResourceEmpty(Exception):
     """Raised when a certain resource is not present anymore"""
 
@@ -22,6 +16,13 @@ class Weather(IntEnum):
     CLOUDY = 1
     RAINING = 2
     STORM = 3
+
+
+class WorldSum(PBaseModel):
+    water: int
+    food: int
+    wood: int
+    weather: Weather
 
 
 class World(BaseModel):
@@ -163,6 +164,7 @@ class World(BaseModel):
             water=self.water_level,
             food=self.food_amount,
             wood=self.wood_amount,
+            weather=self.weather,
         )
 
     def __str__(self):
