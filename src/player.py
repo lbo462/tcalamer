@@ -21,7 +21,7 @@ class PlayerState(IntEnum):
 
 class PlayerSum(PBaseModel):
     number: int
-    state: PlayerState
+    alive: bool
     has_bucket: bool
     has_axe: bool
     has_fishing_rod: bool
@@ -224,7 +224,7 @@ class Player(BaseModel):
     def summarize(self) -> PlayerSum:
         return PlayerSum(
             number=self._number,
-            state=self._state,
+            alive=self._state is PlayerState.ALIVE,
             has_bucket=self.has_bucket,
             has_axe=self.has_axe,
             has_fishing_rod=self.has_fishing_rod,

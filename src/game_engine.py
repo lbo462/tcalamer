@@ -1,8 +1,8 @@
-from typing import List, Optional
-from pydantic import BaseModel as PBaseModel, FilePath, Field
+from typing import List, Optional, Any
+from pydantic import BaseModel as PBaseModel, FilePath
 
 from .wreck import Wreck, WreckSum
-from .world import Weather, World, WorldSum
+from .world import World, WorldSum, Weather
 from .colony import Colony, ColonySum
 from .player import Player
 from .objects import Bucket, Axe, FishingRod
@@ -30,6 +30,32 @@ class GameSum(PBaseModel):
     days: List[DaySum]
 
 
+class GameEngineParams(PBaseModel):
+    number_of_players: int
+    # Wreck
+    wreck_probability: Optional[float] = 0.5
+    bucket_amount: Optional[int] = 1
+    axe_amount: Optional[int] = 1
+    fishing_rod_amount: Optional[int] = 1
+    # World
+    initial_water_level: Optional[int] = 5000
+    initial_food_amount: Optional[int] = 5000
+    initial_wood_amount: Optional[int] = 5000
+    basic_water_fetch_factor: Optional[List[int]] = None
+    basic_wood_fetch_factor: Optional[List[int]] = None
+    basic_food_fetch_factor: Optional[List[int]] = None
+    default_weather: Optional[Weather] = Weather.BLUE_SKY
+    # Colony
+    amount_of_wood_per_player_to_leave: Optional[int] = 5
+    amount_of_water_per_player_to_leave: Optional[int] = 1
+    amount_of_food_per_player_to_leave: Optional[int] = 1
+    initial_surviving_factor: Optional[int] = 3
+    # Training options
+    brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
+    training: bool = False
+    brain_trainer: Optional[Any] = None
+
+
 class GameEngine:
     """
     The GameEngine drives the whole game.
@@ -37,69 +63,44 @@ class GameEngine:
     It defines the different steps of the game
     """
 
-    def __init__(
-        self,
-        number_of_players: int,
-        brain_location: Optional[FilePath] = "brains/trained_q_network.pth",
-        # Wreck
-        wreck_probability: float = 0.5,
-        bucket_amount: int = 1,
-        axe_amount: int = 1,
-        fishing_rod_amount: int = 1,
-        # World
-        initial_water_level: int = 5000,
-        initial_food_amount: int = 5000,
-        initial_wood_amount: int = 5000,
-        basic_water_fetch_factor: List[int] = None,
-        basic_wood_fetch_factor: List[int] = None,
-        basic_food_fetch_factor: List[int] = None,
-        default_weather: Weather = Weather.BLUE_SKY,
-        # Colony
-        amount_of_wood_per_player_to_leave: int = 5,
-        amount_of_water_per_player_to_leave: int = 1,
-        amount_of_food_per_player_to_leave: int = 1,
-        initial_surviving_factor: int = 3,
-        # Training
-        training: bool = False,
-        brain_trainer=None,
-    ):
+    def __init__(self, ge_params: GameEngineParams):
         # Create wreck
-        wreck = Wreck(wreck_probability)
-        wreck.add_item(Bucket, bucket_amount)
-        wreck.add_item(Axe, axe_amount)
-        wreck.add_item(FishingRod, fishing_rod_amount)
+        wreck = Wreck(ge_params.wreck_probability)
+        wreck.add_item(Bucket, ge_params.bucket_amount)
+        wreck.add_item(Axe, ge_params.axe_amount)
+        wreck.add_item(FishingRod, ge_params.fishing_rod_amount)
         self._wreck = wreck
 
         # Create world
         self._world = World(
             wreck=wreck,
-            initial_water_level=initial_water_level,
-            initial_food_amount=initial_food_amount,
-            initial_wood_amount=initial_wood_amount,
-            basic_water_fetch_factor=basic_water_fetch_factor or [3, 4, 5],
-            basic_wood_fetch_factor=basic_wood_fetch_factor or [3, 4, 5],
-            basic_food_fetch_factor=basic_food_fetch_factor or [3, 4, 5],
-            default_weather=default_weather,
+            initial_water_level=ge_params.initial_water_level,
+            initial_food_amount=ge_params.initial_food_amount,
+            initial_wood_amount=ge_params.initial_wood_amount,
+            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [3, 4, 5],
+            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [3, 4, 5],
+            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [3, 4, 5],
+            default_weather=ge_params.default_weather,
         )
 
         # Create colony
         self.colony = Colony(
             world=self._world,
-            amount_of_wood_per_player_to_leave=amount_of_wood_per_player_to_leave,
-            amount_of_water_per_player_to_leave=amount_of_water_per_player_to_leave,
-            amount_of_food_per_player_to_leave=amount_of_food_per_player_to_leave,
-            initial_surviving_factor=initial_surviving_factor,
+            amount_of_wood_per_player_to_leave=ge_params.amount_of_wood_per_player_to_leave,
+            amount_of_water_per_player_to_leave=ge_params.amount_of_water_per_player_to_leave,
+            amount_of_food_per_player_to_leave=ge_params.amount_of_food_per_player_to_leave,
+            initial_surviving_factor=ge_params.initial_surviving_factor,
         )
 
         # Add players
-        for i in range(0, number_of_players):
+        for i in range(0, ge_params.number_of_players):
             self.colony.add_player(
                 Player(
                     number=i,
                     colony=self.colony,
-                    brain_location=brain_location,
-                    training=training,
-                    trainer=brain_trainer,
+                    brain_location=ge_params.brain_location,
+                    training=ge_params.training,
+                    trainer=ge_params.brain_trainer,
                 )
             )
 

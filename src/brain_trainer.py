@@ -10,7 +10,7 @@ import torch
 from torch import nn, optim
 from typing import Dict
 
-from .game_engine import GameEngine
+from .game_engine import GameEngine, GameEngineParams
 from .player import PlayerState
 from .brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
 
@@ -18,7 +18,7 @@ from .brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
 class BrainTrainer:
     def __init__(
         self,
-        number_of_players: int,
+        ge_params: GameEngineParams,
         learning_rate: float = 0.001,
         discount_factor: float = 0.99,
         greedy_epsilon: float = 0.1,
@@ -30,9 +30,6 @@ class BrainTrainer:
         self._greedy_epsilon = greedy_epsilon
         self._num_iterations = iter_amount
 
-        # Choose parameters for the game engine
-        self._number_of_player = number_of_players
-
         # Create a new neural network
         self._q_network = _QNetwork(
             input_size=amount_of_inputs, output_size=amount_of_outputs
@@ -40,6 +37,11 @@ class BrainTrainer:
         self._optimizer = optim.Adam(
             self._q_network.parameters(), lr=self._learning_rate
         )
+
+        # Choose parameters for the game engine
+        ge_params.training = True
+        ge_params.brain_trainer = self
+        self._ge_params = ge_params
 
     @property
     def q_net_dict(self) -> Dict:
@@ -60,11 +62,7 @@ class BrainTrainer:
     def train(self):
         for iteration in range(self._num_iterations):
             # Creates a new game engine for training purposes
-            ge = GameEngine(
-                number_of_players=self._number_of_player,
-                training=True,
-                brain_trainer=self,
-            )
+            ge = GameEngine(self._ge_params)
             total_reward = 0
 
             day_sum = ge.run_single()
