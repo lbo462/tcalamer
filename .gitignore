@@ -1,18 +1,2 @@
-# IDE
-.idea/
-.vscode/
-.fleet/
-
-# Python
-venv/
-env/
-VENV/
-ENV/
-.venv/
-__pycache__/
-
-# Scrapy stuff
-.scrapy/
-
-# Secrets
-.env
+# Godot 4+ specific ignores
+.godot/
