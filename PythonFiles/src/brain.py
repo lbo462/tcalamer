@@ -3,13 +3,15 @@ from dataclasses import dataclass
 from typing import List
 import torch
 from torch import nn
+import math
 
+from .world import Weather
 
 """
 When modifying the amount of inputs or outputs, 
 remember to update this variable :
 """
-amount_of_inputs = 8
+amount_of_inputs = 14
 # len(_daily_actions.actions) can't be imported due to circular imports ...
 amount_of_outputs = 4
 
@@ -18,18 +20,24 @@ amount_of_outputs = 4
 class NNInputs:
     """Modelization of the inputs for the neural network"""
 
-    bucket_amount: int
-    axe_amount: int
-    fishing_rod_amount: int
-    water_level: int
-    wood_amount: int
-    food_amount: int
-    weather: "Weather"
-    wreck_visits_amount: int
-    # players_to_the_wood: int
-    # players_to_the_water: int
-    # players_to_the_food: int
-    # players_waiting: int
+    blue_sky: bool
+    cloudy_sky: bool
+    raining_sky: bool
+    stromy_sky: bool
+
+    wood_dist: float
+    water_dist: float
+    food_dist: float
+
+    wreck_interest: float
+
+    player_axe: bool
+    player_bucket: bool
+    player_fishing_rod: bool
+
+    colony_axes: float
+    colony_buckets: float
+    colony_fishing_rods: float
 
     @classmethod
     def from_player(cls, player):
@@ -37,36 +45,56 @@ class NNInputs:
         world = player._world  # noqa
         wreck = world._wreck  # noqa
 
+        def _clamp(value, min_value, max_value):
+            return min(max(value, min_value), max_value)
+
+        def distance(needs: int, objective: int) -> float:
+            return math.exp(-4 * _clamp(needs / objective, 0, 1))
+
+        colony_axes = len(
+            [p for p in colony.alive_players if p.has_axe and p is not player]
+        )
+        colony_buckets = len(
+            [p for p in colony.alive_players if p.has_bucket and p is not player]
+        )
+        colony_fishing_rods = len(
+            [p for p in colony.alive_players if p.has_fishing_rod and p is not player]
+        )
+
         return cls(
-            0,
-            0,
-            0,
-            colony.water_level,
-            colony.wood_amount,
-            colony.food_amount,
-            world.weather,
-            wreck.number_of_times_fetched,
-            # colony.amount_of_players_to_the_wood,
-            # colony.amount_of_players_to_the_water,
-            # colony.amount_of_players_to_the_food,
-            # colony.amount_of_free_players,
+            blue_sky=world.weather is Weather.BLUE_SKY,
+            cloudy_sky=world.weather is Weather.CLOUDY,
+            raining_sky=world.weather is Weather.RAINING,
+            stromy_sky=world.weather is Weather.STORM,
+            food_dist=distance(colony.food_needs, colony.food_objective),
+            water_dist=distance(colony.water_needs, colony.water_objective),
+            wood_dist=distance(colony.wood_needs, colony.wood_objective),
+            wreck_interest=math.exp(-1.4 * wreck.fail_rate),
+            player_axe=player.has_axe,
+            player_bucket=player.has_bucket,
+            player_fishing_rod=player.has_fishing_rod,
+            colony_axes=colony_axes,
+            colony_buckets=colony_buckets,
+            colony_fishing_rods=colony_fishing_rods,
         )
 
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            self.bucket_amount,
-            self.axe_amount,
-            self.fishing_rod_amount,
-            self.water_level,
-            self.wood_amount,
-            self.food_amount,
-            self.weather.value,
-            self.wreck_visits_amount,
-            # self.players_to_the_wood,
-            # self.players_to_the_water,
-            # self.players_to_the_food,
-            # self.players_waiting,
+            0 if self.blue_sky else 1,
+            0 if self.cloudy_sky else 1,
+            0 if self.raining_sky else 1,
+            0 if self.stromy_sky else 1,
+            self.food_dist,
+            self.water_dist,
+            self.wood_dist,
+            self.wreck_interest,
+            0 if self.player_axe else 1,
+            0 if self.player_bucket else 1,
+            0 if self.player_fishing_rod else 1,
+            self.colony_axes,
+            self.colony_buckets,
+            self.colony_fishing_rods,
         ]
 
     def __str__(self):

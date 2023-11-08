@@ -105,3 +105,5 @@ class BrainTrainer:
                     self._optimizer.step()
 
                 day_sum = ge.run_single()
+
+            print(f"{iteration}: {total_reward}")

@@ -4,7 +4,7 @@ from pydantic import BaseModel as PBaseModel, FilePath
 from .wreck import Wreck, WreckSum
 from .world import World, WorldSum, Weather
 from .colony import Colony, ColonySum
-from .player import Player
+from .player import Player, _daily_actions
 from .objects import Bucket, Axe, FishingRod
 
 
@@ -49,7 +49,7 @@ class GameEngineParams(PBaseModel):
     amount_of_wood_per_player_to_leave: Optional[int] = 5
     amount_of_water_per_player_to_leave: Optional[int] = 1
     amount_of_food_per_player_to_leave: Optional[int] = 1
-    initial_surviving_factor: Optional[int] = 3
+    initial_surviving_factor: Optional[int] = 2
     # Training options
     brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
     training: bool = False
@@ -77,9 +77,9 @@ class GameEngine:
             initial_water_level=ge_params.initial_water_level,
             initial_food_amount=ge_params.initial_food_amount,
             initial_wood_amount=ge_params.initial_wood_amount,
-            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [3, 4, 5],
-            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [3, 4, 5],
-            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [3, 4, 5],
+            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [1, 2, 3],
+            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [1, 2, 3],
+            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [1, 2, 3],
             default_weather=ge_params.default_weather,
         )
 
@@ -123,6 +123,13 @@ class GameEngine:
         self._day += 1
         self._world.update()
 
+        print(
+            f"/ --- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
+            f"| World : {self._world}\n"
+            f"| Colony : {self.colony}\n"
+            f"\\ ---"
+        )
+
         # First step : daily actions
         actions: List[PlayerAction] = []
         for player in self.colony.alive_players:
@@ -133,6 +140,7 @@ class GameEngine:
                     action_id=action_id,
                 )
             )
+            print(f"{player} {_daily_actions.get_func(action_id).__name__}")
 
         # Second step : Some must die
         if not self.colony.enough_resources:
@@ -142,6 +150,7 @@ class GameEngine:
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
                 player_to_die.die(self.current_day)
+                print(f"{player_to_die} died")
 
         if not self._game_over:
             # Third step : Diner
@@ -150,8 +159,8 @@ class GameEngine:
 
             # Fourth step : Verify if there's enough resources to leave
             if self.colony.able_to_leave:
-                for _ in self.colony.leave_isle():
-                    ...
+                for player in self.colony.leave_isle():
+                    print(f"{player} leave !")
 
         return DaySum(
             day=self._day,
