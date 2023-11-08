@@ -3,9 +3,9 @@ import math
 from typing import List, Generator
 from pydantic import BaseModel as PBaseModel
 
-from base_model import BaseModel
-from player import Player, PlayerState, PlayerSum
-from world import World
+from .base_model import BaseModel
+from .player import Player, PlayerState, PlayerSum
+from .world import World
 
 
 class ColonySum(PBaseModel):
@@ -34,6 +34,7 @@ class Colony(BaseModel):
         amount_of_wood_per_player_to_leave: int,
         amount_of_water_per_player_to_leave: int,
         amount_of_food_per_player_to_leave: int,
+        initial_surviving_factor: int,
     ):
         self._world = world
         self._players: List[Player] = []
@@ -44,18 +45,12 @@ class Colony(BaseModel):
         self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = 3
+        self._initial_surviving_factor = initial_surviving_factor
 
         # Define the amount of resources to leave
         self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
         self._amount_of_water_to_leave = amount_of_water_per_player_to_leave
         self._amount_of_food_to_leave = amount_of_food_per_player_to_leave
-
-        # Count the actions made by the player each day
-        self._amount_of_player_to_the_water = 0
-        self._amount_of_player_to_the_wood = 0
-        self._amount_of_player_to_the_food = 0
-        self._amount_of_player_to_the_wreck = 0
 
     @property
     def alive_players(self) -> List[Player]:
@@ -164,15 +159,12 @@ class Colony(BaseModel):
     """
 
     def add_water(self, amount: int):
-        self._amount_of_player_to_the_water += 1
         self._water_level += amount
 
     def add_wood(self, amount: int):
-        self._amount_of_player_to_the_wood += 1
         self._wood_amount += amount
 
     def add_food(self, amount: int):
-        self._amount_of_player_to_the_food += 1
         self._food_amount += amount
 
     """Fetch methods
@@ -204,13 +196,6 @@ class Colony(BaseModel):
     """Other methods
     Some stuff I couldn't store
     """
-
-    def update(self):
-        # Reset action counters
-        self._amount_of_player_to_the_water = 0
-        self._amount_of_player_to_the_wood = 0
-        self._amount_of_player_to_the_food = 0
-        self._amount_of_player_to_the_wreck = 0
 
     def add_player(self, player: Player):
         """Adds a new player in the colony"""

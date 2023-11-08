@@ -1,14 +1,13 @@
 import random
-from typing import List, Callable, Dict, Type, Optional
+from typing import List, Callable, Type, Optional
 from enum import IntEnum
-from pydantic import BaseModel as PBaseModel
+from pydantic import BaseModel as PBaseModel, FilePath
 
-from base_model import BaseModel
-from settings import playable_brain_location
-from actions import ActionRegistry
-from world import ResourceEmpty
-from objects import Object, Bucket, Axe, FishingRod, T
-from brain import Brain, NNInputs
+from .base_model import BaseModel
+from .actions import ActionRegistry
+from .world import ResourceEmpty
+from .objects import Object, Bucket, Axe, FishingRod, T
+from .brain import Brain, NNInputs
 
 _daily_actions = ActionRegistry()
 
@@ -36,7 +35,12 @@ class Player(BaseModel):
     """
 
     def __init__(
-        self, number: int, colony, training=False, trainer: "BrainTrainer" = None
+        self,
+        number: int,
+        colony,
+        brain_location: Optional[FilePath] = None,
+        training: bool = False,
+        trainer=None,
     ):
         if training and not trainer:
             raise ValueError("Please, give a trainer to enable training")
@@ -52,7 +56,7 @@ class Player(BaseModel):
 
         # Brain and NN stuffs blah blah blah
         # don't set brain when training enabled, the trainer do the job
-        self._brain = Brain(playable_brain_location) if not training else None
+        self._brain = Brain(brain_location) if not training else None
         self._training_enable = training
         self._trainer = trainer
         self.nn_vision_before_action: Optional[NNInputs] = None

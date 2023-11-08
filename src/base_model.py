@@ -1,4 +1,4 @@
-from typing import Dict, TypeVar
+from typing import TypeVar
 from pydantic import BaseModel as PBaseModel
 
 T = TypeVar("T", bound=PBaseModel)

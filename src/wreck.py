@@ -2,9 +2,9 @@ import random
 from typing import Type, List, Union
 from pydantic import BaseModel as PBaseModel
 
-from base_model import BaseModel
-from objects import T, Axe, Bucket, FishingRod
-from player import Player
+from .base_model import BaseModel
+from .objects import T, Axe, Bucket, FishingRod
+from .player import Player
 
 
 class WreckSum(PBaseModel):

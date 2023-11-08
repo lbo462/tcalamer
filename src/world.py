@@ -3,8 +3,8 @@ from enum import IntEnum
 from typing import Union, List
 from pydantic import BaseModel as PBaseModel
 
-from base_model import BaseModel
-from objects import T
+from .base_model import BaseModel
+from .objects import T
 
 
 class ResourceEmpty(Exception):
@@ -35,12 +35,16 @@ class World(BaseModel):
     def __init__(
         self,
         wreck,
-        initial_water_level=5000,
-        initial_wood_amount=5000,
-        initial_food_amount=5000,
+        initial_water_level: int,
+        initial_wood_amount: int,
+        initial_food_amount: int,
+        basic_water_fetch_factor: List[int],
+        basic_wood_fetch_factor: List[int],
+        basic_food_fetch_factor: List[int],
+        default_weather: Weather,
     ):
         self._wreck = wreck
-        self._weather = Weather.BLUE_SKY
+        self._weather = default_weather
 
         self._initial_water_level = initial_water_level
         self._initial_wood_amount = initial_wood_amount
@@ -50,9 +54,9 @@ class World(BaseModel):
         self._wood_amount = initial_wood_amount
         self._food_amount = initial_food_amount
 
-        self._basic_water_fetch_factor = [3, 4, 5]
-        self._basic_wood_fetch_factor = [3, 4, 5]
-        self._basic_food_fetch_factor = [3, 4, 5]
+        self._basic_water_fetch_factor = basic_water_fetch_factor
+        self._basic_wood_fetch_factor = basic_wood_fetch_factor
+        self._basic_food_fetch_factor = basic_food_fetch_factor
 
     @property
     def initial_water_level(self) -> int:
