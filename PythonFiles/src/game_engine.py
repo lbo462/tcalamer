@@ -124,11 +124,9 @@ class GameEngine:
         self._world.update()
 
         print(
-            f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
-            f"/ ---\n"
+            f"/ --- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
             f"| World : {self._world}\n"
             f"| Colony : {self.colony}\n"
-            f"| {len(self.colony.alive_players)} players lefts\n"
             f"\\ ---"
         )
 
