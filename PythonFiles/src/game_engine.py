@@ -49,7 +49,7 @@ class GameEngineParams(PBaseModel):
     amount_of_wood_per_player_to_leave: Optional[int] = 5
     amount_of_water_per_player_to_leave: Optional[int] = 1
     amount_of_food_per_player_to_leave: Optional[int] = 1
-    initial_surviving_factor: Optional[int] = 3
+    initial_surviving_factor: Optional[int] = 2
     # Training options
     brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
     training: bool = False
@@ -77,9 +77,9 @@ class GameEngine:
             initial_water_level=ge_params.initial_water_level,
             initial_food_amount=ge_params.initial_food_amount,
             initial_wood_amount=ge_params.initial_wood_amount,
-            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [3, 4, 5],
-            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [3, 4, 5],
-            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [3, 4, 5],
+            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [1, 2, 3],
+            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [1, 2, 3],
+            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [1, 2, 3],
             default_weather=ge_params.default_weather,
         )
 
