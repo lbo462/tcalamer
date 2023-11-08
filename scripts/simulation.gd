@@ -10,12 +10,9 @@ var json_path = DIR.path_join("DATA/Game/game.json")
 @export var playerInfos: PackedScene
 
 @export_group("Players Infos")
-@export var man_sprite: Image
-@export var woman_sprite: Image
-@export var dead_sprite: Image
-
-#var names: Array[String] = ["Ines", "Kowsi", "Valentin", "Aziz", "Sokhna", "Leo", "Edgar", "Etienne", "Nicolas", "Gausse", "Zineb", "Ryad", "Alan", "Lucas", "Quentin", "Alex", "Augusto", "Matheo", "Leo", "Mounir", "Hedi", "Boris"]
-#var sexes: Array[bool] = [false, true, true, true, false, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true]
+@export var man_sprite: Texture2D
+@export var woman_sprite: Texture2D
+@export var dead_sprite: Texture2D
 
 var our_class: Array[Classmate] = [
 	Classmate.new("Ines", false), 
@@ -41,8 +38,10 @@ var our_class: Array[Classmate] = [
 	Classmate.new("Hedi", true), 
 	Classmate.new("Boris", true)]
 
+var nb_days: int
+
 var players: Array[Player] = []
-var nbPlayers: int
+var nb_players: int
 var finished_players: int
 
 func _ready():
@@ -87,15 +86,23 @@ func new_simulation():
 	
 	var initial_state = json_as_dict["initial_state"]
 	
-	nbPlayers = len(initial_state["colony"]["players"])
+	nb_players = len(initial_state["colony"]["players"])
 	
 	_setup_ui(initial_state["world"], initial_state["colony"], initial_state["wreck"], 1)
 	
-	for i in range(nbPlayers):
+	for i in range(nb_players):
 		_setup_player(i)
+	
+	nb_days = len(json_as_dict["turns"])
+	var game_intructions = json_as_dict["turns"]
+	
+	_run_simulation(game_intructions)
 
-func run_simulation():
-	finished_players
+func _run_simulation(game_intructions):
+	pass
+	"""for day in game_intructions:
+		for a in day:
+			a["player_id"]"""
 
 func _setup_ui(world, colony, wreck, day):
 	$WorldUI/Day/CurrentDay.text = str(day)
@@ -106,9 +113,9 @@ func _setup_ui(world, colony, wreck, day):
 	$WorldUI/Ressources/C_Water.text = str(colony["water"])
 	$WorldUI/Ressources/C_Food.text = str(colony["food"])
 	$WorldUI/Ressources/C_Wood.text = str(colony["wood"])
-	$WorldUI/Ressources/N_Water.text = str(nbPlayers)
-	$WorldUI/Ressources/N_Food.text = str(nbPlayers)
-	$WorldUI/Ressources/N_Wood.text = str(nbPlayers * 3)
+	$WorldUI/Ressources/N_Water.text = str(nb_players)
+	$WorldUI/Ressources/N_Food.text = str(nb_players)
+	$WorldUI/Ressources/N_Wood.text = str(nb_players * 3)
 	$WorldUI/Objects/BucketNumber.text = str(wreck["buckets"])
 	$WorldUI/Objects/FishingRodNumber.text = str(wreck["fishing_rods"])
 	$WorldUI/Objects/AxeNumber.text = str(wreck["axes"])
@@ -117,12 +124,16 @@ func _setup_player(i):
 	var p = _create_player(i)
 	var p_i = _create_player_infos(i)
 	var player = Player.new(p, p_i)
-	players.append(player)
+	_manage_player_objects(p_i, player.objects)
 	
-	if nbPlayers != len(our_class):
+	if nb_players != len(our_class):
 		p.sex = "m" if player.sex else "w"
+		p_i.get_node("PlayerOverview").texture = man_sprite if player.sex else woman_sprite
 	else:
 		p.sex = "m" if our_class[i].sex else "w"
+		p_i.get_node("PlayerOverview").texture = man_sprite if our_class[i].sex else woman_sprite
+	
+	players.append(player)
 	
 	_go_to_point(player, randi_range(0, 3))
 
@@ -130,7 +141,7 @@ func _create_player(p):
 	var player = playerInstance.instantiate()
 	
 	var player_spawn_location = $World/SpawnPath/SpawnPoints
-	player_spawn_location.progress_ratio = p * 1.0 / nbPlayers #randf()
+	player_spawn_location.progress_ratio = p * 1.0 / nb_players #randf()
 	player.position = player_spawn_location.position
 	
 	if player_spawn_location.rotation >= -PI / 4 and player_spawn_location.rotation < PI / 4:
@@ -142,7 +153,7 @@ func _create_player(p):
 	else:
 		player.idle = "idle_right_"
 	
-	player.get_node("ID").text = str(p + 1) if nbPlayers != len(our_class) else our_class[p].name
+	player.get_node("ID").text = str(p + 1) if nb_players != len(our_class) else our_class[p].name
 	
 	$World.add_child(player)
 	
@@ -150,9 +161,13 @@ func _create_player(p):
 	
 func _create_player_infos(p):
 	var player = playerInfos.instantiate()
-	player.get_node("ID").text = str(p + 1) if nbPlayers != len(our_class) else our_class[p].name
+	player.get_node("ID").text = str(p + 1) if nb_players != len(our_class) else our_class[p].name
 	$PlayersInfos.add_child(player)
 	return player
+
+func _manage_player_objects(player, objects):
+	for i in range(0, len(player.get_node("ObjectsContainer").get_children())):
+		player.get_node("ObjectsContainer").get_child(i).modulate = Color(int(objects[i]), int(objects[i]), int(objects[i]))
 
 func _go_to_point(player, point):
 	player.player.go_to_point($World.destinations[point])
@@ -162,9 +177,7 @@ class Player:
 	var sex: bool
 	var player
 	var player_infos
-	var has_bucket: bool = false
-	var has_fishing_rod: bool = false
-	var has_axe: bool = false
+	var objects: Array[bool] = [false, false, false]
 	
 	func _init(p, p_infos):
 		player = p

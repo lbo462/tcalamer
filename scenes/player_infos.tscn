@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2e0eopjysnod"]
+[gd_scene load_steps=5 format=3 uid="uid://d2e0eopjysnod"]
 
 [ext_resource type="Texture2D" uid="uid://cyme6bmwuj2dd" path="res://images/character_overview_alive.png" id="1_n5q73"]
+[ext_resource type="Texture2D" uid="uid://bxrexst213vga" path="res://images/Bucket.png" id="2_q5vp5"]
+[ext_resource type="Texture2D" uid="uid://c57fej8juw40b" path="res://images/Fishing_Rod.png" id="3_05a4j"]
+[ext_resource type="Texture2D" uid="uid://cnfaiyg6pm4hx" path="res://images/Axe.png" id="4_xrsgk"]
 
 [node name="PlayerInfos" type="Panel"]
 custom_minimum_size = Vector2(100, 100)
@@ -41,9 +44,17 @@ grow_vertical = 0
 texture = ExtResource("1_n5q73")
 stretch_mode = 5
 
-[node name="Bucket" type="TextureRect" parent="."]
+[node name="ObjectsContainer" type="Control" parent="."]
 layout_mode = 1
-anchors_preset = 6
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bucket" type="TextureRect" parent="ObjectsContainer"]
+texture_filter = 1
+layout_mode = 2
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -53,11 +64,11 @@ offset_top = -20.0
 offset_right = -10.0
 grow_horizontal = 0
 grow_vertical = 2
-texture = ExtResource("1_n5q73")
+texture = ExtResource("2_q5vp5")
 
-[node name="PhishingRode" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 6
+[node name="FishingRod" type="TextureRect" parent="ObjectsContainer"]
+texture_filter = 1
+layout_mode = 2
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -67,11 +78,11 @@ offset_right = -10.0
 offset_bottom = 20.0
 grow_horizontal = 0
 grow_vertical = 2
-texture = ExtResource("1_n5q73")
+texture = ExtResource("3_05a4j")
 
-[node name="Axe" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 6
+[node name="Axe" type="TextureRect" parent="ObjectsContainer"]
+texture_filter = 1
+layout_mode = 2
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -82,4 +93,4 @@ offset_right = -10.0
 offset_bottom = 40.0
 grow_horizontal = 0
 grow_vertical = 2
-texture = ExtResource("1_n5q73")
+texture = ExtResource("4_xrsgk")
