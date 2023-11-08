@@ -240,7 +240,7 @@ point_count = 6
 
 [node name="World" type="Node" node_paths=PackedStringArray("destinations")]
 script = ExtResource("1_b1461")
-destinations = [NodePath("WoodPath/WoodPathFollow"), NodePath("WaterPath/WaterPathFollow"), NodePath("FishPath/FishPathFollow"), NodePath("Path2D/PathFollow2D")]
+destinations = [NodePath("WaterPath/WaterPathFollow"), NodePath("WoodPath/WoodPathFollow"), NodePath("FishPath/FishPathFollow"), NodePath("WreckPath/WreckPathFollow")]
 
 [node name="TileMap" type="TileMap" parent="."]
 texture_filter = 1
@@ -327,8 +327,8 @@ curve = SubResource("Curve2D_77vxy")
 position = Vector2(230, 178)
 rotation = 2.48055
 
-[node name="Path2D" type="Path2D" parent="."]
+[node name="WreckPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_2xhka")
 
-[node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
+[node name="WreckPathFollow" type="PathFollow2D" parent="WreckPath"]
 position = Vector2(229.094, 167.03)

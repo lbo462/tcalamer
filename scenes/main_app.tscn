@@ -72,4 +72,5 @@ text = "Simulation"
 [connection signal="pressed" from="MainMenu/ButtonTraining" to="TrainingUI" method="show_training_ui"]
 [connection signal="pressed" from="MainMenu/ButtonSimulation" to="." method="hide_main_menu"]
 [connection signal="pressed" from="MainMenu/ButtonSimulation" to="Simulation" method="show_simulation"]
-[connection signal="trainingBackButton" from="TrainingUI" to="." method="show_main_menu"]
+[connection signal="back" from="Simulation" to="." method="show_main_menu"]
+[connection signal="training_back_button" from="TrainingUI" to="." method="show_main_menu"]

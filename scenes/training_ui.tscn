@@ -82,14 +82,14 @@ layout_mode = 2
 value = 1.0
 alignment = 1
 
-[node name="FishingRode" type="Label" parent="Objects"]
+[node name="FishingRod" type="Label" parent="Objects"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Canne à pêche"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FishingRodeNumber" type="SpinBox" parent="Objects"]
+[node name="FishingRodNumber" type="SpinBox" parent="Objects"]
 layout_mode = 2
 value = 1.0
 alignment = 1

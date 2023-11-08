@@ -18,4 +18,10 @@ playerInfos = ExtResource("3_0q2us")
 
 [node name="World" parent="." instance=ExtResource("6_oo6ox")]
 
+[node name="TimerBetweenDays" type="Timer" parent="."]
+
+[node name="TimerBetweenPlayers" type="Timer" parent="."]
+wait_time = 0.1
+
+[connection signal="simulation_back_button" from="WorldUI" to="." method="hide_simulation"]
 [connection signal="start_simulation" from="WorldUI" to="." method="new_simulation"]

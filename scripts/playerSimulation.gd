@@ -4,10 +4,11 @@ extends AnimatedSprite2D
 @onready var _last_position: Vector2 = position
 
 var idle: String = "idle_down"
+var sex: String = "m"
 
 var _destination: PathFollow2D = null
 
-var _speed: float = randf_range(0.0035, 0.0075) # 0.0075
+var _speed: float = randf_range(0.1, 0.2)# randf_range(0.0035, 0.0075) # 0.0075
 var _progress: float = 0
 var _start_point: Vector2
 
@@ -23,10 +24,10 @@ var _movement: MOVE_SET = MOVE_SET.TO_PATH
 func _process(delta):
 	#print(delta_position)
 	if _destination == null:
-		play(idle)
+		play(idle + sex)
 		return
 	animate_player()
-	move()
+	move(delta)
 
 func animate_player():
 	_current_position = position
@@ -36,24 +37,24 @@ func animate_player():
 		if _delta_position.x >= 0:
 			if _direction != DIRECTION.RIGHT:
 				_direction = DIRECTION.RIGHT
-				play("right")
+				play("right_" + sex)
 		else:
 			if _direction != DIRECTION.LEFT:
 				_direction = DIRECTION.LEFT
-				play("left")
+				play("left_" + sex)
 	else:
 		if _delta_position.y >= 0:
 			if _direction != DIRECTION.DOWN:
 				_direction = DIRECTION.DOWN
-				play("down")
+				play("down_" + sex)
 		else:
 			if _direction != DIRECTION.UP:
 				_direction = DIRECTION.UP
-				play("up")
+				play("up_" + sex)
 	
 	_last_position = _current_position
 
-func move():
+func move(delta):
 	match _movement:
 		MOVE_SET.TO_PATH:
 			if abs(position.x - _start_point.x) > 0.1 or abs(position.y - _start_point.y) > 0.1:
@@ -61,13 +62,13 @@ func move():
 			else:
 				_movement = MOVE_SET.TO_DEST
 		MOVE_SET.TO_DEST:
-			_progress = clamp(_progress + _speed, 0, 1)
+			_progress = clamp(_progress + _speed * delta, 0, 1)
 			_destination.progress_ratio = _progress
 			position = _destination.position
 			if _destination.progress_ratio >= 0.99:
 				_movement = MOVE_SET.GOING_BACK
 		MOVE_SET.GOING_BACK:
-			_progress = clamp(_progress - _speed, 0, 1)
+			_progress = clamp(_progress - _speed * delta, 0, 1)
 			_destination.progress_ratio = _progress
 			position = _destination.position
 			if _destination.progress_ratio <= 0.01:
