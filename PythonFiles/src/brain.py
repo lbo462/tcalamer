@@ -5,6 +5,8 @@ import torch
 from torch import nn
 import math
 
+from .world import Weather
+
 """
 When modifying the amount of inputs or outputs, 
 remember to update this variable :
@@ -17,26 +19,25 @@ amount_of_outputs = 4
 @dataclass
 class NNInputs:
     """Modelization of the inputs for the neural network"""
-    
-    blue_sky : bool
-    cloudy_sky : bool
-    raining_sky : bool
-    stromy_sky : bool
 
-    wood_dist : float
-    water_dist : float
-    fish_dist : float
+    blue_sky: bool
+    cloudy_sky: bool
+    raining_sky: bool
+    stromy_sky: bool
 
-    wreck_interest : float
+    wood_dist: float
+    water_dist: float
+    food_dist: float
 
-    player_axe : bool
-    player_bucket : bool
-    player_fishing_rod :bool
+    wreck_interest: float
 
-    colony_axes : float
-    colony_buckets : float
-    colony_fishing_rods :float
+    player_axe: bool
+    player_bucket: bool
+    player_fishing_rod: bool
 
+    colony_axes: float
+    colony_buckets: float
+    colony_fishing_rods: float
 
     @classmethod
     def from_player(cls, player):
@@ -44,83 +45,56 @@ class NNInputs:
         world = player._world  # noqa
         wreck = world._wreck  # noqa
 
-        def clamp(value, min_value, max_value):
+        def _clamp(value, min_value, max_value):
             return min(max(value, min_value), max_value)
 
-        # Attribution de la météo
-        blue_sky = 1 if world.weather is Weather.BLUE_SKY else 0
-        cloudy_sky = 1 if world.weather is Weather.CLOUDY else 0
-        raining_sky = 1 if world.weather is Weather.RAINING else 0
-        stromy_sky = 1 if world.weather is Weather.STORM else 0
+        def distance(needs: int, objective: int) -> float:
+            return math.exp(-4 * _clamp(needs / objective, 0, 1))
 
-        #TODO : dont repeat yourself
-        # Attribution des distances 
-        wood_obj = colony._amount_of_wood_to_leave * len(colony.alive_players)
-        fish_obj = (colony._amount_of_food_to_leave + 2) * len(colony.alive_players)
-        water_obj = (colony._amount_of_water_to_leave + 2) * len(colony.alive_players)
-            # Calculer distance + normaliser + restreindre entre 0 et 1 + exponentielle négative
-        fish_dist = math.exp(-4*clamp((wood_objective - colony.wood_amount) / wood_obj,0,1))
-        water_dist = math.exp(-4*clamp((wood_objective - colony.wood_amount) / wood_obj,0,1))      
-        wood_dist = math.exp(-4*clamp((wood_objective - colony.wood_amount) / wood_obj,0,1))
-        
-        # Intérêt épave 
-        ratio = wreck.number_of_failed_fetch / wreck.number_of_times_fetched
-        wreck_interest = math.exp(-(ratio*1.4))
+        colony_axes = len(
+            [p for p in colony.alive_players if p.has_axe and p is not player]
+        )
+        colony_buckets = len(
+            [p for p in colony.alive_players if p.has_bucket and p is not player]
+        )
+        colony_fishing_rods = len(
+            [p for p in colony.alive_players if p.has_fishing_rod and p is not player]
+        )
 
-        # Joueur 
-        player_axe = 1 if player.has_axe else 0
-        player_bucket = 1 if player.has_bucket else 0
-        player_fishing_rod = 1 if player.has_fishing_rod else 0
-
-        # Groupe
-        colony_axe_number = (-1) if player.has_axe else 0
-        colony_fishing_rod_number = (-1) if player.has_bucket else 0
-        colony_bucket_number = (-1) if player.has_fishing_rod else 0
-
-        for player in colony.alive_players :
-            colony_bucket_number += (1 if player.has_bucket else 0)
-            colony_fishing_rod_number += (1 if player.has_fishing_rod else 0)
-            colony_axe_number += (1 if player.has_axe else 0)
-
-        colony_axes = colony_axe_number / len(colony.alive_players)
-        colony_buckets = colony_bucket_number / len(colony.alive_players)
-        colony_fishing_rods = colony_fishing_rod_number / len(colony.alive_players)
-        
         return cls(
-            
-            blue_sky,
-            cloudy_sky,
-            raining_sky,
-            stromy_sky,
-            fish_dist,
-            water_dist,
-            wood_dist,
-            wreck_interest,
-            player_axe,
-            player_bucket,
-            player_fishing_rod,
-            colony_axe,
-            colony_bucket,
-            colony_fishing_rod,
+            blue_sky=world.weather is Weather.BLUE_SKY,
+            cloudy_sky=world.weather is Weather.CLOUDY,
+            raining_sky=world.weather is Weather.RAINING,
+            stromy_sky=world.weather is Weather.STORM,
+            food_dist=distance(colony.food_needs, colony.food_objective),
+            water_dist=distance(colony.water_needs, colony.water_objective),
+            wood_dist=distance(colony.wood_needs, colony.wood_objective),
+            wreck_interest=math.exp(-1.4 * wreck.fail_rate),
+            player_axe=player.has_axe,
+            player_bucket=player.has_bucket,
+            player_fishing_rod=player.has_fishing_rod,
+            colony_axes=colony_axes,
+            colony_buckets=colony_buckets,
+            colony_fishing_rods=colony_fishing_rods,
         )
 
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            self.blue_sky,
-            self.cloudy_sky,
-            self.raining_sky,
-            self.stromy_sky,
-            self.fish_dist,
+            0 if self.blue_sky else 1,
+            0 if self.cloudy_sky else 1,
+            0 if self.raining_sky else 1,
+            0 if self.stromy_sky else 1,
+            self.food_dist,
             self.water_dist,
             self.wood_dist,
             self.wreck_interest,
-            self.player_axe,
-            self.player_bucket,
-            self.player_fishing_rod,
-            self.colony_axe,
-            self.colony_bucket,
-            self.colony_fishing_rod,
+            0 if self.player_axe else 1,
+            0 if self.player_bucket else 1,
+            0 if self.player_fishing_rod else 1,
+            self.colony_axes,
+            self.colony_buckets,
+            self.colony_fishing_rods,
         ]
 
     def __str__(self):

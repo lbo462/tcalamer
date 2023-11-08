@@ -47,13 +47,17 @@ class ActionRegistry:
 
         return register_function
 
-    def call_action(self, id_: int, *args, **kwargs) -> Any:
+    def get_func(self, id_: int) -> Callable:
         """
-        Calls the action registered under the given ID
+        Returns the actions callable registered with the given ID
         :raises UnregisteredAction:
         """
         for action in self.actions:
             if action.id_ == id_:
-                return action.function(*args, **kwargs)
+                return action.function
 
         raise UnregisteredAction(f"ActionSummary #{id_} wasn't registered")
+
+    def call_action(self, id_: int, *args, **kwargs) -> Any:
+        """Calls the action registered under the given ID"""
+        return self.get_func(id_)(*args, **kwargs)

@@ -5,3 +5,6 @@
 .idea/
 .vscode/
 .fleet/
+
+# Scrapy stuff
+.scrapy/

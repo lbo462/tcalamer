@@ -4,7 +4,7 @@ from pydantic import BaseModel as PBaseModel, FilePath
 from .wreck import Wreck, WreckSum
 from .world import World, WorldSum, Weather
 from .colony import Colony, ColonySum
-from .player import Player
+from .player import Player, _daily_actions
 from .objects import Bucket, Axe, FishingRod
 
 
@@ -123,6 +123,15 @@ class GameEngine:
         self._day += 1
         self._world.update()
 
+        print(
+            f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
+            f"/ ---\n"
+            f"| World : {self._world}\n"
+            f"| Colony : {self.colony}\n"
+            f"| {len(self.colony.alive_players)} players lefts\n"
+            f"\\ ---"
+        )
+
         # First step : daily actions
         actions: List[PlayerAction] = []
         for player in self.colony.alive_players:
@@ -133,6 +142,7 @@ class GameEngine:
                     action_id=action_id,
                 )
             )
+            print(f"{player} {_daily_actions.get_func(action_id).__name__}")
 
         # Second step : Some must die
         if not self.colony.enough_resources:
@@ -142,6 +152,7 @@ class GameEngine:
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
                 player_to_die.die(self.current_day)
+                print(f"{player_to_die} died")
 
         if not self._game_over:
             # Third step : Diner
@@ -150,8 +161,8 @@ class GameEngine:
 
             # Fourth step : Verify if there's enough resources to leave
             if self.colony.able_to_leave:
-                for _ in self.colony.leave_isle():
-                    ...
+                for player in self.colony.leave_isle():
+                    print(f"{player} leave !")
 
         return DaySum(
             day=self._day,
