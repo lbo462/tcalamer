@@ -1,16 +1,28 @@
 import random
 import math
 from typing import List, Generator
+from pydantic import BaseModel as PBaseModel
 
-from player import Player, PlayerState
-from world import World
+from .base_model import BaseModel
+from .player import Player, PlayerState, PlayerSum
+from .world import World
+
+
+class ColonySum(PBaseModel):
+    water: int
+    food: int
+    wood: int
+    water_needs: int
+    food_needs: int
+    wood_needs: int
+    players: List[PlayerSum]
 
 
 class InsufficientResources(Exception):
     """Raised when fetching too much of a resource compared to the amount stored in the colony"""
 
 
-class Colony:
+class Colony(BaseModel):
     """
     A colony has a certain amount of resources
     These resources are shared by the players living in the _colony
@@ -22,6 +34,7 @@ class Colony:
         amount_of_wood_per_player_to_leave: int,
         amount_of_water_per_player_to_leave: int,
         amount_of_food_per_player_to_leave: int,
+        initial_surviving_factor: int,
     ):
         self._world = world
         self._players: List[Player] = []
@@ -32,18 +45,12 @@ class Colony:
         self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = 3
+        self._initial_surviving_factor = initial_surviving_factor
 
         # Define the amount of resources to leave
         self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
         self._amount_of_water_to_leave = amount_of_water_per_player_to_leave
         self._amount_of_food_to_leave = amount_of_food_per_player_to_leave
-
-        # Count the actions made by the player each day
-        self._amount_of_player_to_the_water = 0
-        self._amount_of_player_to_the_wood = 0
-        self._amount_of_player_to_the_food = 0
-        self._amount_of_player_to_the_wreck = 0
 
     @property
     def alive_players(self) -> List[Player]:
@@ -81,48 +88,39 @@ class Colony:
     def enough_resources(self) -> bool:
         return self.limiting_factor >= len(self.alive_players)
 
-    """
-    The following properties gives information about 
-    how many player already choose the corresponding action
-    or how many are still ready to make an action
-    """
+    """Objectives"""
 
     @property
-    def amount_of_players_to_the_water(self) -> int:
-        return self._amount_of_player_to_the_water
+    def water_objective(self) -> int:
+        return (self._amount_of_water_to_leave + 2) * len(self.alive_players)
 
     @property
-    def amount_of_players_to_the_wood(self) -> int:
-        return self._amount_of_player_to_the_wood
+    def food_objective(self) -> int:
+        return (self._amount_of_food_to_leave + 2) * len(self.alive_players)
 
     @property
-    def amount_of_players_to_the_food(self) -> int:
-        return self._amount_of_player_to_the_food
+    def wood_objective(self) -> int:
+        return self._amount_of_wood_to_leave * len(self.alive_players)
+
+    """Needs"""
 
     @property
-    def amount_of_players_to_the_wreck(self) -> int:
-        return self._amount_of_player_to_the_wreck
+    def water_needs(self) -> int:
+        return self.water_objective - self.water_level
 
     @property
-    def amount_of_free_players(self) -> int:
-        return (
-            len(self.alive_players)
-            - self.amount_of_players_to_the_water
-            - self.amount_of_players_to_the_wood
-            - self.amount_of_players_to_the_food
-            - self.amount_of_players_to_the_wreck
-        )
+    def food_needs(self) -> int:
+        return self.food_objective - self.food_amount
+
+    @property
+    def wood_needs(self) -> int:
+        return self.wood_objective - self.water_level
 
     @property
     def daily_fitness(self) -> float:
-        wood_objective = self._amount_of_wood_to_leave * len(self.alive_players)
-        food_objective = (self._amount_of_food_to_leave + 2) * len(self.alive_players)
-        water_objective = (self._amount_of_water_to_leave + 2) * len(self.alive_players)
-
-        # Compute distance
-        wood_distance = wood_objective - self.wood_amount
-        food_distance = food_objective - self.food_amount
-        water_distance = water_objective - self.water_level
+        wood_distance = self.wood_needs
+        food_distance = self.food_needs
+        water_distance = self.water_needs
 
         # Adapt distance to care about sign
         wood_distance = wood_distance if wood_distance > 0 else 0.1
@@ -161,15 +159,12 @@ class Colony:
     """
 
     def add_water(self, amount: int):
-        self._amount_of_player_to_the_water += 1
         self._water_level += amount
 
     def add_wood(self, amount: int):
-        self._amount_of_player_to_the_wood += 1
         self._wood_amount += amount
 
     def add_food(self, amount: int):
-        self._amount_of_player_to_the_food += 1
         self._food_amount += amount
 
     """Fetch methods
@@ -202,13 +197,6 @@ class Colony:
     Some stuff I couldn't store
     """
 
-    def update(self):
-        # Reset action counters
-        self._amount_of_player_to_the_water = 0
-        self._amount_of_player_to_the_wood = 0
-        self._amount_of_player_to_the_food = 0
-        self._amount_of_player_to_the_wreck = 0
-
     def add_player(self, player: Player):
         """Adds a new player in the colony"""
         self._players.append(player)
@@ -232,6 +220,17 @@ class Colony:
         for player in self.alive_players:
             player.flee()
             yield player
+
+    def summarize(self) -> ColonySum:
+        return ColonySum(
+            water=self.water_level,
+            food=self.food_amount,
+            wood=self.wood_amount,
+            water_needs=self.water_needs,
+            food_needs=self.food_needs,
+            wood_needs=self.wood_needs,
+            players=[p.summarize() for p in self._players],
+        )
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

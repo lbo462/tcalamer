@@ -1,10 +1,59 @@
-from typing import Generator
+from typing import List, Optional, Any
+from pydantic import BaseModel as PBaseModel, FilePath
 
-from wreck import Wreck
-from world import World
-from colony import Colony
-from player import Player
-from objects import Bucket, Axe, FishingRod
+from .wreck import Wreck, WreckSum
+from .world import World, WorldSum, Weather
+from .colony import Colony, ColonySum
+from .player import Player
+from .objects import Bucket, Axe, FishingRod
+
+
+class PlayerAction(PBaseModel):
+    player_id: int
+    action_id: int
+
+
+class GameStateSum(PBaseModel):
+    world: WorldSum
+    wreck: WreckSum
+    colony: ColonySum
+
+
+class DaySum(PBaseModel):
+    day: int
+    actions: List[PlayerAction]
+    night_state: GameStateSum
+
+
+class GameSum(PBaseModel):
+    initial_state: GameStateSum
+    days: List[DaySum]
+
+
+class GameEngineParams(PBaseModel):
+    number_of_players: int
+    # Wreck
+    wreck_probability: Optional[float] = 0.5
+    bucket_amount: Optional[int] = 1
+    axe_amount: Optional[int] = 1
+    fishing_rod_amount: Optional[int] = 1
+    # World
+    initial_water_level: Optional[int] = 5000
+    initial_food_amount: Optional[int] = 5000
+    initial_wood_amount: Optional[int] = 5000
+    basic_water_fetch_factor: Optional[List[int]] = None
+    basic_wood_fetch_factor: Optional[List[int]] = None
+    basic_food_fetch_factor: Optional[List[int]] = None
+    default_weather: Optional[Weather] = Weather.BLUE_SKY
+    # Colony
+    amount_of_wood_per_player_to_leave: Optional[int] = 5
+    amount_of_water_per_player_to_leave: Optional[int] = 1
+    amount_of_food_per_player_to_leave: Optional[int] = 1
+    initial_surviving_factor: Optional[int] = 3
+    # Training options
+    brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
+    training: bool = False
+    brain_trainer: Optional[Any] = None
 
 
 class GameEngine:
@@ -14,42 +63,52 @@ class GameEngine:
     It defines the different steps of the game
     """
 
-    def __init__(
-        self,
-        number_of_players: int,
-        wreck_probability: float,
-        amount_of_wood_per_player_to_leave=20,
-        amount_of_water_per_player_to_leave=2,
-        amount_of_food_per_player_to_leave=2,
-        training=False,
-        brain_trainer: "BrainTrainer" = None,
-    ):
+    def __init__(self, ge_params: GameEngineParams):
         # Create wreck
-        wreck = Wreck(wreck_probability)
-        wreck.add_item(Bucket, 1)
-        wreck.add_item(Axe, 1)
-        wreck.add_item(FishingRod, 1)
+        wreck = Wreck(ge_params.wreck_probability)
+        wreck.add_item(Bucket, ge_params.bucket_amount)
+        wreck.add_item(Axe, ge_params.axe_amount)
+        wreck.add_item(FishingRod, ge_params.fishing_rod_amount)
+        self._wreck = wreck
 
         # Create world
-        self._world = World(wreck)
+        self._world = World(
+            wreck=wreck,
+            initial_water_level=ge_params.initial_water_level,
+            initial_food_amount=ge_params.initial_food_amount,
+            initial_wood_amount=ge_params.initial_wood_amount,
+            basic_water_fetch_factor=ge_params.basic_water_fetch_factor or [3, 4, 5],
+            basic_wood_fetch_factor=ge_params.basic_wood_fetch_factor or [3, 4, 5],
+            basic_food_fetch_factor=ge_params.basic_food_fetch_factor or [3, 4, 5],
+            default_weather=ge_params.default_weather,
+        )
 
         # Create colony
         self.colony = Colony(
-            self._world,
-            amount_of_wood_per_player_to_leave=amount_of_wood_per_player_to_leave,
-            amount_of_water_per_player_to_leave=amount_of_water_per_player_to_leave,
-            amount_of_food_per_player_to_leave=amount_of_food_per_player_to_leave,
+            world=self._world,
+            amount_of_wood_per_player_to_leave=ge_params.amount_of_wood_per_player_to_leave,
+            amount_of_water_per_player_to_leave=ge_params.amount_of_water_per_player_to_leave,
+            amount_of_food_per_player_to_leave=ge_params.amount_of_food_per_player_to_leave,
+            initial_surviving_factor=ge_params.initial_surviving_factor,
         )
 
         # Add players
-        for i in range(0, number_of_players):
-            self.colony.add_player(Player(i, self.colony, training, brain_trainer))
+        for i in range(0, ge_params.number_of_players):
+            self.colony.add_player(
+                Player(
+                    number=i,
+                    colony=self.colony,
+                    brain_location=ge_params.brain_location,
+                    training=ge_params.training,
+                    trainer=ge_params.brain_trainer,
+                )
+            )
 
         # Initiate day counter
         self._day = 0
 
     @property
-    def game_over(self) -> bool:
+    def _game_over(self) -> bool:
         """The game is over iff every player is dead or gone"""
         return len(self.colony.alive_players) <= 0
 
@@ -57,64 +116,78 @@ class GameEngine:
     def current_day(self) -> int:
         return self._day
 
-    def update(self) -> Generator[str, None, None]:
+    def _update(self) -> DaySum:
         """This updates the game and make the _actions of a complete day, from dawn to dawn"""
 
         # Step zero, world update
         self._day += 1
         self._world.update()
-        self.colony.update()
 
-        yield f"--- DAWN OF DAY #{self._day} ({self._world.weather.name})"
-        yield f"/ ---"
-        yield f"| World : {self._world}"
-        yield f"| Colony : {self.colony}"
-        yield f"| {len(self.colony.alive_players)} players lefts"
-        yield f"\\ ---"
-
-        # First step : daily _actions
+        # First step : daily actions
+        actions: List[PlayerAction] = []
         for player in self.colony.alive_players:
-            yield f"  > {player.make_best_daily_action()}"
-
-        yield ""
-        yield f"--- SUN GETS DOWN - {self.colony}"
+            action_id = player.make_best_daily_action()
+            actions.append(
+                PlayerAction(
+                    player_id=player.number,
+                    action_id=action_id,
+                )
+            )
 
         # Second step : Some must die
         if not self.colony.enough_resources:
             limiting_factor = self.colony.limiting_factor
             amount_of_players_to_die = len(self.colony.alive_players) - limiting_factor
-            yield f"NOT ENOUGH RESOURCES : {amount_of_players_to_die} players must die."
 
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
                 player_to_die.die(self.current_day)
-                yield f"  X {player_to_die} died on day #{player_to_die.day_of_death}."
 
-        if not self.game_over:
+        if not self._game_over:
             # Third step : Diner
-            yield f"EVERY ONE DINE"
-            for player in self.colony.dine():
-                yield f"  - {player} dine"
+            for _ in self.colony.dine():
+                ...
 
             # Fourth step : Verify if there's enough resources to leave
             if self.colony.able_to_leave:
-                yield f"SOME LEAVE THE ISLE !"
-                count = 0
-                for player in self.colony.leave_isle():
-                    yield f"  >> {player} took the raft"
-                    count += 1
-                yield f"--------- {count} PLAYERS ESCAPED ---------"
+                for _ in self.colony.leave_isle():
+                    ...
 
-            # Fifth step : Close your eyes and sleep my darling
-            else:
-                yield "--------- NIGHT FALLS ------------"
+        return DaySum(
+            day=self._day,
+            actions=actions,
+            night_state=GameStateSum(
+                world=self._world.summarize(),
+                wreck=self._wreck.summarize(),
+                colony=self.colony.summarize(),
+            ),
+        )
 
-        else:
-            yield "--------- GAME OVER ------------"
+    def run(self) -> GameSum:
+        initial_state: GameStateSum
+        days: List[DaySum] = []
 
-        # Day summary
-        yield f"/ ---"
-        yield f"| World : {self._world}"
-        yield f"| Colony : {self.colony}"
-        yield f"| {len(self.colony.alive_players)} players lefts"
-        yield f"\\ ---"
+        # Compute initial state
+        initial_state = GameStateSum(
+            world=self._world.summarize(),
+            wreck=self._wreck.summarize(),
+            colony=self.colony.summarize(),
+        )
+
+        # Compute days
+        while not self._game_over:
+            day = self._update()
+            days.append(day)
+
+        return GameSum(
+            initial_state=initial_state,
+            days=days,
+        )
+
+    def run_single(self) -> Optional[DaySum]:
+        """Runs a single day if game is not over
+        returns the day summary
+        """
+        if self._game_over:
+            return None
+        return self._update()

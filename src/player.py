@@ -1,12 +1,13 @@
 import random
-from typing import List, Callable, Generator
+from typing import List, Callable, Type, Optional
 from enum import IntEnum
+from pydantic import BaseModel as PBaseModel, FilePath
 
-from settings import playable_brain_location
-from actions import ActionRegistry
-from world import ResourceEmpty
-from objects import Object, Bucket, Axe, FishingRod
-from brain import Brain, NNInputs
+from .base_model import BaseModel
+from .actions import ActionRegistry
+from .world import ResourceEmpty
+from .objects import Object, Bucket, Axe, FishingRod, T
+from .brain import Brain, NNInputs
 
 _daily_actions = ActionRegistry()
 
@@ -18,7 +19,15 @@ class PlayerState(IntEnum):
     SICK = 4
 
 
-class Player:
+class PlayerSum(PBaseModel):
+    number: int
+    alive: bool
+    has_bucket: bool
+    has_axe: bool
+    has_fishing_rod: bool
+
+
+class Player(BaseModel):
     """
     A player is defined by a _number (names ar for humans)
     He lives in a _colony and can add some resources to it.
@@ -26,7 +35,12 @@ class Player:
     """
 
     def __init__(
-        self, number: int, colony, training=False, trainer: "BrainTrainer" = None
+        self,
+        number: int,
+        colony,
+        brain_location: Optional[FilePath] = None,
+        training: bool = False,
+        trainer=None,
     ):
         if training and not trainer:
             raise ValueError("Please, give a trainer to enable training")
@@ -42,18 +56,22 @@ class Player:
 
         # Brain and NN stuffs blah blah blah
         # don't set brain when training enabled, the trainer do the job
-        self._brain = Brain(playable_brain_location) if not training else None
+        self._brain = Brain(brain_location) if not training else None
         self._training_enable = training
         self._trainer = trainer
-        self.nn_vision_before_action: NNInputs = None  # noqa
-        self.nn_vision_after_action: NNInputs = None  # noqa
-        self.nn_action_taken: int = None  # noqa
-        self.nn_fitness_before_action: float = None  # noqa
-        self.nn_fitness_after_action: float = None  # noqa
+        self.nn_vision_before_action: Optional[NNInputs] = None
+        self.nn_vision_after_action: Optional[NNInputs] = None
+        self.nn_action_taken: Optional[int] = None
+        self.nn_fitness_before_action: Optional[float] = None
+        self.nn_fitness_after_action: Optional[float] = None
 
     @property
     def name(self) -> str:
         return f"N°{self._number}"
+
+    @property
+    def number(self) -> int:
+        return self._number
 
     @property
     def state(self) -> PlayerState:
@@ -65,32 +83,28 @@ class Player:
             raise ValueError(f"{self} not dead yet")
         return self._day_of_death
 
-    @property
-    def bucket_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, Bucket):
-                counter += 1
-        return counter
-
-    @property
-    def axe_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, Axe):
-                counter += 1
-        return counter
-
-    @property
-    def fishing_rod_amount(self) -> int:
-        counter = 0
-        for o in self._inventory:
-            if isinstance(o, FishingRod):
-                counter += 1
-        return counter
-
     def get_current_vision(self) -> NNInputs:
         return NNInputs.from_player(self)
+
+    """Items checkup"""
+
+    def has_item(self, item_class: Type[T]) -> bool:
+        for o in self._inventory:
+            if isinstance(o, item_class):
+                return True
+        return False
+
+    @property
+    def has_bucket(self) -> bool:
+        return self.has_item(Bucket)
+
+    @property
+    def has_axe(self) -> bool:
+        return self.has_item(Axe)
+
+    @property
+    def has_fishing_rod(self) -> bool:
+        return self.has_item(FishingRod)
 
     """Daily action methods
     These are the _actions that a player can do for the _colony during the daylight.
@@ -99,7 +113,7 @@ class Player:
 
     @_daily_actions(id_=0)
     def fetch_water(self) -> str:
-        amount_fetched = 1 + self.bucket_amount
+        amount_fetched = 2 if self.has_bucket else 1
 
         try:
             amount_fetched = self._world.fetch_water(amount_fetched)
@@ -110,7 +124,7 @@ class Player:
 
     @_daily_actions(id_=1)
     def fetch_wood(self) -> str:
-        amount_fetched = 1 + self.axe_amount
+        amount_fetched = 2 if self.has_axe else 1
 
         try:
             amount_fetched = self._world.fetch_wood(amount_fetched)
@@ -121,7 +135,7 @@ class Player:
 
     @_daily_actions(id_=2)
     def fetch_food(self) -> str:
-        amount_fetched = 1 + self.fishing_rod_amount
+        amount_fetched = 2 if self.has_fishing_rod else 1
 
         try:
             amount_fetched = self._world.fetch_food(amount_fetched)
@@ -136,7 +150,7 @@ class Player:
         The player can go to the wreck and search for objects.
         He has a chance of getting a new item in its _inventory
         """
-        new_object = self._world.search_wreck()
+        new_object = self._world.search_wreck(self)
         if new_object:
             self._inventory.append(new_object)
             return f"{self} search wreck and found {new_object}"
@@ -171,7 +185,7 @@ class Player:
     def get_sick(self):
         self._state = PlayerState.SICK
 
-    """Action choice
+    """ActionSummary choice
     The player should choose its _actions with the following methods
     This will later be handled by neural networks
     """
@@ -184,11 +198,12 @@ class Player:
         """Calls a random daily action"""
         return random.choice(_daily_actions.actions).function()
 
-    def make_best_daily_action(self) -> str:
+    def make_best_daily_action(self) -> int:
         """
         Uses a brain to choose the best daily action and calls it
         If training was enabled, the player uses its brain trainer to make the decision
         This updates the vision before and after the action
+        :return: ID of the action chosen
         """
         inputs = self.get_current_vision()
         self.nn_vision_before_action = inputs
@@ -200,11 +215,20 @@ class Player:
             action_id = self._brain.chose_action(inputs)
 
         self.nn_action_taken = action_id
-        output: str = self._make_daily_action(action_id)
+        self._make_daily_action(action_id)
 
         self.nn_vision_after_action = self.get_current_vision()
         self.nn_fitness_after_action = self._colony.daily_fitness
-        return output
+        return action_id
+
+    def summarize(self) -> PlayerSum:
+        return PlayerSum(
+            number=self._number,
+            alive=self._state is PlayerState.ALIVE,
+            has_bucket=self.has_bucket,
+            has_axe=self.has_axe,
+            has_fishing_rod=self.has_fishing_rod,
+        )
 
     def __str__(self):
         return f"{self.name} ({len(self._inventory)} items)"

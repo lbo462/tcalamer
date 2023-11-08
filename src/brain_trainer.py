@@ -6,28 +6,29 @@ The created brain is then used by the player to make actions during the real gam
 """
 
 import random
-from typing import Generator
-
 import torch
 from torch import nn, optim
+from typing import Dict
 
-from settings import number_of_player, wreck_probability, trained_brain_location
-from game_engine import GameEngine
-from player import PlayerState
-from brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
+from .game_engine import GameEngine, GameEngineParams
+from .player import PlayerState
+from .brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
 
 
 class BrainTrainer:
-    def __init__(self):
+    def __init__(
+        self,
+        ge_params: GameEngineParams,
+        learning_rate: float = 0.001,
+        discount_factor: float = 0.99,
+        greedy_epsilon: float = 0.1,
+        iter_amount: int = 1000,
+    ):
         # Learning parameters
-        self._learning_rate = 0.001
-        self._discount_factor = 0.99
-        self._greedy_epsilon = 0.1
-        self._num_iterations = 200
-
-        # Choose parameters for the game engine
-        self._number_of_player = number_of_player
-        self._wreck_probability = wreck_probability
+        self._learning_rate = learning_rate
+        self._discount_factor = discount_factor
+        self._greedy_epsilon = greedy_epsilon
+        self._num_iterations = iter_amount
 
         # Create a new neural network
         self._q_network = _QNetwork(
@@ -36,6 +37,15 @@ class BrainTrainer:
         self._optimizer = optim.Adam(
             self._q_network.parameters(), lr=self._learning_rate
         )
+
+        # Choose parameters for the game engine
+        ge_params.training = True
+        ge_params.brain_trainer = self
+        self._ge_params = ge_params
+
+    @property
+    def q_net_dict(self) -> Dict:
+        return self._q_network.state_dict()
 
     def choose_action(self, inputs: NNInputs) -> int:
         """Take the inputs to return an action ID though the greedy epsilon algorithm"""
@@ -49,26 +59,14 @@ class BrainTrainer:
             q_values = self._q_network(torch.Tensor(inputs.to_list()))
             return q_values.argmax().item()
 
-    def train(self) -> Generator[str, None, None]:
+    def train(self):
         for iteration in range(self._num_iterations):
             # Creates a new game engine for training purposes
-            ge = GameEngine(
-                number_of_players=self._number_of_player,
-                wreck_probability=self._wreck_probability,
-                training=True,
-                brain_trainer=self,
-            )
-
+            ge = GameEngine(self._ge_params)
             total_reward = 0
 
-            while not ge.game_over:
-                """
-                Update the game for the current day,
-                where the players chooses a training action
-                """
-                for _ in ge.update():
-                    ...
-
+            day_sum = ge.run_single()
+            while day_sum is not None:
                 for player in ge.colony.alive_players:
                     # Take a look of the vision before and after the action
                     morning_inputs = player.nn_vision_before_action
@@ -106,13 +104,4 @@ class BrainTrainer:
                     loss.backward()
                     self._optimizer.step()
 
-            yield f"{iteration} : {total_reward}"
-
-
-if __name__ == "__main__":
-    brain_trainer = BrainTrainer()
-    for log in brain_trainer.train():
-        print(log)
-
-    torch.save(brain_trainer._q_network.state_dict(), trained_brain_location)  # noqa
-    print(f"Saved brain at {trained_brain_location}")
+                day_sum = ge.run_single()

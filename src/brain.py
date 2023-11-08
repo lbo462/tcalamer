@@ -32,15 +32,15 @@ class NNInputs:
     # players_waiting: int
 
     @classmethod
-    def from_player(cls, player: "Player"):
+    def from_player(cls, player):
         colony = player._colony  # noqa
         world = player._world  # noqa
         wreck = world._wreck  # noqa
 
         return cls(
-            player.bucket_amount,
-            player.axe_amount,
-            player.fishing_rod_amount,
+            0,
+            0,
+            0,
             colony.water_level,
             colony.wood_amount,
             colony.food_amount,

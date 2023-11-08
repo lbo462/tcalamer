@@ -1,9 +1,10 @@
 import random
 from enum import IntEnum
 from typing import Union, List
+from pydantic import BaseModel as PBaseModel
 
-from wreck import Wreck
-from objects import T
+from .base_model import BaseModel
+from .objects import T
 
 
 class ResourceEmpty(Exception):
@@ -17,7 +18,14 @@ class Weather(IntEnum):
     STORM = 3
 
 
-class World:
+class WorldSum(PBaseModel):
+    water: int
+    food: int
+    wood: int
+    weather: Weather
+
+
+class World(BaseModel):
     """
     The world has certain amount of resources
     The colony lives in the _world and take its resources
@@ -26,13 +34,17 @@ class World:
 
     def __init__(
         self,
-        wreck: Wreck,
-        initial_water_level=5000,
-        initial_wood_amount=5000,
-        initial_food_amount=5000,
+        wreck,
+        initial_water_level: int,
+        initial_wood_amount: int,
+        initial_food_amount: int,
+        basic_water_fetch_factor: List[int],
+        basic_wood_fetch_factor: List[int],
+        basic_food_fetch_factor: List[int],
+        default_weather: Weather,
     ):
         self._wreck = wreck
-        self._weather = Weather.BLUE_SKY
+        self._weather = default_weather
 
         self._initial_water_level = initial_water_level
         self._initial_wood_amount = initial_wood_amount
@@ -42,9 +54,9 @@ class World:
         self._wood_amount = initial_wood_amount
         self._food_amount = initial_food_amount
 
-        self._basic_water_fetch_factor = [3, 4, 5]
-        self._basic_wood_fetch_factor = [3, 4, 5]
-        self._basic_food_fetch_factor = [3, 4, 5]
+        self._basic_water_fetch_factor = basic_water_fetch_factor
+        self._basic_wood_fetch_factor = basic_wood_fetch_factor
+        self._basic_food_fetch_factor = basic_food_fetch_factor
 
     @property
     def initial_water_level(self) -> int:
@@ -141,8 +153,8 @@ class World:
         self._food_amount -= amount
         return amount
 
-    def search_wreck(self) -> Union[None, T]:
-        return self._wreck.search()
+    def search_wreck(self, player) -> Union[None, T]:
+        return self._wreck.search(player)
 
     def update(self):
         # Update the weather
@@ -150,6 +162,14 @@ class World:
             self._weather = Weather.RAINING
         else:
             self._weather = random.choice(list(Weather))
+
+    def summarize(self) -> WorldSum:
+        return WorldSum(
+            water=self.water_level,
+            food=self.food_amount,
+            wood=self.wood_amount,
+            weather=self.weather,
+        )
 
     def __str__(self):
         return f"{self.water_level} water, {self.wood_amount} wood, {self.food_amount} food"

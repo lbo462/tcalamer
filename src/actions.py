@@ -56,4 +56,4 @@ class ActionRegistry:
             if action.id_ == id_:
                 return action.function(*args, **kwargs)
 
-        raise UnregisteredAction(f"Action #{id_} wasn't registered")
+        raise UnregisteredAction(f"ActionSummary #{id_} wasn't registered")
