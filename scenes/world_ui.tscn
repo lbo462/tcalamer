@@ -27,7 +27,6 @@ offset_left = 111.0
 offset_top = 33.0
 offset_right = 334.0
 offset_bottom = 49.0
-min_value = 0.1
 max_value = 10.0
 step = 0.1
 value = 1.0
@@ -55,11 +54,19 @@ text = "1.0"
 
 [node name="StartButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 177.0
-offset_top = 86.0
-offset_right = 233.0
-offset_bottom = 117.0
+offset_left = 300.0
+offset_top = 85.0
+offset_right = 375.0
+offset_bottom = 120.0
 text = "START"
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 85.0
+offset_right = 125.0
+offset_bottom = 120.0
+text = "Retour"
 
 [node name="Ressources" type="GridContainer" parent="."]
 layout_mode = 1
@@ -73,7 +80,7 @@ offset_right = 176.0
 offset_bottom = 65.0
 grow_horizontal = 2
 grow_vertical = 2
-columns = 4
+columns = 5
 metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="Ressources"]
@@ -100,7 +107,14 @@ vertical_alignment = 1
 [node name="ColonyNeeds" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Besoins"
+text = "Survie"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LeavingRessources" type="Label" parent="Ressources"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Départ"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -126,6 +140,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="N_Water" type="Label" parent="Ressources"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="L_Water" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "000"
@@ -160,6 +181,13 @@ text = "000"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="L_Food" type="Label" parent="Ressources"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Wood" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -182,6 +210,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="N_Wood" type="Label" parent="Ressources"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="L_Wood" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "000"
@@ -319,14 +353,6 @@ theme_override_font_sizes/font_size = 10
 text = "000"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="BackButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 49.0
-offset_top = 93.0
-offset_right = 110.0
-offset_bottom = 124.0
-text = "Retour"
 
 [connection signal="value_changed" from="TimeHSlider" to="." method="_on_time_h_slider_value_changed"]
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]

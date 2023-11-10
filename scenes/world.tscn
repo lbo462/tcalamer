@@ -1,8 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://drqhvecp44h5f"]
+[gd_scene load_steps=15 format=3 uid="uid://drqhvecp44h5f"]
 
 [ext_resource type="Texture2D" uid="uid://he5ij0kxuvxt" path="res://images/basictiles.png" id="1_3yean"]
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_b1461"]
 [ext_resource type="Texture2D" uid="uid://dd2j4f6tc2mnv" path="res://images/things.png" id="2_0nuhj"]
+[ext_resource type="Texture2D" uid="uid://0305i42mcv3s" path="res://images/wreck.png" id="4_1ebgj"]
+[ext_resource type="Texture2D" uid="uid://coekm6nif004q" path="res://images/particules/fish_1.png" id="5_2sfp5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n0lxy"]
 texture = ExtResource("1_3yean")
@@ -208,6 +210,23 @@ texture = ExtResource("2_0nuhj")
 sources/0 = SubResource("TileSetAtlasSource_n0lxy")
 sources/1 = SubResource("TileSetAtlasSource_uxtwa")
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xqcwi"]
+particle_flag_disable_z = true
+direction = Vector3(100, -100, 0)
+spread = 20.0
+gravity = Vector3(0, 98, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+angular_velocity_min = -45.0
+angular_velocity_max = -45.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+linear_accel_min = 1.0
+linear_accel_max = 1.0
+angle_min = 10.0
+angle_max = 10.0
+scale_min = 0.5
+
 [sub_resource type="Curve2D" id="Curve2D_3rc73"]
 _data = {
 "points": PackedVector2Array(-27, -1, 27, 1, 257, 145, 1, -12.5, -1, 12.5, 285, 168, 9.25, -5.5, -9.25, 5.5, 271, 194, 3, 21.25, -3, -21.25, 231, 169, 0, 0, 0, 0, 257, 145)
@@ -298,6 +317,26 @@ layer_7/y_sort_enabled = false
 layer_7/y_sort_origin = 0
 layer_7/z_index = 6
 layer_7/tile_data = PackedInt32Array(655376, 524289, 0, 262166, 458752, 3, 655375, 196608, 3)
+
+[node name="Wreck" type="Sprite2D" parent="TileMap"]
+z_index = 20
+position = Vector2(160, 64)
+rotation = -0.349066
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("4_1ebgj")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="TileMap"]
+z_index = 20
+texture_filter = 1
+position = Vector2(26, 338)
+amount = 5
+sub_emitter = NodePath(".")
+process_material = SubResource("ParticleProcessMaterial_xqcwi")
+texture = ExtResource("5_2sfp5")
+preprocess = 1.0
+explosiveness = 0.5
+randomness = 0.5
+visibility_rect = Rect2(-50, -50, 100, 100)
 
 [node name="SpawnPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_3rc73")

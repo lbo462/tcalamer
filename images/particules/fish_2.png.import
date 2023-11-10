@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bos0r3c1htdwl"
-path="res://.godot/imported/Woman_Walk_Left_1.png-b9c776f742bcaee6dd15d02b85c73649.ctex"
+uid="uid://bxjytqff8pk6"
+path="res://.godot/imported/fish_2.png-f0d4bfb00ac4e8141920dc05315ac44d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/animations/woman/Woman_Walk_Left_1.png"
-dest_files=["res://.godot/imported/Woman_Walk_Left_1.png-b9c776f742bcaee6dd15d02b85c73649.ctex"]
+source_file="res://images/particules/fish_2.png"
+dest_files=["res://.godot/imported/fish_2.png-f0d4bfb00ac4e8141920dc05315ac44d.ctex"]
 
 [params]
 

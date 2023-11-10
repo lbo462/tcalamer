@@ -38,7 +38,9 @@ var our_class: Array[Classmate] = [
 	Classmate.new("Hedi", true), 
 	Classmate.new("Boris", true)]
 
-var nb_days: int
+var _game_intructions: Array
+var _nb_days: int
+var _current_day: int = 0
 
 var players: Array[Player] = []
 var nb_players: int
@@ -88,43 +90,24 @@ func new_simulation():
 	
 	nb_players = len(initial_state["colony"]["players"])
 	
-	_setup_ui(initial_state["world"], initial_state["colony"], initial_state["wreck"], 1)
+	_update_ui(initial_state["world"], initial_state["colony"], 1)
+	_update_wreck_ui(initial_state["wreck"])
 	
 	for i in range(nb_players):
 		_setup_player(i)
 	
-	nb_days = len(json_as_dict["turns"])
-	var game_intructions = json_as_dict["turns"]
+	_game_intructions = json_as_dict["turns"]
+	_nb_days = len(_game_intructions)
 	
-	_run_simulation(game_intructions)
+	_run_simulation_morning()
 
-func _run_simulation(game_intructions):
-	pass
-	"""for day in game_intructions:
-		for a in day:
-			a["player_id"]"""
-
-func _setup_ui(world, colony, wreck, day):
-	$WorldUI/Day/CurrentDay.text = str(day)
-	$WorldUI/Climate/CurrentClimate.text = str(world["weather"])
-	$WorldUI/Ressources/W_Water.text = str(world["water"])
-	$WorldUI/Ressources/W_Food.text = str(world["food"])
-	$WorldUI/Ressources/W_Wood.text = str(world["wood"])
-	$WorldUI/Ressources/C_Water.text = str(colony["water"])
-	$WorldUI/Ressources/C_Food.text = str(colony["food"])
-	$WorldUI/Ressources/C_Wood.text = str(colony["wood"])
-	$WorldUI/Ressources/N_Water.text = str(nb_players)
-	$WorldUI/Ressources/N_Food.text = str(nb_players)
-	$WorldUI/Ressources/N_Wood.text = str(nb_players * 3)
-	$WorldUI/Objects/BucketNumber.text = str(wreck["buckets"])
-	$WorldUI/Objects/FishingRodNumber.text = str(wreck["fishing_rods"])
-	$WorldUI/Objects/AxeNumber.text = str(wreck["axes"])
-
-func _setup_player(i):
+func _setup_player(i: int):
 	var p = _create_player(i)
 	var p_i = _create_player_infos(i)
 	var player = Player.new(p, p_i)
-	_manage_player_objects(p_i, player.objects)
+	_update_player_objects(p_i, player.objects)
+	
+	p.id = i
 	
 	if nb_players != len(our_class):
 		p.sex = "m" if player.sex else "w"
@@ -134,8 +117,6 @@ func _setup_player(i):
 		p_i.get_node("PlayerOverview").texture = man_sprite if our_class[i].sex else woman_sprite
 	
 	players.append(player)
-	
-	_go_to_point(player, randi_range(0, 3))
 
 func _create_player(p):
 	var player = playerInstance.instantiate()
@@ -157,6 +138,9 @@ func _create_player(p):
 	
 	$World.add_child(player)
 	
+	player.wreck_searched.connect(_wreck_searched)
+	player.finished_action.connect(_player_finished)
+	
 	return player
 	
 func _create_player_infos(p):
@@ -165,12 +149,81 @@ func _create_player_infos(p):
 	$PlayersInfos.add_child(player)
 	return player
 
-func _manage_player_objects(player, objects):
-	for i in range(0, len(player.get_node("ObjectsContainer").get_children())):
-		player.get_node("ObjectsContainer").get_child(i).modulate = Color(int(objects[i]), int(objects[i]), int(objects[i]))
+func _run_simulation_morning():
+	var day = _game_intructions[_current_day]
+	
+	# Actions
+	finished_players = 0
+	for a in day["actions"]:
+		_go_to_point(players[int(a["player_id"])], int(a["action_id"]))
 
-func _go_to_point(player, point):
+func _player_finished():
+	finished_players += 1
+	if finished_players == nb_players:
+		_run_simulation_evening()
+
+func _wreck_searched(id: int):
+	# Objects
+	var state = _game_intructions[_current_day]["night_state"]
+	var players_states = state["colony"]["players"]
+	_update_player_objects(players[int(players_states[id]["number"])].player_infos, [players_states[id]["has_bucket"], players_states[id]["has_fishing_rod"], players_states[id]["has_axe"]])
+	_update_wreck_ui(state["wreck"])
+
+func _run_simulation_evening():
+	var day = _game_intructions[_current_day]
+	
+	# UI
+	var state = day["night_state"]
+	_update_ui(state["world"], state["colony"], day["day"])
+	
+	# UI Players
+	var players_states = state["colony"]["players"]
+	for p in players_states:
+		if p["state"] == 0:
+			# Die
+			players[int(p["number"])].player_infos.get_node("PlayerOverview").texture = dead_sprite
+	
+	# Next day
+	await get_tree().create_timer(randf_range(3.0, 5.0)).timeout
+	_current_day += 1
+	_run_simulation_morning()
+
+func _update_player_objects(player_infos, objects: Array[bool]):
+	for i in range(0, len(player_infos.get_node("ObjectsContainer").get_children())):
+		player_infos.get_node("ObjectsContainer").get_child(i).modulate = Color(int(objects[i]), int(objects[i]), int(objects[i]))
+
+func _go_to_point(player: Player, point: int):
 	player.player.go_to_point($World.destinations[point])
+
+func _update_ui(world, colony, day):
+	var weather: String
+	match int(world["weather"]):
+		0:
+			weather = "Ciel bleu"
+		1:
+			weather = "Nuageux"
+		2:
+			weather = "Pluvieux"
+		3:
+			weather = "Tempête"
+		_:
+			weather = "Inconnue"
+			
+	$WorldUI/Day/CurrentDay.text = str(day)
+	$WorldUI/Climate/CurrentClimate.text = weather
+	$WorldUI/Ressources/W_Water.text = str(world["water"])
+	$WorldUI/Ressources/W_Food.text = str(world["food"])
+	$WorldUI/Ressources/W_Wood.text = str(world["wood"])
+	$WorldUI/Ressources/C_Water.text = str(colony["water"])
+	$WorldUI/Ressources/C_Food.text = str(colony["food"])
+	$WorldUI/Ressources/C_Wood.text = str(colony["wood"])
+	$WorldUI/Ressources/N_Water.text = str(nb_players)
+	$WorldUI/Ressources/N_Food.text = str(nb_players)
+
+func _update_wreck_ui(wreck):
+	$WorldUI/Objects/BucketNumber.text = str(wreck["buckets"])
+	$WorldUI/Objects/FishingRodNumber.text = str(wreck["fishing_rods"])
+	$WorldUI/Objects/AxeNumber.text = str(wreck["axes"])
 
 class Player:
 	var alive: bool = true

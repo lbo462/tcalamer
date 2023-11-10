@@ -1,20 +1,22 @@
-[gd_scene load_steps=9 format=3 uid="uid://c4qifkwmg5ald"]
+[gd_scene load_steps=10 format=3 uid="uid://c4qifkwmg5ald"]
 
 [ext_resource type="Script" path="res://scripts/simulation.gd" id="1_lm63p"]
 [ext_resource type="PackedScene" uid="uid://b4f4xsvtubtdu" path="res://scenes/player.tscn" id="2_cdr1c"]
 [ext_resource type="PackedScene" uid="uid://d2e0eopjysnod" path="res://scenes/player_infos.tscn" id="3_0q2us"]
-[ext_resource type="Texture2D" uid="uid://tkvielkkginh" path="res://images/Animations/Man/Men_Walk_Down_2.png" id="4_0r44g"]
 [ext_resource type="PackedScene" uid="uid://dyel7u1nk3b88" path="res://scenes/in_game_players_infos.tscn" id="4_kfigw"]
+[ext_resource type="Texture2D" uid="uid://tkvielkkginh" path="res://images/animations/man/Men_Walk_Down_2.png" id="4_xgri8"]
+[ext_resource type="Texture2D" uid="uid://d2b47o54ymvq8" path="res://images/animations/woman/Woman_Walk_Down_2.png" id="5_vf24r"]
 [ext_resource type="PackedScene" uid="uid://clei3idjfq7p7" path="res://scenes/world_ui.tscn" id="5_vw3bp"]
-[ext_resource type="Texture2D" uid="uid://d2b47o54ymvq8" path="res://images/Animations/Woman/Woman_Walk_Down_2.png" id="5_wqdpr"]
+[ext_resource type="Texture2D" uid="uid://cyvhlrl6jogm2" path="res://images/animations/man/Men_Walk_Up_2.png" id="6_37m6w"]
 [ext_resource type="PackedScene" uid="uid://drqhvecp44h5f" path="res://scenes/world.tscn" id="6_oo6ox"]
 
 [node name="Simulation" type="Node"]
 script = ExtResource("1_lm63p")
 playerInstance = ExtResource("2_cdr1c")
 playerInfos = ExtResource("3_0q2us")
-man_sprite = ExtResource("4_0r44g")
-woman_sprite = ExtResource("5_wqdpr")
+man_sprite = ExtResource("4_xgri8")
+woman_sprite = ExtResource("5_vf24r")
+dead_sprite = ExtResource("6_37m6w")
 
 [node name="PlayersInfos" parent="." instance=ExtResource("4_kfigw")]
 

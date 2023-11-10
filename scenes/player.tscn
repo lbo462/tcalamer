@@ -1,31 +1,31 @@
 [gd_scene load_steps=28 format=3 uid="uid://b4f4xsvtubtdu"]
 
-[ext_resource type="Texture2D" uid="uid://dp3af0en5i62v" path="res://images/Animations/Man/Men_Walk_Down_1.png" id="1_j7284"]
-[ext_resource type="Texture2D" uid="uid://tkvielkkginh" path="res://images/Animations/Man/Men_Walk_Down_2.png" id="2_vga4o"]
-[ext_resource type="Texture2D" uid="uid://ck6ukc13ssyjo" path="res://images/Animations/Man/Men_Walk_Down_3.png" id="3_36hxp"]
-[ext_resource type="Texture2D" uid="uid://xiveliemwfkf" path="res://images/Animations/Man/Men_Walk_Left_1.png" id="4_5lwf4"]
-[ext_resource type="Texture2D" uid="uid://d4g783t7mdsvb" path="res://images/Animations/Woman/Woman_Walk_Down_1.png" id="4_ce58s"]
-[ext_resource type="Texture2D" uid="uid://d2b47o54ymvq8" path="res://images/Animations/Woman/Woman_Walk_Down_2.png" id="5_b76qb"]
-[ext_resource type="Texture2D" uid="uid://iaqivimi5o03" path="res://images/Animations/Man/Men_Walk_Left_2.png" id="5_kwwah"]
-[ext_resource type="Texture2D" uid="uid://bm2f8qqw1aph0" path="res://images/Animations/Man/Men_Walk_Left_3.png" id="6_0kbxh"]
-[ext_resource type="Texture2D" uid="uid://bsf2ut64n3kt1" path="res://images/Animations/Woman/Woman_Walk_Down_3.png" id="6_n7jin"]
-[ext_resource type="Texture2D" uid="uid://c7rxj8stbw1vx" path="res://images/Animations/Man/Men_Walk_Right_1.png" id="7_77ck5"]
-[ext_resource type="Texture2D" uid="uid://dwpx5kolygrip" path="res://images/Animations/Woman/Woman_Walk_Left_2.png" id="8_d0rpi"]
-[ext_resource type="Texture2D" uid="uid://cjkm20f11guac" path="res://images/Animations/Man/Men_Walk_Right_2.png" id="8_n5sm8"]
-[ext_resource type="Texture2D" uid="uid://cok13p8u4twln" path="res://images/Animations/Man/Men_Walk_Right_3.png" id="9_ma6ao"]
-[ext_resource type="Texture2D" uid="uid://cs8hq6mk2dcq2" path="res://images/Animations/Man/Men_Walk_Up_1.png" id="10_klmb5"]
-[ext_resource type="Texture2D" uid="uid://5vstdjhst36i" path="res://images/Animations/Woman/Woman_Walk_Right_2.png" id="10_x3e4r"]
-[ext_resource type="Texture2D" uid="uid://cyvhlrl6jogm2" path="res://images/Animations/Man/Men_Walk_Up_2.png" id="11_7vbkv"]
-[ext_resource type="Texture2D" uid="uid://jm1e2omkvgqh" path="res://images/Animations/Man/Men_Walk_Up_3.png" id="12_77j4r"]
-[ext_resource type="Texture2D" uid="uid://45tea24iy6dn" path="res://images/Animations/Woman/Woman_Walk_Up_2.png" id="12_wmt2l"]
+[ext_resource type="Texture2D" uid="uid://dp3af0en5i62v" path="res://images/animations/man/Men_Walk_Down_1.png" id="1_dfdn6"]
+[ext_resource type="Texture2D" uid="uid://tkvielkkginh" path="res://images/animations/man/Men_Walk_Down_2.png" id="2_n4txb"]
+[ext_resource type="Texture2D" uid="uid://ck6ukc13ssyjo" path="res://images/animations/man/Men_Walk_Down_3.png" id="3_drvf1"]
+[ext_resource type="Texture2D" uid="uid://d4g783t7mdsvb" path="res://images/animations/woman/Woman_Walk_Down_1.png" id="4_l01m5"]
+[ext_resource type="Texture2D" uid="uid://d2b47o54ymvq8" path="res://images/animations/woman/Woman_Walk_Down_2.png" id="5_hi2kr"]
+[ext_resource type="Texture2D" uid="uid://bsf2ut64n3kt1" path="res://images/animations/woman/Woman_Walk_Down_3.png" id="6_he5xy"]
+[ext_resource type="Texture2D" uid="uid://iaqivimi5o03" path="res://images/animations/man/Men_Walk_Left_2.png" id="7_bymew"]
+[ext_resource type="Texture2D" uid="uid://dwpx5kolygrip" path="res://images/animations/woman/Woman_Walk_Left_2.png" id="8_rn6j5"]
+[ext_resource type="Texture2D" uid="uid://cjkm20f11guac" path="res://images/animations/man/Men_Walk_Right_2.png" id="9_4nd4f"]
+[ext_resource type="Texture2D" uid="uid://5vstdjhst36i" path="res://images/animations/woman/Woman_Walk_Right_2.png" id="10_gf2u7"]
+[ext_resource type="Texture2D" uid="uid://cyvhlrl6jogm2" path="res://images/animations/man/Men_Walk_Up_2.png" id="11_o0bt5"]
+[ext_resource type="Texture2D" uid="uid://45tea24iy6dn" path="res://images/animations/woman/Woman_Walk_Up_2.png" id="12_qhwc8"]
 [ext_resource type="Script" path="res://scripts/playerSimulation.gd" id="13_0l3y0"]
+[ext_resource type="Texture2D" uid="uid://xiveliemwfkf" path="res://images/animations/man/Men_Walk_Left_1.png" id="13_86bfs"]
+[ext_resource type="Texture2D" uid="uid://bm2f8qqw1aph0" path="res://images/animations/man/Men_Walk_Left_3.png" id="14_a2y1a"]
 [ext_resource type="FontFile" uid="uid://tvtnoij3bbif" path="res://font/Pixeled.ttf" id="14_y4p2k"]
-[ext_resource type="Texture2D" uid="uid://bos0r3c1htdwl" path="res://images/Animations/Woman/Woman_Walk_Left_1.png" id="15_ta87e"]
-[ext_resource type="Texture2D" uid="uid://6x6qu6qammp0" path="res://images/Animations/Woman/Woman_Walk_Left_3.png" id="16_nf7lt"]
-[ext_resource type="Texture2D" uid="uid://1mjlsr31dleu" path="res://images/Animations/Woman/Woman_Walk_Right_1.png" id="19_6dlr6"]
-[ext_resource type="Texture2D" uid="uid://5ykyevb4j3nm" path="res://images/Animations/Woman/Woman_Walk_Right_3.png" id="20_16bbk"]
-[ext_resource type="Texture2D" uid="uid://d1osjp6kgtkoa" path="res://images/Animations/Woman/Woman_Walk_Up_1.png" id="23_m1gx4"]
-[ext_resource type="Texture2D" uid="uid://bx2klqsyv7cr1" path="res://images/Animations/Woman/Woman_Walk_Up_3.png" id="24_rky66"]
+[ext_resource type="Texture2D" uid="uid://bos0r3c1htdwl" path="res://images/animations/woman/Woman_Walk_Left_1.png" id="15_bdqgk"]
+[ext_resource type="Texture2D" uid="uid://6x6qu6qammp0" path="res://images/animations/woman/Woman_Walk_Left_3.png" id="16_3l4n3"]
+[ext_resource type="Texture2D" uid="uid://c7rxj8stbw1vx" path="res://images/animations/man/Men_Walk_Right_1.png" id="17_fkw7i"]
+[ext_resource type="Texture2D" uid="uid://cok13p8u4twln" path="res://images/animations/man/Men_Walk_Right_3.png" id="18_7ch4b"]
+[ext_resource type="Texture2D" uid="uid://1mjlsr31dleu" path="res://images/animations/woman/Woman_Walk_Right_1.png" id="19_a6ibq"]
+[ext_resource type="Texture2D" uid="uid://5ykyevb4j3nm" path="res://images/animations/woman/Woman_Walk_Right_3.png" id="20_gcjyr"]
+[ext_resource type="Texture2D" uid="uid://cs8hq6mk2dcq2" path="res://images/animations/man/Men_Walk_Up_1.png" id="21_erbue"]
+[ext_resource type="Texture2D" uid="uid://jm1e2omkvgqh" path="res://images/animations/man/Men_Walk_Up_3.png" id="22_o1ukw"]
+[ext_resource type="Texture2D" uid="uid://d1osjp6kgtkoa" path="res://images/animations/woman/Woman_Walk_Up_1.png" id="23_socj0"]
+[ext_resource type="Texture2D" uid="uid://bx2klqsyv7cr1" path="res://images/animations/woman/Woman_Walk_Up_3.png" id="24_cd2q6"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5pkjy"]
 animations = [{
@@ -36,13 +36,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_j7284")
+"texture": ExtResource("1_dfdn6")
 }, {
 "duration": 1.0,
-"texture": ExtResource("2_vga4o")
+"texture": ExtResource("2_n4txb")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_36hxp")
+"texture": ExtResource("3_drvf1")
 }],
 "loop": true,
 "name": &"down_m",
@@ -50,13 +50,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_ce58s")
+"texture": ExtResource("4_l01m5")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5_b76qb")
+"texture": ExtResource("5_hi2kr")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_n7jin")
+"texture": ExtResource("6_he5xy")
 }],
 "loop": true,
 "name": &"down_w",
@@ -64,7 +64,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_vga4o")
+"texture": ExtResource("2_n4txb")
 }],
 "loop": true,
 "name": &"idle_down_m",
@@ -72,7 +72,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_b76qb")
+"texture": ExtResource("5_hi2kr")
 }],
 "loop": true,
 "name": &"idle_down_w",
@@ -80,7 +80,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_kwwah")
+"texture": ExtResource("7_bymew")
 }],
 "loop": true,
 "name": &"idle_left_m",
@@ -88,7 +88,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("8_d0rpi")
+"texture": ExtResource("8_rn6j5")
 }],
 "loop": true,
 "name": &"idle_left_w",
@@ -96,7 +96,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("8_n5sm8")
+"texture": ExtResource("9_4nd4f")
 }],
 "loop": true,
 "name": &"idle_right_m",
@@ -104,7 +104,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("10_x3e4r")
+"texture": ExtResource("10_gf2u7")
 }],
 "loop": true,
 "name": &"idle_right_w",
@@ -112,7 +112,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("11_7vbkv")
+"texture": ExtResource("11_o0bt5")
 }],
 "loop": true,
 "name": &"idle_up_m",
@@ -120,7 +120,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("12_wmt2l")
+"texture": ExtResource("12_qhwc8")
 }],
 "loop": true,
 "name": &"idle_up_w",
@@ -128,13 +128,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_5lwf4")
+"texture": ExtResource("13_86bfs")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5_kwwah")
+"texture": ExtResource("7_bymew")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_0kbxh")
+"texture": ExtResource("14_a2y1a")
 }],
 "loop": true,
 "name": &"left_m",
@@ -142,13 +142,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("15_ta87e")
+"texture": ExtResource("15_bdqgk")
 }, {
 "duration": 1.0,
-"texture": ExtResource("8_d0rpi")
+"texture": ExtResource("8_rn6j5")
 }, {
 "duration": 1.0,
-"texture": ExtResource("16_nf7lt")
+"texture": ExtResource("16_3l4n3")
 }],
 "loop": true,
 "name": &"left_w",
@@ -156,13 +156,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("7_77ck5")
+"texture": ExtResource("17_fkw7i")
 }, {
 "duration": 1.0,
-"texture": ExtResource("8_n5sm8")
+"texture": ExtResource("9_4nd4f")
 }, {
 "duration": 1.0,
-"texture": ExtResource("9_ma6ao")
+"texture": ExtResource("18_7ch4b")
 }],
 "loop": true,
 "name": &"right_m",
@@ -170,13 +170,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("19_6dlr6")
+"texture": ExtResource("19_a6ibq")
 }, {
 "duration": 1.0,
-"texture": ExtResource("10_x3e4r")
+"texture": ExtResource("10_gf2u7")
 }, {
 "duration": 1.0,
-"texture": ExtResource("20_16bbk")
+"texture": ExtResource("20_gcjyr")
 }],
 "loop": true,
 "name": &"right_w",
@@ -184,13 +184,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("10_klmb5")
+"texture": ExtResource("21_erbue")
 }, {
 "duration": 1.0,
-"texture": ExtResource("11_7vbkv")
+"texture": ExtResource("11_o0bt5")
 }, {
 "duration": 1.0,
-"texture": ExtResource("12_77j4r")
+"texture": ExtResource("22_o1ukw")
 }],
 "loop": true,
 "name": &"up_m",
@@ -198,13 +198,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("23_m1gx4")
+"texture": ExtResource("23_socj0")
 }, {
 "duration": 1.0,
-"texture": ExtResource("12_wmt2l")
+"texture": ExtResource("12_qhwc8")
 }, {
 "duration": 1.0,
-"texture": ExtResource("24_rky66")
+"texture": ExtResource("24_cd2q6")
 }],
 "loop": true,
 "name": &"up_w",

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d4g783t7mdsvb"
-path="res://.godot/imported/Woman_Walk_Down_1.png-3d7a4834e3aa24e088f3ddf34e19a136.ctex"
+path="res://.godot/imported/Woman_Walk_Down_1.png-8148c3909cc016c3e69a91f03e90589b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/Animations/Woman/Woman_Walk_Down_1.png"
-dest_files=["res://.godot/imported/Woman_Walk_Down_1.png-3d7a4834e3aa24e088f3ddf34e19a136.ctex"]
+source_file="res://images/animations/woman/Woman_Walk_Down_1.png"
+dest_files=["res://.godot/imported/Woman_Walk_Down_1.png-8148c3909cc016c3e69a91f03e90589b.ctex"]
 
 [params]
 
