@@ -29,7 +29,7 @@ def run_game(ge_params: GameEngineParams = Body(GameEngineParams())) -> GameSum:
 @app.post("/test")
 def test(
     ge_params: GameEngineParams = Body(GameEngineParams()),
-    amount_of_games: int = Body(1000),
+    amount_of_games: int = Body(100),
 ) -> float:
     """Returns the win ratio"""
     wins = 0
@@ -47,8 +47,8 @@ def train_brain(
     ge_params: GameEngineParams = Body(GameEngineParams()),
     learning_rate: float = Body(0.001),
     discount_factor: float = Body(0.99),
-    greedy_epsilon: float = Body(0.3),
-    iter_amount: int = Body(3000),
+    greedy_epsilon: float = Body(0.1),
+    iter_amount: int = Body(1000),
 ) -> FilePath:
     """
     Trains a single brain with the given parameters
