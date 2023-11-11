@@ -159,7 +159,7 @@ offset_right = 254.0
 offset_bottom = 116.0
 grow_horizontal = 2
 grow_vertical = 2
-columns = 5
+columns = 4
 metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="Ressources"]
@@ -179,13 +179,6 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Ressources de départ"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ResourcesNeeds" type="Label" parent="Ressources"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Besoins par joueur"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -212,13 +205,6 @@ value = 1000.0
 alignment = 1
 
 [node name="S_WaterNumber" type="SpinBox" parent="Ressources"]
-layout_mode = 2
-min_value = 1.0
-max_value = 10.0
-value = 1.0
-alignment = 1
-
-[node name="N_WaterNumber" type="SpinBox" parent="Ressources"]
 layout_mode = 2
 min_value = 1.0
 max_value = 10.0
@@ -254,13 +240,6 @@ max_value = 10.0
 value = 1.0
 alignment = 1
 
-[node name="N_FoodNumber" type="SpinBox" parent="Ressources"]
-layout_mode = 2
-min_value = 1.0
-max_value = 10.0
-value = 1.0
-alignment = 1
-
 [node name="L_FoodNumber" type="SpinBox" parent="Ressources"]
 layout_mode = 2
 min_value = 1.0
@@ -284,9 +263,6 @@ value = 1000.0
 alignment = 1
 
 [node name="S_W" type="Label" parent="Ressources"]
-layout_mode = 2
-
-[node name="N_W" type="Label" parent="Ressources"]
 layout_mode = 2
 
 [node name="L_WoodNumber" type="SpinBox" parent="Ressources"]

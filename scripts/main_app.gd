@@ -7,13 +7,10 @@ func _ready():
 	if !OS.has_feature("standalone"): # if NOT exported version
 		json_path = ProjectSettings.globalize_path("res://DATA/data.json")
 	
-	var json_as_text = FileAccess.get_file_as_string(json_path)
-	if json_as_text:
-		$MainMenu/ButtonSimulation.disabled = false
-	else:
-		$MainMenu/ButtonSimulation.disabled = true
+	show_main_menu()
 
 func show_main_menu():
+	$MainMenu/ButtonSimulation.disabled = !FileAccess.get_file_as_string(json_path)
 	$MainMenu.show()
 
 func hide_main_menu():

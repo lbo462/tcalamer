@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cs8hq6mk2dcq2"
-path="res://.godot/imported/Men_Walk_Up_1.png-df3b1a2e4b3e7f9abedd263aca0ec26b.ctex"
+path="res://.godot/imported/Men_Walk_Up_1.png-fdd22c0aafcb0e3e91c29bbd3944f832.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/animations/man/Men_Walk_Up_1.png"
-dest_files=["res://.godot/imported/Men_Walk_Up_1.png-df3b1a2e4b3e7f9abedd263aca0ec26b.ctex"]
+source_file="res://images/Animations/Man/Men_Walk_Up_1.png"
+dest_files=["res://.godot/imported/Men_Walk_Up_1.png-fdd22c0aafcb0e3e91c29bbd3944f832.ctex"]
 
 [params]
 

@@ -96,8 +96,9 @@ func new_simulation():
 	
 	$GameOverScreen.hide()
 	$WorldUI/StartButton.disabled = true
-	var headers = ["Content-Type: application/json"]
-	$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
+	#var headers = ["Content-Type: application/json"]
+	#$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
+	_run_simulation()
 
 func _on_request_completed_brains(_result, response_code, _headers, _body):
 	if response_code == 200:
@@ -274,11 +275,9 @@ func _update_ui(world, colony, day):
 	$WorldUI/Ressources/C_Water.text = str(colony["water"])
 	$WorldUI/Ressources/C_Food.text = str(colony["food"])
 	$WorldUI/Ressources/C_Wood.text = str(colony["wood"])
-	$WorldUI/Ressources/N_Water.text = str(nb_players)
-	$WorldUI/Ressources/N_Food.text = str(nb_players)
-	$WorldUI/Ressources/L_Water.text = str(nb_players)
-	$WorldUI/Ressources/L_Food.text = str(nb_players)
-	$WorldUI/Ressources/L_Wood.text = str(nb_players)
+	$WorldUI/Ressources/L_Water.text = str(colony["water_needs"])
+	$WorldUI/Ressources/L_Food.text = str(colony["food_needs"])
+	$WorldUI/Ressources/L_Wood.text = str(colony["wood_needs"])
 
 func _update_wreck_ui(wreck):
 	$WorldUI/Objects/BucketNumber.text = str(wreck["buckets"])

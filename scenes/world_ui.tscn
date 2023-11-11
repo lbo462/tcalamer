@@ -80,7 +80,7 @@ offset_right = 176.0
 offset_bottom = 65.0
 grow_horizontal = 2
 grow_vertical = 2
-columns = 5
+columns = 4
 metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="Ressources"]
@@ -101,13 +101,6 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "Colonie"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ColonyNeeds" type="Label" parent="Ressources"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "Survie"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -133,13 +126,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="C_Water" type="Label" parent="Ressources"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "000"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="N_Water" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "000"
@@ -174,13 +160,6 @@ text = "000"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="N_Food" type="Label" parent="Ressources"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "000"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="L_Food" type="Label" parent="Ressources"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -206,12 +185,6 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "000"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="N_Wood" type="Label" parent="Ressources"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 

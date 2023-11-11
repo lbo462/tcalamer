@@ -12,7 +12,7 @@ var id: int
 
 var _destination: PathFollow2D = null
 
-var _speed: float = randf_range(0.3, 0.5)# randf_range(0.0035, 0.0075) # 0.0075
+var _speed: float
 var _progress: float = 0
 var _start_point: Vector2
 var _dist_to_path: Vector2
@@ -105,7 +105,7 @@ func move(delta):
 
 func go_to_point(dest):
 	await get_tree().create_timer(randf_range(0.1, 1.0)).timeout
-	_speed = randf_range(0.3, 0.5)
+	_speed = randf_range(0.2, 0.4)
 	_destination = dest
 	_progress = 0
 	_destination.progress_ratio = _progress

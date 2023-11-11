@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dwpx5kolygrip"
-path="res://.godot/imported/Woman_Walk_Left_2.png-ecd557964e20db737bc0e16bc487a0a2.ctex"
+path="res://.godot/imported/Woman_Walk_Left_2.png-dacbd2162575da77f5daabfda7bdba26.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/animations/woman/Woman_Walk_Left_2.png"
-dest_files=["res://.godot/imported/Woman_Walk_Left_2.png-ecd557964e20db737bc0e16bc487a0a2.ctex"]
+source_file="res://images/Animations/Woman/Woman_Walk_Left_2.png"
+dest_files=["res://.godot/imported/Woman_Walk_Left_2.png-dacbd2162575da77f5daabfda7bdba26.ctex"]
 
 [params]
 
