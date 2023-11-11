@@ -48,7 +48,8 @@ def train_brain(
     learning_rate: float = Body(0.001),
     discount_factor: float = Body(0.99),
     greedy_epsilon: float = Body(0.1),
-    iter_amount: int = Body(1000),
+    iter_amount: int = Body(10000),
+    max_win_streak: int = Body(100),
 ) -> FilePath:
     """
     Trains a single brain with the given parameters
@@ -63,6 +64,7 @@ def train_brain(
         discount_factor=discount_factor,
         greedy_epsilon=greedy_epsilon,
         iter_amount=iter_amount,
+        max_win_streak=max_win_streak,
     )
     brain_trainer.train()
     torch.save(brain_trainer.q_net_dict, location)

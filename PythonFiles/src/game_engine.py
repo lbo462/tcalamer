@@ -197,7 +197,7 @@ class GameEngine:
             day = self._update()
             days.append(day)
 
-        print(f"{'✔️' if self.colony.at_least_one_left_the_isle else '❌'}")
+        print(f"{'✔️' if self.colony.at_least_one_left_the_isle else '❌'} ({self.current_day} days)")
 
         return GameSum(
             initial_state=initial_state,

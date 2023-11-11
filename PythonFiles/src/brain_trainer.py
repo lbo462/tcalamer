@@ -23,13 +23,14 @@ class BrainTrainer:
         discount_factor: float,
         greedy_epsilon: float,
         iter_amount: int,
+        max_win_streak: int,
     ):
         # Learning parameters
         self._learning_rate = learning_rate
         self._discount_factor = discount_factor
         self._greedy_epsilon = greedy_epsilon
         self._num_iterations = iter_amount
-        self._max_win_streak = 50
+        self._max_win_streak = max_win_streak
 
         # Create a new neural network
         self._q_network = _QNetwork(
@@ -108,20 +109,20 @@ class BrainTrainer:
                     loss.backward()
                     self._optimizer.step()
 
-                if ge.colony.at_least_one_left_the_isle:
-                    win_streak += 1
-                else:
-                    win_streak = 0
-
                 day_sum = ge.run_single()
 
-            print(
-                f"{iteration} "
-                f"{'✔️' if ge.colony.at_least_one_left_the_isle else '❌'} "
-                f"({win_streak} / {self._max_win_streak}) "
-                f": {total_reward}"
-            )
+            if ge.colony.at_least_one_left_the_isle:
+                win_streak += 1
+            else:
+                win_streak = 0
 
             if win_streak > self._max_win_streak:
                 print("Stopped by win streak")
                 break
+
+            print(
+                f"{iteration} "
+                f"{'✔️' if ge.colony.at_least_one_left_the_isle else '❌'} "
+                f"({win_streak}/{self._max_win_streak}) "
+                f": {total_reward}"
+            )
