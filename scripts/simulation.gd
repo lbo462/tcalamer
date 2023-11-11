@@ -3,7 +3,8 @@ extends Node
 signal back
 
 var DIR = OS.get_executable_path().get_base_dir()
-var json_path = DIR.path_join("DATA/Game/game.json")
+var json_path = DIR.path_join("DATA/data.json")
+var game_json_path = DIR.path_join("DATA/Game/game.json")
 
 @export_group("Players")
 @export var playerInstance: PackedScene
@@ -44,51 +45,92 @@ var _current_day: int = 0
 
 var players: Array[Player] = []
 var nb_players: int
+var nb_players_alive: int
 var finished_players: int
 
 func _ready():
 	if !OS.has_feature("standalone"): # if NOT exported version
-		json_path = ProjectSettings.globalize_path("res://DATA/Game/game.json")
+		json_path = ProjectSettings.globalize_path("res://DATA/data.json")
+		game_json_path = ProjectSettings.globalize_path("res://DATA/Game/game.json")
 	
-	$PlayersInfos.hide()
-	$World/TileMap.visible = false
-	$WorldUI.hide()
+	$HTTPRequestBrain.request_completed.connect(_on_request_completed_brains)
+	$HTTPRequestGame.request_completed.connect(_on_request_completed_game)
+	
+	hide_simulation()
 
 func show_simulation():
 	clear_simulation_data()
-	$PlayersInfos.show()
+	
+	var json_as_text = FileAccess.get_file_as_string(json_path)
+	if json_as_text:
+		$WorldUI/StartButton.disabled = false
+	else:
+		$WorldUI/StartButton.disabled = true
+	
+	$PlayersInfosScrollBar.show()
+	$Background.show()
 	$World/TileMap.visible = true
 	$WorldUI.show()
+	$GameOverScreen.hide()
 	
 func hide_simulation():
 	clear_simulation_data()
-	$PlayersInfos.hide()
+	$PlayersInfosScrollBar.hide()
+	$Background.hide()
 	$World/TileMap.visible = false
 	$WorldUI.hide()
+	$GameOverScreen.hide()
 	back.emit()
 
 func clear_simulation_data():
 	for p in players:
-		p.player.queue_free()
+		if p.alive:
+			p.player.queue_free()
 		p.player_infos.queue_free()
 	players.clear()
+	_current_day = 0
 
 func new_simulation():
-	
-	var json_as_text = FileAccess.get_file_as_string(json_path)
-	var json_as_dict = JSON.parse_string(json_as_text)
-	
-	'''if json_as_dict:
-		print(json_as_dict)
-	else:
-		print("no json")
-		#return'''
-	
+	#_start_simulation()
 	clear_simulation_data()
 	
-	var initial_state = json_as_dict["initial_state"]
+	$GameOverScreen.hide()
+	$WorldUI/StartButton.disabled = true
+	var headers = ["Content-Type: application/json"]
+	$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
+
+func _on_request_completed_brains(_result, response_code, _headers, _body):
+	if response_code == 200:
+		_run_simulation()
+	else:
+		$WorldUI/StartButton.disabled = false
+		print("no brains")
+
+func _run_simulation():
+	var json_as_text = FileAccess.get_file_as_string(json_path)
+	var headers = ["Content-Type: application/json"]
+	$HTTPRequestGame.request("http://localhost:8000/run", headers, HTTPClient.METHOD_POST, json_as_text)
+
+func _on_request_completed_game(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		_start_simulation(json)
+	else:
+		$WorldUI/StartButton.disabled = false
+		print("no game")
+
+func _start_simulation(json: Dictionary):
+	
+	#var json_as_text = FileAccess.get_file_as_string(game_json_path)
+	#var json_as_dict = JSON.parse_string(json_as_text)
+	
+	#sprint("start")
+	#print(json)
+	
+	var initial_state = json["initial_state"]
 	
 	nb_players = len(initial_state["colony"]["players"])
+	nb_players_alive = nb_players
 	
 	_update_ui(initial_state["world"], initial_state["colony"], 1)
 	_update_wreck_ui(initial_state["wreck"])
@@ -96,7 +138,7 @@ func new_simulation():
 	for i in range(nb_players):
 		_setup_player(i)
 	
-	_game_intructions = json_as_dict["turns"]
+	_game_intructions = json["days"]
 	_nb_days = len(_game_intructions)
 	
 	_run_simulation_morning()
@@ -122,7 +164,7 @@ func _create_player(p):
 	var player = playerInstance.instantiate()
 	
 	var player_spawn_location = $World/SpawnPath/SpawnPoints
-	player_spawn_location.progress_ratio = p * 1.0 / nb_players #randf()
+	player_spawn_location.progress_ratio = p * 1.0 / nb_players
 	player.position = player_spawn_location.position
 	
 	if player_spawn_location.rotation >= -PI / 4 and player_spawn_location.rotation < PI / 4:
@@ -146,7 +188,7 @@ func _create_player(p):
 func _create_player_infos(p):
 	var player = playerInfos.instantiate()
 	player.get_node("ID").text = str(p + 1) if nb_players != len(our_class) else our_class[p].name
-	$PlayersInfos.add_child(player)
+	$PlayersInfosScrollBar/PlayersInfos.add_child(player)
 	return player
 
 func _run_simulation_morning():
@@ -159,7 +201,7 @@ func _run_simulation_morning():
 
 func _player_finished():
 	finished_players += 1
-	if finished_players == nb_players:
+	if finished_players == nb_players_alive:
 		_run_simulation_evening()
 
 func _wreck_searched(id: int):
@@ -179,14 +221,29 @@ func _run_simulation_evening():
 	# UI Players
 	var players_states = state["colony"]["players"]
 	for p in players_states:
-		if p["state"] == 0:
+		if !p["alive"]:
 			# Die
 			players[int(p["number"])].player_infos.get_node("PlayerOverview").texture = dead_sprite
+			players[int(p["number"])].player.queue_free()
+			players[int(p["number"])].alive = false
+			nb_players_alive -= 1
 	
 	# Next day
-	await get_tree().create_timer(randf_range(3.0, 5.0)).timeout
 	_current_day += 1
-	_run_simulation_morning()
+	if _current_day < _nb_days:
+		await get_tree().create_timer(randf_range(3.0, 5.0)).timeout
+		_run_simulation_morning()
+	else:
+		_end_game()
+
+func _end_game():
+	if nb_players_alive > 0:
+		$GameOverScreen/GameOverLabel.text = str(nb_players_alive) + " joueurs se sont échappés"
+	else:
+		$GameOverScreen/GameOverLabel.text = "Tout le monde est mort"
+		
+	$GameOverScreen.show()
+	$WorldUI/StartButton.disabled = false
 
 func _update_player_objects(player_infos, objects: Array[bool]):
 	for i in range(0, len(player_infos.get_node("ObjectsContainer").get_children())):
@@ -219,6 +276,9 @@ func _update_ui(world, colony, day):
 	$WorldUI/Ressources/C_Wood.text = str(colony["wood"])
 	$WorldUI/Ressources/N_Water.text = str(nb_players)
 	$WorldUI/Ressources/N_Food.text = str(nb_players)
+	$WorldUI/Ressources/L_Water.text = str(nb_players)
+	$WorldUI/Ressources/L_Food.text = str(nb_players)
+	$WorldUI/Ressources/L_Wood.text = str(nb_players)
 
 func _update_wreck_ui(wreck):
 	$WorldUI/Objects/BucketNumber.text = str(wreck["buckets"])
@@ -241,6 +301,6 @@ class Classmate:
 	var name: String
 	var sex: bool
 	
-	func _init(name, sex):
-		self.name = name
-		self.sex = sex
+	func _init(n, s):
+		name = n
+		sex = s

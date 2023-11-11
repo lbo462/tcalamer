@@ -12,7 +12,6 @@
 [ext_resource type="Texture2D" uid="uid://5vstdjhst36i" path="res://images/animations/woman/Woman_Walk_Right_2.png" id="10_gf2u7"]
 [ext_resource type="Texture2D" uid="uid://cyvhlrl6jogm2" path="res://images/animations/man/Men_Walk_Up_2.png" id="11_o0bt5"]
 [ext_resource type="Texture2D" uid="uid://45tea24iy6dn" path="res://images/animations/woman/Woman_Walk_Up_2.png" id="12_qhwc8"]
-[ext_resource type="Script" path="res://scripts/playerSimulation.gd" id="13_0l3y0"]
 [ext_resource type="Texture2D" uid="uid://xiveliemwfkf" path="res://images/animations/man/Men_Walk_Left_1.png" id="13_86bfs"]
 [ext_resource type="Texture2D" uid="uid://bm2f8qqw1aph0" path="res://images/animations/man/Men_Walk_Left_3.png" id="14_a2y1a"]
 [ext_resource type="FontFile" uid="uid://tvtnoij3bbif" path="res://font/Pixeled.ttf" id="14_y4p2k"]
@@ -26,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://jm1e2omkvgqh" path="res://images/animations/man/Men_Walk_Up_3.png" id="22_o1ukw"]
 [ext_resource type="Texture2D" uid="uid://d1osjp6kgtkoa" path="res://images/animations/woman/Woman_Walk_Up_1.png" id="23_socj0"]
 [ext_resource type="Texture2D" uid="uid://bx2klqsyv7cr1" path="res://images/animations/woman/Woman_Walk_Up_3.png" id="24_cd2q6"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="25_c3ilw"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5pkjy"]
 animations = [{
@@ -217,7 +217,7 @@ texture_filter = 1
 position = Vector2(8, 8)
 sprite_frames = SubResource("SpriteFrames_5pkjy")
 animation = &"up_w"
-script = ExtResource("13_0l3y0")
+script = ExtResource("25_c3ilw")
 
 [node name="ID" type="Label" parent="."]
 anchors_preset = 5

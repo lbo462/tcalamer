@@ -12,7 +12,7 @@ var id: int
 
 var _destination: PathFollow2D = null
 
-var _speed: float = randf_range(0.1, 0.2)# randf_range(0.0035, 0.0075) # 0.0075
+var _speed: float = randf_range(0.3, 0.5)# randf_range(0.0035, 0.0075) # 0.0075
 var _progress: float = 0
 var _start_point: Vector2
 var _dist_to_path: Vector2
@@ -42,26 +42,27 @@ func animate_player():
 	_current_position = position
 	
 	_delta_position = _current_position - _last_position
-	if _delta_position.x > _delta_position.y:
-		if _delta_position.x >= 0:
-			if _direction != DIRECTION.RIGHT:
-				_direction = DIRECTION.RIGHT
-				play("right_" + sex)
-		else:
-			if _direction != DIRECTION.LEFT:
-				_direction = DIRECTION.LEFT
-				play("left_" + sex)
-	elif _delta_position.x < _delta_position.y:
-		if _delta_position.y >= 0:
-			if _direction != DIRECTION.DOWN:
-				_direction = DIRECTION.DOWN
-				play("down_" + sex)
-		else:
-			if _direction != DIRECTION.UP:
-				_direction = DIRECTION.UP
-				play("up_" + sex)
+	if !_is_waiting:
+		if _delta_position.x >= _delta_position.y:
+			if _delta_position.x >= 0:
+				if _direction != DIRECTION.RIGHT:
+					_direction = DIRECTION.RIGHT
+					play("right_" + sex)
+			else:
+				if _direction != DIRECTION.LEFT:
+					_direction = DIRECTION.LEFT
+					play("left_" + sex)
+		elif _delta_position.x < _delta_position.y:
+			if _delta_position.y >= 0:
+				if _direction != DIRECTION.DOWN:
+					_direction = DIRECTION.DOWN
+					play("down_" + sex)
+			else:
+				if _direction != DIRECTION.UP:
+					_direction = DIRECTION.UP
+					play("up_" + sex)
 	else:
-		play(idle + sex)
+		play(_destination.get_parent().get_parent().destinations_idle_animations[_destination.get_parent().get_parent().destinations.find(_destination)] + sex)
 	
 	_last_position = _current_position
 

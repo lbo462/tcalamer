@@ -43,6 +43,31 @@ max_value = 30.0
 value = 5.0
 alignment = 1
 
+[node name="Iterations" type="GridContainer" parent="."]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+offset_left = 100.0
+offset_top = 150.0
+offset_right = 399.0
+offset_bottom = 181.0
+columns = 2
+metadata/_edit_group_ = true
+
+[node name="NbIterations" type="Label" parent="Iterations"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Nombre d'iterations : "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NbIterationsInput" type="SpinBox" parent="Iterations"]
+layout_mode = 2
+min_value = 10.0
+max_value = 1000.0
+step = 10.0
+value = 100.0
+alignment = 1
+
 [node name="Objects" type="GridContainer" parent="."]
 custom_minimum_size = Vector2(100, 20)
 layout_mode = 1
@@ -275,8 +300,10 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -75.0
-offset_right = 200.0
+offset_left = 10.0
+offset_top = -85.0
+offset_right = 210.0
+offset_bottom = -10.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 text = "Retour"
@@ -289,8 +316,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -100.0
-offset_top = -75.0
+offset_top = -85.0
 offset_right = 100.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
@@ -303,13 +331,18 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -75.0
+offset_left = -210.0
+offset_top = -85.0
+offset_right = -10.0
+offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 disabled = true
 text = "Simulation"
 
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="TrainButton" to="." method="_on_train_button_pressed"]
+[connection signal="pressed" from="SimulationButton" to="." method="_on_simulation_button_pressed"]

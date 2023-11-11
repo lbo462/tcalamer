@@ -64,6 +64,21 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Simulation"
 
+[node name="ButtonQuit" type="Button" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -60.0
+offset_right = 50.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "EXIT"
+
 [node name="Simulation" parent="." instance=ExtResource("1_fd2rt")]
 
 [node name="TrainingUI" parent="." instance=ExtResource("3_ndj38")]
@@ -72,5 +87,7 @@ text = "Simulation"
 [connection signal="pressed" from="MainMenu/ButtonTraining" to="TrainingUI" method="show_training_ui"]
 [connection signal="pressed" from="MainMenu/ButtonSimulation" to="." method="hide_main_menu"]
 [connection signal="pressed" from="MainMenu/ButtonSimulation" to="Simulation" method="show_simulation"]
+[connection signal="pressed" from="MainMenu/ButtonQuit" to="." method="_on_button_quit_pressed"]
 [connection signal="back" from="Simulation" to="." method="show_main_menu"]
+[connection signal="go_to_simulation" from="TrainingUI" to="Simulation" method="show_simulation"]
 [connection signal="training_back_button" from="TrainingUI" to="." method="show_main_menu"]
