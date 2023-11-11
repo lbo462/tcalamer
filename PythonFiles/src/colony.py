@@ -34,7 +34,8 @@ class Colony(BaseModel):
         amount_of_wood_per_player_to_leave: int,
         amount_of_water_per_player_to_leave: int,
         amount_of_food_per_player_to_leave: int,
-        initial_surviving_factor: int,
+        initial_food_surviving_factor: int,
+        initial_water_surviving_factor: int,
     ):
         self._world = world
         self._players: List[Player] = []
@@ -45,7 +46,8 @@ class Colony(BaseModel):
         self._food_amount = 0
 
         # This defines the amount of resources added per player in the colony
-        self._initial_surviving_factor = initial_surviving_factor
+        self._initial_food_surviving_factor = initial_food_surviving_factor
+        self._initial_water_surviving_factor = initial_water_surviving_factor
 
         # Define the amount of resources to leave
         self._amount_of_wood_to_leave = amount_of_wood_per_player_to_leave
@@ -114,23 +116,19 @@ class Colony(BaseModel):
 
     @property
     def wood_needs(self) -> int:
-        return self.wood_objective - self.water_level
+        return self.wood_objective - self.wood_amount
 
     @property
     def daily_fitness(self) -> float:
-        wood_distance = self.wood_needs
-        food_distance = self.food_needs
-        water_distance = self.water_needs
-
-        # Adapt distance to care about sign
-        wood_distance = wood_distance if wood_distance > 0 else 0.1
-        food_distance = food_distance if food_distance > 0 else 0.1
-        water_distance = water_distance if water_distance > 0 else 0.1
+        # Adapt needs to care about sign
+        wood_needs = self.wood_needs if self.wood_needs > 0 else 0
+        food_needs = self.food_needs if self.food_needs > 0 else 0
+        water_needs = self.water_needs if self.water_needs > 0 else 0
 
         return 100 * (
-            1 / math.exp(wood_distance)
-            + 1 / math.exp(food_distance)
-            + 1 / math.exp(water_distance)
+            1 / math.exp(wood_needs)
+            + 1 / math.exp(food_needs)
+            + 1 / math.exp(water_needs)
         )
 
     """
@@ -202,8 +200,8 @@ class Colony(BaseModel):
         self._players.append(player)
 
         # Add resources to live one day
-        self.add_water(self._initial_surviving_factor)
-        self.add_food(self._initial_surviving_factor)
+        self.add_water(self._initial_water_surviving_factor)
+        self.add_food(self._initial_food_surviving_factor)
 
     def get_random_alive_player(self) -> Player:
         return random.choice(self.alive_players)

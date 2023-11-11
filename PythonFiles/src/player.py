@@ -196,7 +196,7 @@ class Player(BaseModel):
 
     def make_random_daily_action(self) -> str:
         """Calls a random daily action"""
-        return random.choice(_daily_actions.actions).function()
+        return random.choice(_daily_actions.actions).function(self)
 
     def make_best_daily_action(self) -> int:
         """
