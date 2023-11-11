@@ -224,7 +224,7 @@ class Player(BaseModel):
     def summarize(self) -> PlayerSum:
         return PlayerSum(
             number=self._number,
-            alive=self._state is PlayerState.ALIVE,
+            alive=self._state in [PlayerState.ALIVE, PlayerState.ESCAPED],
             has_bucket=self.has_bucket,
             has_axe=self.has_axe,
             has_fishing_rod=self.has_fishing_rod,

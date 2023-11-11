@@ -94,11 +94,11 @@ class Colony(BaseModel):
 
     @property
     def water_objective(self) -> int:
-        return (self._amount_of_water_to_leave + 2) * len(self.alive_players)
+        return (self._amount_of_water_to_leave + 1) * len(self.alive_players)
 
     @property
     def food_objective(self) -> int:
-        return (self._amount_of_food_to_leave + 2) * len(self.alive_players)
+        return (self._amount_of_food_to_leave + 1) * len(self.alive_players)
 
     @property
     def wood_objective(self) -> int:

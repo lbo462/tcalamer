@@ -1,8 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://drqhvecp44h5f"]
+[gd_scene load_steps=16 format=3 uid="uid://drqhvecp44h5f"]
 
 [ext_resource type="Texture2D" uid="uid://he5ij0kxuvxt" path="res://images/basictiles.png" id="1_3yean"]
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_b1461"]
 [ext_resource type="Texture2D" uid="uid://dd2j4f6tc2mnv" path="res://images/things.png" id="2_0nuhj"]
+[ext_resource type="Texture2D" uid="uid://0305i42mcv3s" path="res://images/wreck.png" id="4_1ebgj"]
+[ext_resource type="Texture2D" uid="uid://coekm6nif004q" path="res://images/particules/fish_1.png" id="5_2sfp5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n0lxy"]
 texture = ExtResource("1_3yean")
@@ -208,6 +210,33 @@ texture = ExtResource("2_0nuhj")
 sources/0 = SubResource("TileSetAtlasSource_n0lxy")
 sources/1 = SubResource("TileSetAtlasSource_uxtwa")
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ft78c"]
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = true
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xqcwi"]
+emission_shape = 1
+emission_sphere_radius = 25.0
+particle_flag_disable_z = true
+direction = Vector3(100, -100, 0)
+spread = 20.0
+gravity = Vector3(0, 98, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+angular_velocity_min = -45.0
+angular_velocity_max = -45.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+linear_accel_min = 1.0
+linear_accel_max = 1.0
+angle_min = 10.0
+angle_max = 10.0
+scale_min = 0.5
+anim_offset_min = 1.0
+anim_offset_max = 1.0
+
 [sub_resource type="Curve2D" id="Curve2D_3rc73"]
 _data = {
 "points": PackedVector2Array(-27, -1, 27, 1, 257, 145, 1, -12.5, -1, 12.5, 285, 168, 9.25, -5.5, -9.25, 5.5, 271, 194, 3, 21.25, -3, -21.25, 231, 169, 0, 0, 0, 0, 257, 145)
@@ -216,31 +245,32 @@ point_count = 5
 
 [sub_resource type="Curve2D" id="Curve2D_ef3pr"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 268, 180, 0, 0, 0, 0, 308, 196, 0, 0, 0, 0, 329, 214, 0, 0, 0, 0, 331, 235, 0, 0, 0, 0, 346, 254)
+"points": PackedVector2Array(0, 0, 0, 0, 308, 196, 0, 0, 0, 0, 329, 214, 0, 0, 0, 0, 331, 235, 0, 0, 0, 0, 346, 254)
 }
-point_count = 5
+point_count = 4
 
 [sub_resource type="Curve2D" id="Curve2D_a30mb"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 286, 157, 0, 0, 0, 0, 313, 153, 0, 0, 0, 0, 334, 151, -7, 13, 7, -13, 351, 144, 0, 0, 0, 0, 332, 118, 0, 0, 0, 0, 326, 99, 0, 0, 0, 0, 324, 85, 0, 0, 0, 0, 333, 74, 0, 0, 0, 0, 347, 73)
+"points": PackedVector2Array(0, 0, 0, 0, 313, 153, -7, 13, 7, -13, 351, 144, 0, 0, 0, 0, 332, 118, 0, 0, 0, 0, 326, 99, 0, 0, 0, 0, 324, 85, 0, 0, 0, 0, 333, 74, 0, 0, 0, 0, 347, 73)
 }
-point_count = 9
+point_count = 7
 
 [sub_resource type="Curve2D" id="Curve2D_77vxy"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 230, 178, 0, 0, 0, 0, 212, 192, 0, 0, 0, 0, 216, 204, 0, 0, 0, 0, 215, 214, 0, 0, 0, 0, 201, 229, 0, 0, 0, 0, 189, 239, 0, 0, 0, 0, 171, 258, 0, 0, 0, 0, 146, 266, 0, 0, 0, 0, 132, 275, 0, 0, 0, 0, 117, 294)
+"points": PackedVector2Array(0, 0, 0, 0, 212, 192, 0, 0, 0, 0, 216, 204, 0, 0, 0, 0, 215, 214, 0, 0, 0, 0, 201, 229, 0, 0, 0, 0, 189, 239, 0, 0, 0, 0, 171, 258, 0, 0, 0, 0, 146, 266, 0, 0, 0, 0, 132, 275, 0, 0, 0, 0, 117, 294)
 }
-point_count = 10
+point_count = 9
 
 [sub_resource type="Curve2D" id="Curve2D_2xhka"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 229, 167, 0, 0, 0, 0, 229, 167, 0, 0, 0, 0, 194, 156, 0, 0, 0, 0, 175, 136, 0, 0, 0, 0, 145, 130, 0, 0, 0, 0, 134, 115)
+"points": PackedVector2Array(0, 0, 0, 0, 194, 156, 0, 0, 0, 0, 175, 136, 0, 0, 0, 0, 151, 126, 0, 0, 0, 0, 146, 104, 0, 0, 0, 0, 165, 76)
 }
-point_count = 6
+point_count = 5
 
 [node name="World" type="Node" node_paths=PackedStringArray("destinations")]
 script = ExtResource("1_b1461")
 destinations = [NodePath("WaterPath/WaterPathFollow"), NodePath("WoodPath/WoodPathFollow"), NodePath("FishPath/FishPathFollow"), NodePath("WreckPath/WreckPathFollow")]
+destinations_idle_animations = Array[String](["idle_right_", "idle_down_", "idle_down_", "idle_up_"])
 
 [node name="TileMap" type="TileMap" parent="."]
 texture_filter = 1
@@ -283,7 +313,7 @@ layer_5/modulate = Color(1, 1, 1, 1)
 layer_5/y_sort_enabled = false
 layer_5/y_sort_origin = 0
 layer_5/z_index = 4
-layer_5/tile_data = PackedInt32Array(1048597, 262144, 11, 1048598, 262144, 11, 1048599, 262144, 11, 1048600, 262144, 11, 1048601, 262144, 11, 1114136, 262144, 11, 1114135, 262144, 11, 1114134, 262144, 11, 1114137, 262144, 11, 1114133, 262144, 11, 1179669, 262144, 11, 1179670, 262144, 11, 1179671, 262144, 11, 1179672, 262144, 11, 1179673, 262144, 11, 1245206, 262144, 11, 1245207, 262144, 11, 1245208, 262144, 11, 1310742, 262144, 9, 1310743, 393216, 4, 1310744, 262144, 9, 1245209, 196608, 13, 1245210, 262144, 9, 1310741, 393216, 4, 1245205, 262144, 11, 1245204, 262144, 9, 1245203, 262144, 9, 1179668, 262144, 11, 1114132, 262144, 11, 1179674, 262144, 11, 1114138, 262144, 11, 1048602, 262144, 11, 1245202, 327680, 9, 1179667, 327680, 9, 1310738, 327680, 9, 1179666, 327680, 9, 1245198, 262144, 2, 1310735, 262144, 2, 1114129, 262144, 2, 983054, 262144, 2, 1114126, 262144, 2, 1114123, 262144, 2, 1179663, 262144, 2, 1310736, 262144, 2, 983060, 262144, 2, 851993, 262144, 2, 917522, 262144, 2, 851991, 262144, 2, 655381, 262144, 2, 851990, 262144, 2, 917529, 262144, 2, 655384, 262144, 2, 393238, 262144, 2, 458763, 262144, 2, 720904, 262144, 2, 524305, 262144, 2, 655377, 262144, 2, 786447, 262144, 2, 851982, 262144, 2, 589837, 262144, 2, 524308, 262144, 2, 917523, 262144, 2, 983058, 262144, 2, 720918, 262144, 2, 458766, 262144, 2, 589834, 262144, 2, 393226, 262144, 2, 655365, 262144, 2, 917507, 262144, 2, 983045, 262144, 2, 917513, 262144, 2, 1114122, 262144, 2, 327696, 262144, 2, 196627, 262144, 2)
+layer_5/tile_data = PackedInt32Array(1048598, 262144, 11, 1048599, 262144, 11, 1048600, 262144, 11, 1048601, 262144, 11, 1114136, 262144, 11, 1114135, 262144, 11, 1114134, 262144, 11, 1114137, 262144, 11, 1114133, 262144, 11, 1179669, 262144, 11, 1179670, 262144, 11, 1179671, 262144, 11, 1179672, 262144, 11, 1179673, 262144, 11, 1245206, 262144, 11, 1245207, 262144, 11, 1245208, 393216, 4, 1310742, 262144, 9, 1310743, 393216, 4, 1310744, 262144, 9, 1245209, 262144, 9, 1245210, 262144, 9, 1310741, 393216, 4, 1245205, 262144, 9, 1245204, 262144, 9, 1245203, 327680, 9, 1179668, 393216, 3, 1114132, 393216, 3, 1179674, 262144, 11, 1114138, 262144, 11, 1048602, 262144, 11, 1245202, 327680, 9, 1179667, 327680, 9, 1310738, 327680, 9, 1179666, 327680, 9, 1245198, 262144, 2, 1310735, 262144, 2, 1114129, 262144, 2, 983054, 262144, 2, 1114126, 262144, 2, 1114123, 262144, 2, 1179663, 262144, 2, 1310736, 262144, 2, 983060, 262144, 2, 851993, 262144, 2, 917522, 262144, 2, 851991, 262144, 2, 655381, 262144, 2, 851990, 262144, 2, 917529, 262144, 2, 655384, 262144, 2, 393238, 262144, 2, 458763, 262144, 2, 720904, 262144, 2, 524305, 262144, 2, 655377, 262144, 2, 786447, 262144, 2, 851982, 262144, 2, 589837, 262144, 2, 524308, 262144, 2, 917523, 262144, 2, 983058, 262144, 2, 720918, 262144, 2, 458766, 262144, 2, 589834, 262144, 2, 393226, 262144, 2, 655365, 262144, 2, 917507, 262144, 2, 983045, 262144, 2, 917513, 262144, 2, 1114122, 262144, 2, 327696, 262144, 2, 196627, 262144, 2, 1114131, 393216, 3)
 layer_6/name = "Island_Path"
 layer_6/enabled = true
 layer_6/modulate = Color(1, 1, 1, 1)
@@ -299,6 +329,27 @@ layer_7/y_sort_origin = 0
 layer_7/z_index = 6
 layer_7/tile_data = PackedInt32Array(655376, 524289, 0, 262166, 458752, 3, 655375, 196608, 3)
 
+[node name="Wreck" type="Sprite2D" parent="TileMap"]
+z_index = 20
+position = Vector2(160, 64)
+rotation = -0.349066
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("4_1ebgj")
+
+[node name="FishesParticules" type="GPUParticles2D" parent="TileMap"]
+z_index = 20
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_ft78c")
+position = Vector2(40, 330)
+amount = 5
+sub_emitter = NodePath(".")
+process_material = SubResource("ParticleProcessMaterial_xqcwi")
+texture = ExtResource("5_2sfp5")
+lifetime = 1.5
+preprocess = 1.0
+explosiveness = 0.25
+visibility_rect = Rect2(-50, -50, 100, 100)
+
 [node name="SpawnPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_3rc73")
 
@@ -310,25 +361,26 @@ rotation = 0.0370201
 curve = SubResource("Curve2D_ef3pr")
 
 [node name="WoodPathFollow" type="PathFollow2D" parent="WoodPath"]
-position = Vector2(268, 180)
-rotation = 0.380506
+position = Vector2(308, 196)
+rotation = 0.708626
 
 [node name="WaterPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_a30mb")
 
 [node name="WaterPathFollow" type="PathFollow2D" parent="WaterPath"]
-position = Vector2(286, 157)
-rotation = -0.147078
+position = Vector2(313, 153)
+rotation = -0.232557
 
 [node name="FishPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_77vxy")
 
 [node name="FishPathFollow" type="PathFollow2D" parent="FishPath"]
-position = Vector2(230, 178)
-rotation = 2.48055
+position = Vector2(212, 192)
+rotation = 1.24905
 
 [node name="WreckPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_2xhka")
 
 [node name="WreckPathFollow" type="PathFollow2D" parent="WreckPath"]
-position = Vector2(229.094, 167.03)
+position = Vector2(194, 156)
+rotation = -2.33056
