@@ -105,6 +105,7 @@ func move(delta):
 
 func go_to_point(dest):
 	await get_tree().create_timer(randf_range(0.1, 1.0)).timeout
+	_speed = randf_range(0.3, 0.5)
 	_destination = dest
 	_progress = 0
 	_destination.progress_ratio = _progress
