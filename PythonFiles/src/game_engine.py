@@ -31,7 +31,8 @@ class GameSum(PBaseModel):
 
 
 class GameEngineParams(PBaseModel):
-    number_of_players: int
+    number_of_players: int = 22
+    print_game: bool = False
     # Wreck
     wreck_probability: Optional[float] = 0.5
     bucket_amount: Optional[int] = 1
@@ -49,7 +50,8 @@ class GameEngineParams(PBaseModel):
     amount_of_wood_per_player_to_leave: Optional[int] = 5
     amount_of_water_per_player_to_leave: Optional[int] = 1
     amount_of_food_per_player_to_leave: Optional[int] = 1
-    initial_surviving_factor: Optional[int] = 2
+    initial_food_surviving_factor: Optional[int] = 2
+    initial_water_surviving_factor: Optional[int] = 2
     # Training options
     brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
     training: bool = False
@@ -64,6 +66,8 @@ class GameEngine:
     """
 
     def __init__(self, ge_params: GameEngineParams):
+        self._print_game = ge_params.print_game
+
         # Create wreck
         wreck = Wreck(ge_params.wreck_probability)
         wreck.add_item(Bucket, ge_params.bucket_amount)
@@ -89,7 +93,8 @@ class GameEngine:
             amount_of_wood_per_player_to_leave=ge_params.amount_of_wood_per_player_to_leave,
             amount_of_water_per_player_to_leave=ge_params.amount_of_water_per_player_to_leave,
             amount_of_food_per_player_to_leave=ge_params.amount_of_food_per_player_to_leave,
-            initial_surviving_factor=ge_params.initial_surviving_factor,
+            initial_food_surviving_factor=ge_params.initial_food_surviving_factor,
+            initial_water_surviving_factor=ge_params.initial_water_surviving_factor,
         )
 
         # Add players
@@ -123,12 +128,13 @@ class GameEngine:
         self._day += 1
         self._world.update()
 
-        print(
-            f"/ --- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
-            f"| World : {self._world}\n"
-            f"| Colony : {self.colony}\n"
-            f"\\ ---"
-        )
+        if self._print_game:
+            print(
+                f"/ --- DAWN OF DAY #{self._day} ({self._world.weather.name})\n"
+                f"| World : {self._world}\n"
+                f"| Colony : {self.colony}\n"
+                f"\\ ---"
+            )
 
         # First step : daily actions
         actions: List[PlayerAction] = []
@@ -140,7 +146,8 @@ class GameEngine:
                     action_id=action_id,
                 )
             )
-            print(f"{player} {_daily_actions.get_func(action_id).__name__}")
+            if self._print_game:
+                print(f"{player} {_daily_actions.get_func(action_id).__name__}")
 
         # Second step : Some must die
         if not self.colony.enough_resources:
@@ -150,7 +157,8 @@ class GameEngine:
             for i in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
                 player_to_die.die(self.current_day)
-                print(f"{player_to_die} died")
+                if self._print_game:
+                    print(f"{player_to_die} died")
 
         if not self._game_over:
             # Third step : Diner
@@ -160,7 +168,8 @@ class GameEngine:
             # Fourth step : Verify if there's enough resources to leave
             if self.colony.able_to_leave:
                 for player in self.colony.leave_isle():
-                    print(f"{player} leave !")
+                    if self._print_game:
+                        print(f"{player} leave !")
 
         return DaySum(
             day=self._day,
@@ -187,6 +196,8 @@ class GameEngine:
         while not self._game_over:
             day = self._update()
             days.append(day)
+
+        print(f"{'✔️' if self.colony.at_least_one_left_the_isle else '❌'}")
 
         return GameSum(
             initial_state=initial_state,

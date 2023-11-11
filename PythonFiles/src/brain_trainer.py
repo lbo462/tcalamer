@@ -19,10 +19,10 @@ class BrainTrainer:
     def __init__(
         self,
         ge_params: GameEngineParams,
-        learning_rate: float = 0.001,
-        discount_factor: float = 0.99,
-        greedy_epsilon: float = 0.1,
-        iter_amount: int = 1000,
+        learning_rate: float,
+        discount_factor: float,
+        greedy_epsilon: float,
+        iter_amount: int,
     ):
         # Learning parameters
         self._learning_rate = learning_rate
@@ -82,6 +82,8 @@ class BrainTrainer:
                         reward = 1000 / ge.current_day
                     total_reward += reward
 
+                    # print(f"{morning_inputs} -> {action_taken} = {reward}")
+
                     # Now, observe the result of the chosen action regarding the inputs
                     q_values = self._q_network(torch.Tensor(morning_inputs.to_list()))
                     next_q_values = self._q_network(
@@ -106,4 +108,6 @@ class BrainTrainer:
 
                 day_sum = ge.run_single()
 
-            print(f"{iteration}: {total_reward}")
+            print(
+                f"{iteration} {'✔️' if ge.colony.at_least_one_left_the_isle else '❌'} : {total_reward}"
+            )
