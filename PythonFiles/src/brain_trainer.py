@@ -28,7 +28,7 @@ class BrainTrainer:
         # Learning parameters
         self._learning_rate = learning_rate
         self._discount_factor = discount_factor
-        self._greedy_epsilon = greedy_epsilon
+        self._greedy_epsilon = 1#greedy_epsilon
         self._num_iterations = iter_amount
         self._max_win_streak = max_win_streak
 
@@ -51,6 +51,9 @@ class BrainTrainer:
 
     def choose_action(self, inputs: NNInputs) -> int:
         """Take the inputs to return an action ID though the greedy epsilon algorithm"""
+
+        if self._greedy_epsilon > 0.001:
+            self._greedy_epsilon -= 0.0001
 
         # Falls to random action thanks to greedy epsilon
         if random.random() < self._greedy_epsilon:
@@ -80,9 +83,9 @@ class BrainTrainer:
                     # Compute its reward
                     reward = player.nn_fitness_after_action
                     if player.state is PlayerState.DEAD:
-                        reward = -100
+                        reward = 0
                     elif player.state is PlayerState.ESCAPED:
-                        reward = 1000 / ge.current_day
+                        reward = (100000 * (len(ge.colony.alive_players) / len(ge.colony._players))) / ge.current_day
                     total_reward += reward
 
                     # print(f"{morning_inputs} -> {action_taken} = {reward}")
@@ -122,7 +125,7 @@ class BrainTrainer:
 
             print(
                 f"{iteration} "
-                f"{'✔️' if ge.colony.at_least_one_left_the_isle else '❌'} "
+                f"{'✔️ victory' if ge.colony.at_least_one_left_the_isle else '❌ defeat'} "
                 f"({win_streak}/{self._max_win_streak}) "
                 f": {total_reward}"
             )

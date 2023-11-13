@@ -108,13 +108,12 @@ class _QNetwork(nn.Module):
         super(_QNetwork, self).__init__()
 
         # Adds two fully-connected layers
-        self.fc1 = nn.Linear(input_size, 16)
-        self.fc2 = nn.Linear(16, output_size)
+        self.fc1 = nn.Linear(input_size, 28)
+        self.fc2 = nn.Linear(28, output_size)
 
     def forward(self, x):
-        x = self.fc1(x)
+        x = torch.relu(self.fc1(x))
         return self.fc2(x)
-
 
 class Brain:
     def __init__(self, nn_filename: str = None):

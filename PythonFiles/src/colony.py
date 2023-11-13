@@ -121,15 +121,15 @@ class Colony(BaseModel):
     @property
     def daily_fitness(self) -> float:
         # Adapt needs to care about sign
-        wood_needs = self.wood_needs if self.wood_needs > 0 else 0
-        food_needs = self.food_needs if self.food_needs > 0 else 0
-        water_needs = self.water_needs if self.water_needs > 0 else 0
+        wood_needs = self.wood_needs / self.wood_objective if self.wood_needs > -1 else -1
+        food_needs = self.food_needs / self.food_objective if self.food_needs > -1 else -1
+        water_needs = self.water_needs / self.water_objective if self.water_needs > -1 else -1
 
-        return 100 * (
-            1 / math.exp(wood_needs)
-            + 1 / math.exp(food_needs)
-            + 1 / math.exp(water_needs)
-        )
+        wood_needs = wood_needs / 2 + 0.5
+        food_needs = food_needs / 2 + 0.5
+        water_needs = water_needs / 2 + 0.5
+
+        return 1 * (math.exp(-wood_needs*3) + math.exp(-food_needs*3) + math.exp(-water_needs*3)) #+ self._world._wreck.number_of_times_fetched
 
     """
     The resources are protected attributes to force the use of the deposit methods
