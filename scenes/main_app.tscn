@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://bksh85gqn8ccw"]
+[gd_scene load_steps=5 format=3 uid="uid://bksh85gqn8ccw"]
 
 [ext_resource type="PackedScene" uid="uid://c4qifkwmg5ald" path="res://scenes/simulation.tscn" id="1_fd2rt"]
 [ext_resource type="Script" path="res://scripts/main_app.gd" id="1_o38ed"]
+[ext_resource type="Texture2D" uid="uid://cqpl3kplkes8n" path="res://images/EcranFinal.png" id="2_1q8cj"]
 [ext_resource type="PackedScene" uid="uid://cb8j18rqiw7v3" path="res://scenes/training_ui.tscn" id="3_ndj38"]
 
 [node name="App" type="Node"]
@@ -15,7 +16,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="TextureRect" type="TextureRect" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1q8cj")
+expand_mode = 1
+
 [node name="Background" type="Panel" parent="MainMenu"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,6 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="MainMenu"]
+visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -82,6 +95,7 @@ text = "EXIT"
 [node name="Simulation" parent="." instance=ExtResource("1_fd2rt")]
 
 [node name="TrainingUI" parent="." instance=ExtResource("3_ndj38")]
+visible = false
 
 [connection signal="pressed" from="MainMenu/ButtonTraining" to="." method="hide_main_menu"]
 [connection signal="pressed" from="MainMenu/ButtonTraining" to="TrainingUI" method="show_training_ui"]

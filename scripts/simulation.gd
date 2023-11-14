@@ -96,16 +96,15 @@ func new_simulation():
 	
 	$GameOverScreen.hide()
 	$WorldUI/StartButton.disabled = true
-	#var headers = ["Content-Type: application/json"]
-	#$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
-	_run_simulation()
+	var headers = ["Content-Type: application/json"]
+	$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
+	#_run_simulation()
 
 func _on_request_completed_brains(_result, response_code, _headers, _body):
 	if response_code == 200:
 		_run_simulation()
 	else:
 		$WorldUI/StartButton.disabled = false
-		print("no brains")
 
 func _run_simulation():
 	var json_as_text = FileAccess.get_file_as_string(json_path)
@@ -118,15 +117,11 @@ func _on_request_completed_game(_result, response_code, _headers, body):
 		_start_simulation(json)
 	else:
 		$WorldUI/StartButton.disabled = false
-		print("no game")
 
 func _start_simulation(json: Dictionary):
 	
 	#var json_as_text = FileAccess.get_file_as_string(game_json_path)
 	#var json_as_dict = JSON.parse_string(json_as_text)
-	
-	#sprint("start")
-	#print(json)
 	
 	var initial_state = json["initial_state"]
 	

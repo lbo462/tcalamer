@@ -65,7 +65,7 @@ layout_mode = 2
 min_value = 10.0
 max_value = 1000.0
 step = 10.0
-value = 100.0
+value = 500.0
 alignment = 1
 
 [node name="Objects" type="GridContainer" parent="."]
@@ -272,45 +272,43 @@ value = 10.0
 alignment = 1
 
 [node name="BackButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
+layout_mode = 2
 offset_left = 10.0
-offset_top = -85.0
+offset_top = 455.0
 offset_right = 210.0
-offset_bottom = -10.0
+offset_bottom = 530.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 text = "Retour"
 
 [node name="TrainButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -85.0
-offset_right = 100.0
-offset_bottom = -10.0
+layout_mode = 2
+offset_left = 260.0
+offset_top = 455.0
+offset_right = 460.0
+offset_bottom = 530.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 text = "Entrainer"
 
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 500.0
+offset_top = 455.0
+offset_right = 700.0
+offset_bottom = 530.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+text = "Sauvegarder"
+
 [node name="SimulationButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -210.0
-offset_top = -85.0
-offset_right = -10.0
-offset_bottom = -10.0
+layout_mode = 2
+offset_left = 750.0
+offset_top = 455.0
+offset_right = 950.0
+offset_bottom = 530.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 30
@@ -321,4 +319,5 @@ text = "Simulation"
 
 [connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="TrainButton" to="." method="_on_train_button_pressed"]
+[connection signal="pressed" from="SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="SimulationButton" to="." method="_on_simulation_button_pressed"]

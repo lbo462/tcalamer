@@ -6,8 +6,6 @@ signal go_to_simulation
 var DIR = OS.get_executable_path().get_base_dir()
 var json_path = DIR.path_join("DATA/data.json")
 
-var game_data: Dictionary
-
 func _ready():
 	hide_training_ui()
 	
@@ -38,8 +36,11 @@ func _on_simulation_button_pressed():
 	hide_training_ui()
 	go_to_simulation.emit()
 
-func train():
-	game_data = {
+func _on_save_button_pressed():
+	_save_data(_get_game_data())
+
+func _get_game_data():
+	return {
 		"number_of_players": get_node("Players/NbPlayersInput").value,
 		"wreck_probability": get_node("Objects/ProbabiliyValue").value,
 		"bucket_amount": get_node("Objects/BucketNumber").value,
@@ -54,28 +55,24 @@ func train():
 		"initial_water_surviving_factor": get_node("Ressources/S_WaterNumber").value,
 		"initial_food_surviving_factor": get_node("Ressources/S_FoodNumber").value
 	}
+
+func train():
+	var game_data = _get_game_data()
 	var training_data = {
 		"ge_params": game_data,
 		"iter_amount": get_node("Iterations/NbIterationsInput").value
 	}
 	
-	#DirAccess.remove_absolute(pth_path)
-	#OS.execute(interpreter_path, [script_path, JSON.stringify(training_data)])
-	#_save_data()
+	_save_data(game_data)
+	
 	var headers = ["Content-Type: application/json"]
 	$HTTPRequest.request_completed.connect(_on_request_completed)
 	$HTTPRequest.request("http://localhost:8000/train", headers, HTTPClient.METHOD_POST, JSON.stringify(training_data))
 
-func _on_request_completed(_result, response_code, _headers, _body):
-	if response_code == 200:
-		# var json = JSON.parse_string(body.get_string_from_utf8())
-		_save_data()
-		_activate_buttons()
-	else:
-		_activate_buttons()
-		print("not ok")
+func _on_request_completed(_result, _response_code, _headers, _body):
+	_activate_buttons()
 
-func _save_data():
+func _save_data(game_data: Dictionary):
 	var file = FileAccess.open(json_path, FileAccess.WRITE)
 	file.store_line(JSON.stringify(game_data))
 
@@ -83,8 +80,10 @@ func _disable_buttons():
 	$BackButton.disabled = true
 	$TrainButton.disabled = true
 	$SimulationButton.disabled = true
+	$SaveButton.disabled = true
 
 func _activate_buttons():
 	$BackButton.disabled = false
 	$TrainButton.disabled = false
 	$SimulationButton.disabled = false
+	$SaveButton.disabled = false
