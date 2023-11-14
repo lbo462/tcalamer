@@ -94,17 +94,20 @@ class NNInputs:
     def __str__(self):
         # return f"{', '.join([str(i) for i in self.to_list()])}"
         return (
-            f"{self.weather.name} "
+            f"{'☀️' if self.weather is Weather.BLUE_SKY else ''}"
+            f"{'☁️' if self.weather is Weather.CLOUDY else ''}"
+            f"{'🌧️' if self.weather is Weather.RAINING else ''}"
+            f"{'🌩️' if self.weather is Weather.STORM else ''}"
             f"({self.food_dist:.2f}🐟"
             f" {self.water_dist:.2f}💧"
             f" {self.wood_dist:.2f}🌳"
             f" {self.wreck_interest:.2f}🚤)"
-            f"({'🔨' if self.player_axe else ''}"
-            f"{'🥛' if self.player_bucket else ''}"
-            f"{'🎣' if self.player_fishing_rod else ''})"
             f"({self.colony_axes:.2f}🔨"
             f" {self.colony_buckets:.2f}🥛"
             f" {self.colony_fishing_rods:.2f}🎣)"
+            f"({'🔨' if self.player_axe else ''}"
+            f"{'🥛' if self.player_bucket else ''}"
+            f"{'🎣' if self.player_fishing_rod else ''})"
         )
 
 

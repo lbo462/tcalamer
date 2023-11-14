@@ -78,28 +78,23 @@ class Player(BaseModel):
     def fitness(self) -> float:
         colony = self._colony
 
-        # Adapt needs to care about sign
-        wood_needs = (
-            colony.wood_needs / colony.wood_objective if colony.wood_needs > -1 else -1
-        )
-        food_needs = (
-            colony.food_needs / colony.food_objective if colony.food_needs > -1 else -1
-        )
-        water_needs = (
-            colony.water_needs / colony.water_objective
-            if colony.water_needs > -1
-            else -1
-        )
+        wood_needs = colony.wood_needs / colony.wood_objective
+        if wood_needs < 0:
+            wood_needs = 0
 
-        wood_needs = wood_needs / 2 + 0.5
-        food_needs = food_needs / 2 + 0.5
-        water_needs = water_needs / 2 + 0.5
+        food_needs = colony.food_needs / colony.food_objective
+        if food_needs < 0:
+            food_needs = 0
 
-        return 1 * (
-            math.exp(-wood_needs * 3)
-            + math.exp(-food_needs * 3)
-            + math.exp(-water_needs * 3)
-            + math.exp(0.1 * len(self._inventory))
+        water_needs = colony.water_needs / colony.water_objective
+        if water_needs < 0:
+            water_needs = 0
+
+        return 1 / (
+            math.exp(wood_needs)
+            + math.exp(food_needs)
+            + math.exp(water_needs)
+            + math.exp(-len(self._inventory))
         )
 
     @property

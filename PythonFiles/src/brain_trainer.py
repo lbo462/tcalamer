@@ -70,7 +70,9 @@ class BrainTrainer:
 
             day_sum = ge.run_single()
             while day_sum is not None:
-                for player in [p for p in ge.colony._players if p.nn_action_taken]:
+                for player in [
+                    p for p in ge.colony._players if p.nn_action_taken is not None
+                ]:
                     # Take a look of the vision before and after the action
                     morning_inputs = player.nn_vision_before_action
                     night_inputs = player.nn_vision_after_action
@@ -83,12 +85,13 @@ class BrainTrainer:
                         reward = 0
                         player.nn_action_taken = None
                     elif player.state is PlayerState.ESCAPED:
-                        reward = 10
+                        reward = 100
                         player.nn_action_taken = None
                     total_reward += reward
 
                     print(
-                        f"{player.number} {morning_inputs} : {player.nn_fitness_before_action:.5f} "
+                        f"Day #{ge.current_day} n°{player.number} "
+                        f"{morning_inputs} : {player.nn_fitness_before_action:.5f} "
                         f"-> {_daily_actions.get_func(action_taken).__name__} = {reward:.5f}"
                     )
 
