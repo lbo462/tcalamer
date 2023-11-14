@@ -50,8 +50,8 @@ class GameEngineParams(PBaseModel):
     amount_of_wood_per_player_to_leave: Optional[int] = 5
     amount_of_water_per_player_to_leave: Optional[int] = 1
     amount_of_food_per_player_to_leave: Optional[int] = 1
-    initial_food_surviving_factor: Optional[int] = 2
-    initial_water_surviving_factor: Optional[int] = 2
+    initial_food_surviving_factor: Optional[int] = 1
+    initial_water_surviving_factor: Optional[int] = 1
     # Training options
     brain_location: Optional[FilePath] = "brains/trained_q_network.pth"
     training: bool = False
@@ -197,7 +197,9 @@ class GameEngine:
             day = self._update()
             days.append(day)
 
-        print(f"{'✔️' if self.colony.at_least_one_left_the_isle else '❌'} ({self.current_day} days)")
+        print(
+            f"{'✔️ victory' if self.colony.at_least_one_left_the_isle else '❌ defeat'} ({self.current_day} days)"
+        )
 
         return GameSum(
             initial_state=initial_state,

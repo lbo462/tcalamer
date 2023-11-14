@@ -64,6 +64,15 @@ class Colony(BaseModel):
         ]
 
     @property
+    def escaped_players(self) -> List[Player]:
+        """Returns the list of escaped players"""
+        return [
+            player
+            for player in self._players
+            if player.state in [PlayerState.ALIVE, PlayerState.ESCAPED]
+        ]
+
+    @property
     def at_least_one_left_the_isle(self) -> bool:
         for player in self._players:
             if player.state is PlayerState.ESCAPED:
@@ -117,19 +126,6 @@ class Colony(BaseModel):
     @property
     def wood_needs(self) -> int:
         return self.wood_objective - self.wood_amount
-
-    @property
-    def daily_fitness(self) -> float:
-        # Adapt needs to care about sign
-        wood_needs = self.wood_needs if self.wood_needs > 0 else 0
-        food_needs = self.food_needs if self.food_needs > 0 else 0
-        water_needs = self.water_needs if self.water_needs > 0 else 0
-
-        return 100 * (
-            1 / math.exp(wood_needs)
-            + 1 / math.exp(food_needs)
-            + 1 / math.exp(water_needs)
-        )
 
     """
     The resources are protected attributes to force the use of the deposit methods

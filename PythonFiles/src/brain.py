@@ -20,10 +20,7 @@ amount_of_outputs = 4
 class NNInputs:
     """Modelization of the inputs for the neural network"""
 
-    blue_sky: bool
-    cloudy_sky: bool
-    raining_sky: bool
-    stromy_sky: bool
+    weather: Weather
 
     wood_dist: float
     water_dist: float
@@ -49,23 +46,20 @@ class NNInputs:
             return min(max(value, min_value), max_value)
 
         def distance(needs: int, objective: int) -> float:
-            return math.exp(-4 * _clamp(needs / objective, 0, 1))
+            return 1 - math.exp(-4 * _clamp(needs / objective, 0, 1))
 
         colony_axes = len(
             [p for p in colony.alive_players if p.has_axe and p is not player]
-        )
+        ) / len(colony.alive_players)
         colony_buckets = len(
             [p for p in colony.alive_players if p.has_bucket and p is not player]
-        )
+        ) / len(colony.alive_players)
         colony_fishing_rods = len(
             [p for p in colony.alive_players if p.has_fishing_rod and p is not player]
-        )
+        ) / len(colony.alive_players)
 
         return cls(
-            blue_sky=world.weather is Weather.BLUE_SKY,
-            cloudy_sky=world.weather is Weather.CLOUDY,
-            raining_sky=world.weather is Weather.RAINING,
-            stromy_sky=world.weather is Weather.STORM,
+            weather=world.weather,
             food_dist=distance(colony.food_needs, colony.food_objective),
             water_dist=distance(colony.water_needs, colony.water_objective),
             wood_dist=distance(colony.wood_needs, colony.wood_objective),
@@ -81,10 +75,10 @@ class NNInputs:
     def to_list(self) -> List[float]:
         """Returns a formatted list of inputs to be consumed by the neural network"""
         return [
-            1 if self.blue_sky else 0,
-            1 if self.cloudy_sky else 0,
-            1 if self.raining_sky else 0,
-            1 if self.stromy_sky else 0,
+            self.weather is Weather.BLUE_SKY,
+            self.weather is Weather.CLOUDY,
+            self.weather is Weather.RAINING,
+            self.weather is Weather.STORM,
             self.food_dist,
             self.water_dist,
             self.wood_dist,
@@ -98,7 +92,23 @@ class NNInputs:
         ]
 
     def __str__(self):
-        return f"{', '.join([str(i) for i in self.to_list()])}"
+        # return f"{', '.join([str(i) for i in self.to_list()])}"
+        return (
+            f"{'☀️' if self.weather is Weather.BLUE_SKY else ''}"
+            f"{'☁️' if self.weather is Weather.CLOUDY else ''}"
+            f"{'🌧️' if self.weather is Weather.RAINING else ''}"
+            f"{'🌩️' if self.weather is Weather.STORM else ''}"
+            f"({self.food_dist:.2f}🐟"
+            f" {self.water_dist:.2f}💧"
+            f" {self.wood_dist:.2f}🌳"
+            f" {self.wreck_interest:.2f}🚤)"
+            f"({self.colony_axes:.2f}🔨"
+            f" {self.colony_buckets:.2f}🥛"
+            f" {self.colony_fishing_rods:.2f}🎣)"
+            f"({'🔨' if self.player_axe else ''}"
+            f"{'🥛' if self.player_bucket else ''}"
+            f"{'🎣' if self.player_fishing_rod else ''})"
+        )
 
 
 class _QNetwork(nn.Module):
@@ -108,11 +118,11 @@ class _QNetwork(nn.Module):
         super(_QNetwork, self).__init__()
 
         # Adds two fully-connected layers
-        self.fc1 = nn.Linear(input_size, 16)
-        self.fc2 = nn.Linear(16, output_size)
+        self.fc1 = nn.Linear(input_size, 28)
+        self.fc2 = nn.Linear(28, output_size)
 
     def forward(self, x):
-        x = self.fc1(x)
+        x = torch.relu(self.fc1(x))
         return self.fc2(x)
 
 

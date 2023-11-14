@@ -1,4 +1,5 @@
 import random
+import math
 from typing import List, Callable, Type, Optional
 from enum import IntEnum
 from pydantic import BaseModel as PBaseModel, FilePath
@@ -72,6 +73,29 @@ class Player(BaseModel):
     @property
     def number(self) -> int:
         return self._number
+
+    @property
+    def fitness(self) -> float:
+        colony = self._colony
+
+        wood_needs = colony.wood_needs / colony.wood_objective
+        if wood_needs < 0:
+            wood_needs = 0
+
+        food_needs = colony.food_needs / colony.food_objective
+        if food_needs < 0:
+            food_needs = 0
+
+        water_needs = colony.water_needs / colony.water_objective
+        if water_needs < 0:
+            water_needs = 0
+
+        return 100 / (
+            math.exp(wood_needs)
+            + math.exp(food_needs)
+            + math.exp(water_needs)
+            + math.exp(-len(self._inventory))
+        )
 
     @property
     def state(self) -> PlayerState:
@@ -207,7 +231,7 @@ class Player(BaseModel):
         """
         inputs = self.get_current_vision()
         self.nn_vision_before_action = inputs
-        self.nn_fitness_before_action = self._colony.daily_fitness
+        self.nn_fitness_before_action = self.fitness
 
         if self._training_enable:
             action_id = self._trainer.choose_action(inputs)
@@ -218,7 +242,7 @@ class Player(BaseModel):
         self._make_daily_action(action_id)
 
         self.nn_vision_after_action = self.get_current_vision()
-        self.nn_fitness_after_action = self._colony.daily_fitness
+        self.nn_fitness_after_action = self.fitness
         return action_id
 
     def summarize(self) -> PlayerSum:
