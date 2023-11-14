@@ -88,13 +88,13 @@ class BrainTrainer:
                         reward = 100
                         player.nn_action_taken = None
                     total_reward += reward
-
+                    """
                     print(
                         f"Day #{ge.current_day} n°{player.number} "
                         f"{morning_inputs} : {player.nn_fitness_before_action:.5f} "
                         f"-> {_daily_actions.get_func(action_taken).__name__} = {reward:.5f}"
                     )
-
+                    """
                     # Now, observe the result of the chosen action regarding the inputs
                     q_values = self._q_network(torch.Tensor(morning_inputs.to_list()))
                     next_q_values = self._q_network(

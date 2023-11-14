@@ -90,7 +90,7 @@ class Player(BaseModel):
         if water_needs < 0:
             water_needs = 0
 
-        return 1 / (
+        return 100 / (
             math.exp(wood_needs)
             + math.exp(food_needs)
             + math.exp(water_needs)
