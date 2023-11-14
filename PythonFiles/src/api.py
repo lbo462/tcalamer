@@ -48,7 +48,7 @@ def train_brain(
     learning_rate: float = Body(0.001),
     discount_factor: float = Body(0.99),
     greedy_epsilon: float = Body(0.1),
-    iter_amount: int = Body(10000),
+    iter_amount: int = Body(100),
     max_win_streak: int = Body(100),
 ) -> FilePath:
     """

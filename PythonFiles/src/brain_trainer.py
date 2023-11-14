@@ -11,7 +11,7 @@ from torch import nn, optim
 from typing import Dict
 
 from .game_engine import GameEngine, GameEngineParams
-from .player import PlayerState
+from .player import PlayerState, _daily_actions
 from .brain import _QNetwork, NNInputs, amount_of_inputs, amount_of_outputs
 
 
@@ -28,7 +28,7 @@ class BrainTrainer:
         # Learning parameters
         self._learning_rate = learning_rate
         self._discount_factor = discount_factor
-        self._greedy_epsilon = 1#greedy_epsilon
+        self._greedy_epsilon = greedy_epsilon
         self._num_iterations = iter_amount
         self._max_win_streak = max_win_streak
 
@@ -52,9 +52,6 @@ class BrainTrainer:
     def choose_action(self, inputs: NNInputs) -> int:
         """Take the inputs to return an action ID though the greedy epsilon algorithm"""
 
-        if self._greedy_epsilon > 0.001:
-            self._greedy_epsilon -= 0.0001
-
         # Falls to random action thanks to greedy epsilon
         if random.random() < self._greedy_epsilon:
             return random.randint(0, amount_of_outputs - 1)
@@ -73,7 +70,7 @@ class BrainTrainer:
 
             day_sum = ge.run_single()
             while day_sum is not None:
-                for player in ge.colony.alive_players:
+                for player in [p for p in ge.colony._players if p.nn_action_taken]:
                     # Take a look of the vision before and after the action
                     morning_inputs = player.nn_vision_before_action
                     night_inputs = player.nn_vision_after_action
@@ -84,11 +81,16 @@ class BrainTrainer:
                     reward = player.nn_fitness_after_action
                     if player.state is PlayerState.DEAD:
                         reward = 0
+                        player.nn_action_taken = None
                     elif player.state is PlayerState.ESCAPED:
-                        reward = (100000 * (len(ge.colony.alive_players) / len(ge.colony._players))) / ge.current_day
+                        reward = 10
+                        player.nn_action_taken = None
                     total_reward += reward
 
-                    # print(f"{morning_inputs} -> {action_taken} = {reward}")
+                    print(
+                        f"{player.number} {morning_inputs} : {player.nn_fitness_before_action:.5f} "
+                        f"-> {_daily_actions.get_func(action_taken).__name__} = {reward:.5f}"
+                    )
 
                     # Now, observe the result of the chosen action regarding the inputs
                     q_values = self._q_network(torch.Tensor(morning_inputs.to_list()))
@@ -124,8 +126,8 @@ class BrainTrainer:
                 break
 
             print(
-                f"{iteration} "
-                f"{'✔️ victory' if ge.colony.at_least_one_left_the_isle else '❌ defeat'} "
+                f"{1+iteration}/{self._num_iterations} "
+                f"{'✔️' if ge.colony.at_least_one_left_the_isle else '❌'} "
                 f"({win_streak}/{self._max_win_streak}) "
-                f": {total_reward}"
+                f"{total_reward/(ge.current_day * len(ge.colony._players))}"
             )
