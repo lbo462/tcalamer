@@ -1,0 +1,107 @@
+[gd_scene load_steps=5 format=3 uid="uid://bksh85gqn8ccw"]
+
+[ext_resource type="PackedScene" uid="uid://c4qifkwmg5ald" path="res://scenes/simulation.tscn" id="1_fd2rt"]
+[ext_resource type="Script" path="res://scripts/main_app.gd" id="1_o38ed"]
+[ext_resource type="Texture2D" uid="uid://cqpl3kplkes8n" path="res://images/EcranFinal.png" id="2_1q8cj"]
+[ext_resource type="PackedScene" uid="uid://cb8j18rqiw7v3" path="res://scenes/training_ui.tscn" id="3_ndj38"]
+
+[node name="App" type="Node"]
+script = ExtResource("1_o38ed")
+
+[node name="MainMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1q8cj")
+expand_mode = 1
+
+[node name="Background" type="Panel" parent="MainMenu"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MainMenu"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 100
+text = "Projet TIP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonTraining" type="Button" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -70.0
+offset_right = 100.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Entrainement"
+
+[node name="ButtonSimulation" type="Button" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 80.0
+offset_right = 100.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Simulation"
+
+[node name="ButtonQuit" type="Button" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -60.0
+offset_right = 50.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "EXIT"
+
+[node name="Simulation" parent="." instance=ExtResource("1_fd2rt")]
+
+[node name="TrainingUI" parent="." instance=ExtResource("3_ndj38")]
+visible = false
+
+[connection signal="pressed" from="MainMenu/ButtonTraining" to="." method="hide_main_menu"]
+[connection signal="pressed" from="MainMenu/ButtonTraining" to="TrainingUI" method="show_training_ui"]
+[connection signal="pressed" from="MainMenu/ButtonSimulation" to="." method="hide_main_menu"]
+[connection signal="pressed" from="MainMenu/ButtonSimulation" to="Simulation" method="show_simulation"]
+[connection signal="pressed" from="MainMenu/ButtonQuit" to="." method="_on_button_quit_pressed"]
+[connection signal="back" from="Simulation" to="." method="show_main_menu"]
+[connection signal="go_to_simulation" from="TrainingUI" to="Simulation" method="show_simulation"]
+[connection signal="training_back_button" from="TrainingUI" to="." method="show_main_menu"]
