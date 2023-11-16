@@ -15,6 +15,9 @@ var game_json_path = DIR.path_join("DATA/Game/game.json")
 @export var woman_sprite: Texture2D
 @export var dead_sprite: Texture2D
 
+@export_group("Climate")
+@export var climates: Array[Texture2D]
+
 var our_class: Array[Classmate] = [
 	Classmate.new("Ines", false), 
 	Classmate.new("Kowsi", true), 
@@ -71,6 +74,7 @@ func show_simulation():
 	$Background.show()
 	$World/TileMap.visible = true
 	$WorldUI.show()
+	$Climate.show()
 	$GameOverScreen.hide()
 	
 func hide_simulation():
@@ -79,6 +83,7 @@ func hide_simulation():
 	$Background.hide()
 	$World/TileMap.visible = false
 	$WorldUI.hide()
+	$Climate.hide()
 	$GameOverScreen.hide()
 	back.emit()
 
@@ -268,6 +273,7 @@ func _update_ui(world, colony, day):
 			
 	$WorldUI/Day/CurrentDay.text = str(day)
 	$WorldUI/Climate/CurrentClimate.text = weather
+	$Climate.texture = climates[int(world["weather"])]
 	$WorldUI/Ressources/W_Water.text = str(world["water"])
 	$WorldUI/Ressources/W_Food.text = str(world["food"])
 	$WorldUI/Ressources/W_Wood.text = str(world["wood"])

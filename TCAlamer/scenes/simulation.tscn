@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c4qifkwmg5ald"]
+[gd_scene load_steps=14 format=3 uid="uid://c4qifkwmg5ald"]
 
 [ext_resource type="Script" path="res://scripts/simulation.gd" id="1_lm63p"]
 [ext_resource type="PackedScene" uid="uid://b4f4xsvtubtdu" path="res://scenes/player.tscn" id="2_cdr1c"]
@@ -9,6 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://clei3idjfq7p7" path="res://scenes/world_ui.tscn" id="5_vw3bp"]
 [ext_resource type="Texture2D" uid="uid://deu1gmdk2ou4e" path="res://images/skeleton.png" id="6_j78na"]
 [ext_resource type="PackedScene" uid="uid://drqhvecp44h5f" path="res://scenes/world.tscn" id="6_oo6ox"]
+[ext_resource type="Texture2D" uid="uid://dfldwfoe4e87t" path="res://images/nuageux.png" id="8_qxr8q"]
+[ext_resource type="Texture2D" uid="uid://cwb8pb51oviee" path="res://images/pluvieux.png" id="9_0ffcx"]
+[ext_resource type="Texture2D" uid="uid://knnksvxbed5j" path="res://images/sun.png" id="10_rw0rr"]
+[ext_resource type="Texture2D" uid="uid://o4701ftjrxl7" path="res://images/stromy.png" id="10_xn8v3"]
 
 [node name="Simulation" type="Node"]
 script = ExtResource("1_lm63p")
@@ -17,6 +21,7 @@ playerInfos = ExtResource("3_0q2us")
 man_sprite = ExtResource("4_xgri8")
 woman_sprite = ExtResource("5_vf24r")
 dead_sprite = ExtResource("6_j78na")
+climates = Array[Texture2D]([ExtResource("10_rw0rr"), ExtResource("8_qxr8q"), ExtResource("9_0ffcx"), ExtResource("10_xn8v3")])
 
 [node name="Background" type="Panel" parent="."]
 anchors_preset = 15
@@ -42,7 +47,16 @@ theme_override_constants/v_separation = 30
 
 [node name="World" parent="." instance=ExtResource("6_oo6ox")]
 
+[node name="Climate" type="TextureRect" parent="."]
+z_index = 4090
+offset_right = 75.0
+offset_bottom = 75.0
+texture = ExtResource("10_rw0rr")
+expand_mode = 1
+stretch_mode = 4
+
 [node name="GameOverScreen" type="Panel" parent="."]
+visible = false
 z_index = 4096
 offset_right = 480.0
 offset_bottom = 384.0
