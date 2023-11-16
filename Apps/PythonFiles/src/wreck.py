@@ -66,11 +66,11 @@ class Wreck(BaseModel):
     def add_item(self, item_class: Type[T], quantity: int):
         self._item_sets.append(_ItemSet(item_class, quantity))
 
-    def _amount(self, item_class: Type[T]) -> bool:
+    def _amount(self, item_class: Type[T]) -> int:
         for item_set in self._item_sets:
             if item_set.item_class is item_class:
-                return True
-        return False
+                return item_set.quantity
+        return 0
 
     def search(self, player: Player) -> Union[None, T]:
         """Search the wreck

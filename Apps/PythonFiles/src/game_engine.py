@@ -154,7 +154,7 @@ class GameEngine:
             limiting_factor = self.colony.limiting_factor
             amount_of_players_to_die = len(self.colony.alive_players) - limiting_factor
 
-            for i in range(0, amount_of_players_to_die):
+            for _ in range(0, amount_of_players_to_die):
                 player_to_die = self.colony.get_random_alive_player()
                 player_to_die.die(self.current_day)
                 if self._print_game:
