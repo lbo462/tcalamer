@@ -96,6 +96,7 @@ func new_simulation():
 	
 	$GameOverScreen.hide()
 	$WorldUI/StartButton.disabled = true
+	$WorldUI/BackButton.disabled = true
 	var headers = ["Content-Type: application/json"]
 	$HTTPRequestBrain.request("http://localhost:8000/check-brain", headers, HTTPClient.METHOD_GET)
 	#_run_simulation()
@@ -105,6 +106,7 @@ func _on_request_completed_brains(_result, response_code, _headers, _body):
 		_run_simulation()
 	else:
 		$WorldUI/StartButton.disabled = false
+		$WorldUI/BackButton.disabled = false
 
 func _run_simulation():
 	var json_as_text = FileAccess.get_file_as_string(json_path)
@@ -117,6 +119,8 @@ func _on_request_completed_game(_result, response_code, _headers, body):
 		_start_simulation(json)
 	else:
 		$WorldUI/StartButton.disabled = false
+	
+	$WorldUI/BackButton.disabled = false
 
 func _start_simulation(json: Dictionary):
 	

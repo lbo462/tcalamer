@@ -39,7 +39,7 @@ vertical_alignment = 1
 [node name="NbPlayersInput" type="SpinBox" parent="Players"]
 layout_mode = 2
 min_value = 1.0
-max_value = 30.0
+max_value = 300.0
 value = 5.0
 alignment = 1
 
