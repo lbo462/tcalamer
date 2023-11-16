@@ -43,7 +43,7 @@ theme_override_constants/v_separation = 30
 [node name="World" parent="." instance=ExtResource("6_oo6ox")]
 
 [node name="GameOverScreen" type="Panel" parent="."]
-z_index = 30
+z_index = 4096
 offset_right = 480.0
 offset_bottom = 384.0
 
