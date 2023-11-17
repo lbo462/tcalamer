@@ -1,10 +1,2 @@
-# Godot 4+ specific ignores
-.godot/
-
-# IDE
 .idea/
-.vscode/
-.fleet/
-
-# Scrapy stuff
-.scrapy/
+.godot/
